@@ -1,0 +1,27 @@
+{
+  "profile": {
+    "name": "哆哆啦",
+    "email": "dodolalorc@gmail.com",
+    "mobile": "17543809322",
+    "github": "https://github.com/dodolalorc",
+    "blog": "",
+    "zhihu": "",
+    "xiaoHongShu": "",
+    "workExpYear": ""
+  },
+  "education": [
+    {
+      "school": "东北师范大学",
+      "degree": "本科",
+      "major": "计算机科学与技术",
+      "edu_time": ["2022.09", "2026.06"]
+    }
+  ],
+  "awards": [
+    {
+      "title": "优秀学生奖",
+      "date": "2023-06",
+      "issuer": "东北师范大学"
+    }
+  ]
+}
