@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import type { ResumeConfig } from "@/types/resumeConfig";
-import profileCard from "@/components/profile-card.vue";
+import ViewLayout from "@/layout/view-layout.vue";
+import type { ResumeConfig, Profile } from "@/types/resumeConfig";
+import profileCard from "./components/profile-card.vue";
 
 const config = ref<Partial<ResumeConfig>>({});
-const profile = ref({});
+const profile = ref<Profile>({});
+
 onMounted(async () => {
   try {
     const response = await fetch("/cv.json");
@@ -18,8 +20,20 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-    <h1>{{ config }}</h1>
-    <profile-card :profile="profile" />
-  </div>
+  <ViewLayout>
+    <div class="resume-shell">
+      <!-- 个人基本信息 -->
+      <profile-card v-model:profile="profile" />
+    </div>
+  </ViewLayout>
 </template>
+
+<style scoped>
+.resume-shell {
+  width: 1200px;
+  height: fit-content;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+</style>

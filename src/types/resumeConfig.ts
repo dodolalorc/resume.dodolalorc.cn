@@ -4,11 +4,27 @@ export interface avatarConfig {
   size?: number // 照片大小(px)
 }
 
+export interface jobIntention {
+  position?: string // 意向职位
+  city?: string // 意向城市
+  salary?: string // 期望薪资
+}
+
+export type prependType = 'icon' | 'text' | 'both' | 'none' // 基本信息的前置内容
+
 export interface Profile {
   name?: string // 姓名
   avatar?: avatarConfig // 照片
+  prepend?: prependType // 基本信息的前置内容
   email?: string // 邮箱
   phone?: string // 电话
+  github?: string // GitHub 链接
+  blog?: string // 个人博客链接
+  zhihu?: string // 知乎链接
+  xiaohongshu?: string // 小红书链接
+  wechat?: string // 微信链接
+  workExpYear?: string // 工作经验年限
+  jobIntention?: jobIntention
 }
 
 export interface ExperienceConfig {

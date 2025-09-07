@@ -1,0 +1,18 @@
+{
+  "profile": {
+    "name": "姓名",
+    "email": "邮箱",
+    "phone": "电话",
+    "github": "GitHub",
+    "blog": "博客",
+    "zhihu": "知乎",  
+    "xiaohongshu": "小红书",
+    "workExpYear": "工作经验",
+    "wechat": "微信",
+    "jobIntention": {
+      "position": "意向职位",
+      "city": "意向城市",
+      "salary": "期望薪资"
+    }
+  }
+}

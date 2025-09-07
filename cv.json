@@ -1,20 +1,35 @@
 {
   "profile": {
     "name": "哆哆啦",
+    "avatar": {
+      "url": "https://avatars.githubusercontent.com/u/114007020?v=4",
+      "rounded": true,
+      "size": 150
+    },
+    "prepend": "both",
     "email": "dodolalorc@gmail.com",
-    "mobile": "17543809322",
+    "phone": "17543809322",
     "github": "https://github.com/dodolalorc",
-    "blog": "",
-    "zhihu": "",
-    "xiaoHongShu": "",
-    "workExpYear": ""
+    "blog": "https://dodolalorc.cn/",
+    "zhihu": "zhihuzhihu",
+    "xiaohongshu": "xiaohongshuxiaohongshu",
+    "wechat": "wechatwechat",
+    "workExpYear": "0.3年",
+    "jobIntention": {
+      "city": "杭州/上海/深圳/北京",
+      "position": "前端开发工程师",
+      "salary": "salarysalary"
+    }
   },
   "education": [
     {
       "school": "东北师范大学",
       "degree": "本科",
       "major": "计算机科学与技术",
-      "edu_time": ["2022.09", "2026.06"]
+      "edu_time": [
+        "2022.09",
+        "2026.06"
+      ]
     }
   ],
   "awards": [

@@ -1,0 +1,11 @@
+{
+  "profile": {
+    "name": "姓名",
+    "email": "郵箱",
+    "phone": "電話",
+    "github": "GitHub",
+    "blog": "博客",
+    "zhihu": "知乎",
+    "xiaohongshu": "小紅書"
+  }
+}
