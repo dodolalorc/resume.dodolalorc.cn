@@ -4,6 +4,11 @@
     "": {
       "name": "resume.dodolalorc.cn",
       "dependencies": {
+        "@fortawesome/fontawesome-svg-core": "^7.0.1",
+        "@fortawesome/free-brands-svg-icons": "^7.0.1",
+        "@fortawesome/free-regular-svg-icons": "^7.0.1",
+        "@fortawesome/free-solid-svg-icons": "^7.0.1",
+        "@fortawesome/vue-fontawesome": "^3.1.1",
         "pinia": "^3.0.1",
         "vue": "^3.5.13",
         "vue-router": "^4.5.0",
@@ -196,6 +201,18 @@
     "@eslint/object-schema": ["@eslint/object-schema@2.1.6", "https://registry.npmmirror.com/@eslint/object-schema/-/object-schema-2.1.6.tgz", {}, "sha512-RBMg5FRL0I0gs51M/guSAj5/e14VQ4tpZnQNWwuDT66P14I43ItmPfIZRhO9fUVIPOAQXU47atlywZ/czoqFPA=="],
 
     "@eslint/plugin-kit": ["@eslint/plugin-kit@0.2.8", "https://registry.npmmirror.com/@eslint/plugin-kit/-/plugin-kit-0.2.8.tgz", { "dependencies": { "@eslint/core": "^0.13.0", "levn": "^0.4.1" } }, "sha512-ZAoA40rNMPwSm+AeHpCq8STiNAwzWLJuP8Xv4CHIc9wv/PSuExjMrmjfYNj682vW0OOiZ1HKxzvjQr9XZIisQA=="],
+
+    "@fortawesome/fontawesome-common-types": ["@fortawesome/fontawesome-common-types@7.0.1", "https://registry.npmmirror.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-7.0.1.tgz", {}, "sha512-0VpNtO5cNe1/HQWMkl4OdncYK/mv9hnBte0Ew0n6DMzmo3Q3WzDFABHm6LeNTipt5zAyhQ6Ugjiu8aLaEjh1gg=="],
+
+    "@fortawesome/fontawesome-svg-core": ["@fortawesome/fontawesome-svg-core@7.0.1", "https://registry.npmmirror.com/@fortawesome/fontawesome-svg-core/-/fontawesome-svg-core-7.0.1.tgz", { "dependencies": { "@fortawesome/fontawesome-common-types": "7.0.1" } }, "sha512-x0cR55ILVqFpUioSMf6ebpRCMXMcheGN743P05W2RB5uCNpJUqWIqW66Lap8PfL/lngvjTbZj0BNSUweIr/fHQ=="],
+
+    "@fortawesome/free-brands-svg-icons": ["@fortawesome/free-brands-svg-icons@7.0.1", "https://registry.npmmirror.com/@fortawesome/free-brands-svg-icons/-/free-brands-svg-icons-7.0.1.tgz", { "dependencies": { "@fortawesome/fontawesome-common-types": "7.0.1" } }, "sha512-6xPmn5SrND/GM0+W33E77x05+aDn6RpR02eWd8eLdN0IxY0vXa5yU/ugaAKloOVxiG9w2330TSRsbJYL6c57Ow=="],
+
+    "@fortawesome/free-regular-svg-icons": ["@fortawesome/free-regular-svg-icons@7.0.1", "https://registry.npmmirror.com/@fortawesome/free-regular-svg-icons/-/free-regular-svg-icons-7.0.1.tgz", { "dependencies": { "@fortawesome/fontawesome-common-types": "7.0.1" } }, "sha512-4V9fHbHjcx9Qu4O99AM5B4zuEDfB4zajk1I77hEzOxPN00f8g3484Aeq6WpfFcmookvjLE3Pr71Dhf/lqw7tbA=="],
+
+    "@fortawesome/free-solid-svg-icons": ["@fortawesome/free-solid-svg-icons@7.0.1", "https://registry.npmmirror.com/@fortawesome/free-solid-svg-icons/-/free-solid-svg-icons-7.0.1.tgz", { "dependencies": { "@fortawesome/fontawesome-common-types": "7.0.1" } }, "sha512-esKuSrl1WMOTMDLNt38i16VfLe/gRZt2ZAJ3Yw7slfs7sj583MKqNFqO57zmhknk1Sya6f9Wys89aCzIJkcqlg=="],
+
+    "@fortawesome/vue-fontawesome": ["@fortawesome/vue-fontawesome@3.1.1", "https://registry.npmmirror.com/@fortawesome/vue-fontawesome/-/vue-fontawesome-3.1.1.tgz", { "peerDependencies": { "@fortawesome/fontawesome-svg-core": "~1 || ~6 || ~7", "vue": ">= 3.0.0 < 4" } }, "sha512-U5azn4mcUVpjHe4JO0Wbe7Ih8e3VbN83EH7OTBtA5/QGw9qcPGffqcmwsLyZYgEkpVkYbq/6dX1Iyl5KUGMp6Q=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "https://registry.npmmirror.com/@humanfs/core/-/core-0.19.1.tgz", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 
