@@ -191,12 +191,6 @@ const showIcon = computed(() => profile.value.prepend === 'icon' || profile.valu
 
 <style scoped>
 .profile-card {
-  border: 1px solid #eee;
-  border-radius: 8px;
-  padding: 16px;
-  margin: 16px 0;
-  background-color: #f9f9f9;
-
   display: flex;
   justify-content: space-between;
   align-items: center;

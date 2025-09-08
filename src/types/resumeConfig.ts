@@ -28,22 +28,46 @@ export interface Profile {
 }
 
 export interface ExperienceConfig {
-  jobTitle?: string // 职位
+  jobTitle?: string // 职位名称
   company?: string // 公司
-  years?: string // 工作年限
-  description?: string // 工作描述
+  partment?: string // 部门
+  jobTime?: string[] // 工作时间
+  jobDesc?: string // 工作描述(支持 markdown)
 }
 
 export interface EducationConfig {
   school?: string // 学校
   degree?: string // 学位
   major?: string // 专业
-  edu_time?: string[] // 就读时间
+  eduTime?: string[] // 就读时间
+  eduDesc?: string // 在校描述(支持 markdown)
+}
+
+export interface Project {
+  name: string // 项目名称
+  link?: string // 项目链接
+  role?: string // 在项目中的角色
+  techStack?: string[] // 技术栈
+  projectTime?: string[] // 项目时间
+  projectDesc?: string // 项目描述(支持 markdown)
+  projectAchievements?: string[] // 项目成果
+  // 主要工作内容
+  mainWork?: Array<{
+    title: string // 工作内容标题
+    desc: string // 工作内容描述(支持 markdown)
+  }>
+}
+
+export interface Award {
+  title: string // 奖项名称
+  level?: string // 奖项等级
+  date?: string // 获奖时间
 }
 
 export interface ResumeConfig {
   profile: Profile
   education: Array<EducationConfig>
   experience: Array<ExperienceConfig>
-  skills: Array<string> // 技能
+  projects?: Array<Project>
+  awards?: Array<Award> // 奖项
 }
