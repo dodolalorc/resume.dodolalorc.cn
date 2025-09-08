@@ -6,6 +6,13 @@
     "github": "GitHub",
     "blog": "博客",
     "zhihu": "知乎",
-    "xiaohongshu": "小紅書"
+    "xiaohongshu": "小紅書",
+    "workExpYear": "工作經驗",
+    "wechat": "微信",
+    "jobIntention": {
+      "position": "意向職位",
+      "city": "意向城市",
+      "salary": "期望薪資"
+    }
   }
 }

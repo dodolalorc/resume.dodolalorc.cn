@@ -6,6 +6,13 @@
     "github": "GitHub",
     "blog": "ブログ",
     "zhihu": "Zhihu",
-    "xiaohongshu": "Xiaohongshu"
+    "xiaohongshu": "Xiaohongshu",
+    "workExpYear": "職務経験",
+    "wechat": "WeChat",
+    "jobIntention": {
+      "position": "希望職種",
+      "city": "希望勤務地",
+      "salary": "希望給与"
+    }
   }
 }

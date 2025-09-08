@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { Profile } from "@/types/resumeConfig";
-import iconLogo from "@/components/icon-logo.vue";
+import iconLogo from "@/components/IconLogo.vue";
 
 const profile = defineModel<Profile>('profile', {
   type: Object,

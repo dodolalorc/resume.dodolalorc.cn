@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 import ViewLayout from "@/layout/view-layout.vue";
 import type { ResumeConfig, Profile } from "@/types/resumeConfig";
-import profileCard from "./components/profile-card.vue";
+import profileCard from "./components/ProfileCard.vue";
 
 const config = ref<Partial<ResumeConfig>>({});
 const profile = ref<Profile>({});
