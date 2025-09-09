@@ -1,0 +1,135 @@
+{
+  "profile": {
+    "name": "哆哆啦",
+    "avatar": {
+      "url": "https://avatars.githubusercontent.com/u/114007020?v=4",
+      "rounded": true,
+      "size": 150
+    },
+    "prepend": "both",
+    "email": "dodolalorc@gmail.com",
+    "phone": "17543809322",
+    "github": "https://github.com/dodolalorc",
+    "blog": "https://dodolalorc.cn/",
+    "zhihu": "",
+    "xiaohongshu": "",
+    "wechat": "dodolalorc",
+    "workExpYear": "",
+    "jobIntention": {
+      "city": "杭州/上海/深圳/北京",
+      "position": "前端开发/客户端开发",
+      "salary": ""
+    }
+  },
+  "education": [
+    {
+      "school": "东北师范大学",
+      "degree": "本科",
+      "major": "计算机科学与技术",
+      "eduTime": ["2022.09", "2026.06"],
+      "eduDesc": "东北师范大学“创新创业”奖学金、东北师范大学竞赛二等奖学金。为学校蓝旭工作室前端负责人，提供前端技术分享，积极参与各类编程竞赛和开源项目。"
+    }
+  ],
+  "experience": [
+    {
+      "jobTitle": "前端开发实习生",
+      "company": "杭州今日头条科技有限公司",
+      "partment": "Data-中国交易与广告",
+      "jobTime": ["2025.05", "至今"],
+      "jobDesc": [
+        "参与公司广告中台部分前端系统的开发与维护，了解业务需求，优化用户界面，提供日常维护和完成需求。",
+        "协助推进广告审核全机审的推进，了解和学习大模型应用于广告审核的相关技术和业务需求。",
+        "学习 Electron 框架，并学习框架源码以及上游依赖的源码，在实习期间实现新功能 API 并在司内接受，新功能为人审提效约 80%，也向 Election 官方提交了PR：electron/electron/pull/48149"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "哈佛教育论坛——新兴科技与未来人才联合论坛网站",
+      "link": "https://harvardces.eduhk.hk/",
+      "role": "前端负责人",
+      "techStack": ["Nuxt", "TypeScript", "TailwindCSS", "Git"],
+      "projectTime": ["2024.11", "2025.05"],
+      "projectDesc": "本项目为香港教育大学举办的教育论坛的线上信息平台，提供论坛各项信息的查阅服务。平台为用户提供论坛议程、演讲嘉宾、会议资料等信息的在线查询功能。",
+      "projectAchievements": ["2025 年 5 月已投入使用，反馈正向，并约定 26 年的继续合作。"],
+      "mainWork": [
+        {
+          "title": "项目开发",
+          "desc": "参与项目结构设计、本项目页面的设计和实现。"
+        },
+        {
+          "title": "信息同步",
+          "desc": "参与同步人员、会议等具体信息的变更以及修改，确保平台信息的及时更新。"
+        }
+      ]
+    },
+    {
+      "name": "东北师范大学第二学士学位报名审核系统",
+      "link": "https://tslxbm.nenu.edu.cn/",
+      "role": "前端负责人",
+      "techStack": ["Vue3", "TypeScript", "Vite", "Pinia", "TailwindCSS", "Element Plus"],
+      "projectTime": ["2024.09", "2025.05"],
+      "projectDesc": "本项目为本校生申请第二学位提供线上平台，学生端提供完善个人信息、申请学位、上传文件、下载申请表查询审核进度、等功能，管理员端提供批量导入学生账号、审核申请、查询用户信息等功能。",
+      "projectAchievements": [
+        "已在2025年第二学位报名季成功上线，服务本校学生。",
+        "实现审核流程的线上化，提升审核效率，增强信息同步。"
+      ],
+      "mainWork": [
+        {
+          "title": "功能开发",
+          "desc": "参与项目结构设计、本项目页面的设计和实现，完善管理员和学生端路由鉴权功能。"
+        },
+        {
+          "title": "接口对接",
+          "desc": "完成对接接口工作，渲染页面，参与测试和验收工作。"
+        }
+      ]
+    },
+    {
+      "name": "东北师范大学高考信息查询系统",
+      "link": "https://gkcx.nenu.edu.cn/",
+      "role": "前端负责人",
+      "techStack": ["TypeScript", "React", "Ant Design", "Node.js"],
+      "projectTime": ["2024.03", "2024.08"],
+      "projectDesc": "本项目是校招生办项目，为广大师生家长提供每年的本科招生分数线、招生计划、录取进度查询功能。管理员端提供修改前端展示信息条目、上传文件覆盖最新信息、调整录取进度等功能。",
+      "projectAchievements": ["已在2024年高考季成功上线，目前已经服务两届高考学生及家长"],
+      "mainWork": [
+        {
+          "title": "页面开发",
+          "desc": "完成用户端的移动端样式适配，完成管理员端的数据信息展示、优化管理员操作的交互提示等功能。"
+        },
+        {
+          "title": "性能优化",
+          "desc": "修复数据更新不同步 bug、页面抖动 bug，优化项目性能，完成本项目中的错误反馈，增添路由鉴权功能。"
+        }
+      ]
+    }
+  ],
+  "awards": [
+    {
+      "title": "2024、2023 CCPC 中国大学生程序设计竞赛女生专场",
+      "date": "2024-11、2023-11",
+      "level": "银奖、铜奖"
+    },
+    {
+      "title": "2024 第十五届、2025 第十六届蓝桥杯大赛吉林赛区",
+      "date": "2024-04、2025-04",
+      "level": "省级一等奖、国家级优秀奖"
+    },
+    {
+      "title": "2024 年中国大学生程序设计竞赛-全国邀请赛(长春、东北赛区)",
+      "date": "2024-04",
+      "level": "银奖、铜奖"
+    },
+    {
+      "title": "2024 团体程序设计天梯赛",
+      "date": "2024-05",
+      "level": "个人三等奖、团队二等奖"
+    },
+    {
+      "title": "2023 高教社杯全国大学生数学建模",
+      "date": "2023-11",
+      "level": "省级一等奖、国家级二等奖"
+    }
+  ]
+}

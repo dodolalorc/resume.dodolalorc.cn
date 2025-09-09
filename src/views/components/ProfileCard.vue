@@ -180,7 +180,7 @@ const showIcon = computed(() => profile.value.prepend === 'icon' || profile.valu
       </div>
     </div>
     <div class="avatar-container">
-      <img :src="profile.avatar?.url" :alt="profile.name" :style="{
+      <img class="avatar" :src="profile.avatar?.url" :alt="profile.name" :style="{
         width: profile.avatar?.size + 'px',
         height: profile.avatar?.size + 'px',
         borderRadius: profile.avatar?.rounded ? '50%' : '0'
@@ -233,6 +233,12 @@ const showIcon = computed(() => profile.value.prepend === 'icon' || profile.valu
         align-items: center;
       }
     }
+  }
+}
+
+.avatar-container {
+  .avatar {
+    object-fit: contain;
   }
 }
 </style>

@@ -57,12 +57,12 @@ const edu = defineModel<EducationConfig[]>('education', {
       display: inline-block;
       margin-left: 10px;
       color: #666;
-      background: #f3f3f3;
+      /* background: #f3f3f3; */
       border-radius: 12px;
       padding: 2px 10px;
       font-size: 13px;
       line-height: 1.2;
-      border: 1px solid #e0e0e0;
+      /* border: 1px solid #e0e0e0; */
     }
     .edu-major {
       margin-left: 10px;
