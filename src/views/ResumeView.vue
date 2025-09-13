@@ -17,6 +17,7 @@ import eduCard from './components/EduCard.vue'
 import expCard from './components/ExpCard.vue'
 import projectCard from './components/ProjectCard.vue'
 import awardCard from './components/AwardCard.vue'
+import cvData from '@/data/cv.json'
 
 const config = ref<Partial<ResumeConfig>>({})
 const profile = ref<Profile>({})
@@ -88,11 +89,10 @@ const exportToPDF = async () => {
   }
 }
 
-onMounted(async () => {
+onMounted(() => {
   try {
-    const response = await fetch('/cv.json')
-    const data = await response.json()
-    config.value = data as ResumeConfig
+    // 直接使用导入的JSON数据
+    config.value = cvData as ResumeConfig
     profile.value = config.value.profile || {}
     education.value = config.value.education || []
     experience.value = config.value.experience || []
@@ -183,9 +183,11 @@ onMounted(async () => {
 }
 
 .resume-shell {
-  width: 1000px; /* 进一步缩小宽度 */
+  width: 1000px;
+  /* 进一步缩小宽度 */
   height: fit-content;
-  min-height: auto; /* 移除最小高度限制 */
+  min-height: auto;
+  /* 移除最小高度限制 */
   display: flex;
   flex-direction: column;
 
@@ -203,5 +205,4 @@ onMounted(async () => {
   /* 添加轻微阴影，但仅在屏幕显示时 */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-
 </style>
