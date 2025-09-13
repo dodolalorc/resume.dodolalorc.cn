@@ -33,16 +33,16 @@ jobs:
           node-version: 22
           cache: ''
 
-      - name: Setup bun
-        run: npm install -g bun
-          
+      - name: Setup pnpm
+        run: npm install -g pnpm
+
       - name: Setup Pages
         run: |
-          bun install
+          pnpm install
 
       - name: Build with
         run: |
-          bun run build
+          pnpm run build
 
       - name: Deploy to Remote Server
         uses: easingthemes/ssh-deploy@v5.1.1
