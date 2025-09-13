@@ -2,7 +2,7 @@ name: Deploy Resume Pages
 
 on:
   push:
-    branches: [v4]
+    branches: [main]
 
   workflow_dispatch:
 
