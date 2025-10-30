@@ -32,7 +32,7 @@ export interface ExperienceConfig {
   company?: string // 公司
   partment?: string // 部门
   jobTime?: string[] // 工作时间
-  jobDesc?: string // 工作描述(支持 markdown)
+  jobDesc?: string[] // 工作描述(支持 markdown)
 }
 
 export interface EducationConfig {

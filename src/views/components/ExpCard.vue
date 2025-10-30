@@ -20,7 +20,9 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
       <span class="exp-time">{{ item.jobTime?.join(' - ') }}</span>
       <div class="exp-desc">
         <div class="exp-desc-title">主要工作：</div>
-        <div v-html="item.jobDesc"></div>
+        <div class="exp-desc-content">
+          <div class="exp-desc-item" v-for="(desc, descIndex) in item.jobDesc" :key="descIndex" v-html="desc"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -84,6 +86,23 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
       .exp-desc-title {
         min-width: 80px;
         font-weight: bold;
+      }
+      .exp-desc-content {
+        flex: 1;
+
+        .exp-desc-item {
+          display: flex;
+          align-items: flex-start;
+          margin-bottom: 4px;
+        }
+        .exp-desc-item::before {
+          content: '•';
+          color: #666;
+          flex: none;
+          margin-right: 8px;
+          line-height: 1;
+          margin-top: 0.15em; /* 微调垂直位置以和首行对齐 */
+        }
       }
     }
   }
