@@ -27,60 +27,62 @@ const projects = ref<Project[]>([]) // 项目经历
 const awards = ref<Award[]>([]) // 奖项
 const isExporting = ref(false) // 导出状态
 
-// PDF导出功能 - 一页纸优化版本
+// PDF导出功能 - 优化文件大小（降分辨率 + JPEG压缩）
 const exportToPDF = async () => {
   try {
     isExporting.value = true
 
-    // 获取简历容器元素
     const element = document.querySelector('.resume-shell') as HTMLElement
-    if (!element) {
-      throw new Error('找不到简历容器')
-    }
+    if (!element) throw new Error('找不到简历容器')
 
-    // 使用html2canvas截取DOM元素 - 针对一页纸优化
+    // 使用较低的 scale，结合之后的重新缩放与JPEG压缩，显著减小文件体积
+    const scale = Math.min(1.2, window.devicePixelRatio || 1)
     const canvas = await html2canvas(element, {
-      scale: 1.8, // 适中的清晰度，避免文件过大
+      scale,
       useCORS: true,
-      allowTaint: true,
+      allowTaint: false,
       backgroundColor: '#ffffff',
-      height: element.scrollHeight, // 确保捕获完整高度
+      height: element.scrollHeight,
       windowHeight: element.scrollHeight,
     })
 
-    // 创建PDF
-    const imgData = canvas.toDataURL('image/png', 0.8) // 压缩图片质量
-    const pdf = new jsPDF('p', 'mm', 'a4')
-
-    // 计算PDF尺寸 - 优化以适合一页
-    const pdfWidth = 210 // A4宽度(mm)
-    const pdfHeight = 297 // A4高度(mm)
-    const imgWidth = pdfWidth - 20 // 留出边距
-    const imgHeight = (canvas.height * imgWidth) / canvas.width
-
-    // 如果内容高度超出一页，等比缩放以适应
-    if (imgHeight > pdfHeight - 20) {
-      const scaleFactor = (pdfHeight - 20) / imgHeight
-      const finalWidth = imgWidth * scaleFactor
-      const finalHeight = imgHeight * scaleFactor
-
-      // 居中放置
-      const x = (pdfWidth - finalWidth) / 2
-      const y = 10
-
-      pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight)
-    } else {
-      // 如果内容适合一页，居中放置
-      const x = (pdfWidth - imgWidth) / 2
-      const y = (pdfHeight - imgHeight) / 2
-
-      pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight)
+    // 限制最大像素宽度，避免超大图片（而不是直接使用canvas的原始分辨率）
+    const MAX_WIDTH_PX = 1200
+    let finalCanvas = canvas
+    if (canvas.width > MAX_WIDTH_PX) {
+      const off = document.createElement('canvas')
+      off.width = MAX_WIDTH_PX
+      off.height = Math.round((canvas.height * MAX_WIDTH_PX) / canvas.width)
+      const ctx = off.getContext('2d')
+      if (ctx) ctx.drawImage(canvas, 0, 0, off.width, off.height)
+      finalCanvas = off
     }
 
-    // 下载PDF
+    // 使用JPEG并设置较低质量以压缩体积
+    const imgData = finalCanvas.toDataURL('image/jpeg', 0.7)
+
+    // 生成PDF并将图片按比例放入单页
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    const pdfWidth = 210
+    const pdfHeight = 297
+    const margin = 10
+    const imgWidthMm = pdfWidth - margin * 2
+    const imgHeightMm = (finalCanvas.height * imgWidthMm) / finalCanvas.width
+
+    let drawWidth = imgWidthMm
+    let drawHeight = imgHeightMm
+    if (imgHeightMm > pdfHeight - margin * 2) {
+      const scaleFactor = (pdfHeight - margin * 2) / imgHeightMm
+      drawWidth = imgWidthMm * scaleFactor
+      drawHeight = imgHeightMm * scaleFactor
+    }
+
+    const x = (pdfWidth - drawWidth) / 2
+    const y = (pdfHeight - drawHeight) / 2
+    pdf.addImage(imgData, 'JPEG', x, y, drawWidth, drawHeight)
+
     const fileName = `${profile.value.name || 'resume'}_${new Date().toISOString().split('T')[0]}.pdf`
     pdf.save(fileName)
-
   } catch (error) {
     console.error('PDF导出失败:', error)
     alert('PDF导出失败，请稍后重试')

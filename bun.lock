@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "resume.dodolalorc.cn",
@@ -1189,7 +1190,7 @@
 
     "csso/css-tree": ["css-tree@2.2.1", "https://registry.npmmirror.com/css-tree/-/css-tree-2.2.1.tgz", { "dependencies": { "mdn-data": "2.0.28", "source-map-js": "^1.0.1" } }, "sha512-OA0mILzGc1kCOCSJerOeqDxDQ4HOh+G8NbOJFOTgOCzpw7fCBubk0fEyxp8AgOL/jvLgYA/uV0cMbe43ElF1JA=="],
 
-    "dom-serializer/entities": ["entities@4.5.0", "https://registry.npmmirror.com/entities/-/entities-4.5.0.tgz", {}, "sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw=="],
+    "dom-serializer/entities": ["entities@4.5.0", "https://registry.npmmirror.comentities/-/entities-4.5.0.tgz", {}, ""],
 
     "editorconfig/commander": ["commander@10.0.1", "https://registry.npmmirror.comcommander/-/commander-10.0.1.tgz", {}, ""],
 
@@ -1213,21 +1214,21 @@
 
     "string-width-cjs/emoji-regex": ["emoji-regex@8.0.0", "https://registry.npmmirror.comemoji-regex/-/emoji-regex-8.0.0.tgz", {}, ""],
 
-    "string-width-cjs/strip-ansi": ["strip-ansi@6.0.1", "https://registry.npmmirror.comstrip-ansi/-/strip-ansi-6.0.1.tgz", { "dependencies": { "ansi-regex": "^5.0.1" } }, ""],
+    "string-width-cjs/strip-ansi": ["strip-ansi@6.0.1", "https://registry.npmmirror.comstrip-ansi-cjs/-/strip-ansi-cjs-6.0.1.tgz", { "dependencies": { "ansi-regex": "^5.0.1" } }, ""],
 
     "strip-ansi-cjs/ansi-regex": ["ansi-regex@5.0.1", "https://registry.npmmirror.comansi-regex/-/ansi-regex-5.0.1.tgz", {}, ""],
 
     "vue-i18n/@vue/devtools-api": ["@vue/devtools-api@6.6.4", "https://registry.npmmirror.com/@vue/devtools-api/-/devtools-api-6.6.4.tgz", {}, "sha512-sGhTPMuXqZ1rVOk32RylztWkfXTRhuS7vgAKv0zjqk8gbsHkJ7xfFf+jbySxt7tWObEJwyKaHMikV/WGDiQm8g=="],
 
-    "vue-router/@vue/devtools-api": ["@vue/devtools-api@6.6.4", "https://registry.npmmirror.com@vue/devtools-api/-/devtools-api-6.6.4.tgz", {}, ""],
+    "vue-router/@vue/devtools-api": ["@vue/devtools-api@6.6.4", "https://registry.npmmirror.com/@vue/devtools-api/-/devtools-api-6.6.4.tgz", {}, "sha512-sGhTPMuXqZ1rVOk32RylztWkfXTRhuS7vgAKv0zjqk8gbsHkJ7xfFf+jbySxt7tWObEJwyKaHMikV/WGDiQm8g=="],
 
     "w3c-xmlserializer/xml-name-validator": ["xml-name-validator@5.0.0", "https://registry.npmmirror.comxml-name-validator/-/xml-name-validator-5.0.0.tgz", {}, ""],
 
     "wrap-ansi-cjs/ansi-styles": ["ansi-styles@4.3.0", "https://registry.npmmirror.comansi-styles/-/ansi-styles-4.3.0.tgz", { "dependencies": { "color-convert": "^2.0.1" } }, ""],
 
-    "wrap-ansi-cjs/string-width": ["string-width@4.2.3", "https://registry.npmmirror.comstring-width/-/string-width-4.2.3.tgz", { "dependencies": { "emoji-regex": "^8.0.0", "is-fullwidth-code-point": "^3.0.0", "strip-ansi": "^6.0.1" } }, ""],
+    "wrap-ansi-cjs/string-width": ["string-width@4.2.3", "https://registry.npmmirror.comstring-width-cjs/-/string-width-cjs-4.2.3.tgz", { "dependencies": { "emoji-regex": "^8.0.0", "is-fullwidth-code-point": "^3.0.0", "strip-ansi": "^6.0.1" } }, ""],
 
-    "wrap-ansi-cjs/strip-ansi": ["strip-ansi@6.0.1", "https://registry.npmmirror.comstrip-ansi/-/strip-ansi-6.0.1.tgz", { "dependencies": { "ansi-regex": "^5.0.1" } }, ""],
+    "wrap-ansi-cjs/strip-ansi": ["strip-ansi@6.0.1", "https://registry.npmmirror.comstrip-ansi-cjs/-/strip-ansi-cjs-6.0.1.tgz", { "dependencies": { "ansi-regex": "^5.0.1" } }, ""],
 
     "@typescript-eslint/typescript-estree/minimatch/brace-expansion": ["brace-expansion@2.0.1", "https://registry.npmmirror.combrace-expansion/-/brace-expansion-2.0.1.tgz", { "dependencies": { "balanced-match": "^1.0.0" } }, ""],
 
