@@ -14,5 +14,22 @@
       "city": "希望勤務地",
       "salary": "希望給与"
     }
+  },
+  "actions": {
+    "theme": "テーマ",
+    "editMode": "編集モード",
+    "closeEdit": "閉じる",
+    "exportPdf": "PDF出力",
+    "exportJson": "JSON出力",
+    "reset": "リセット",
+    "autosave": "自動保存",
+    "lastSaved": "最終保存",
+    "exporting": "出力中..."
+  },
+  "section": {
+    "education": "学歴",
+    "experience": "職務経験",
+    "projects": "プロジェクト",
+    "awards": "受賞"
   }
 }

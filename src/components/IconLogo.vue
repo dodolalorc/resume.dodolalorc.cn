@@ -52,7 +52,10 @@ const iconMap: Record<string, typeof EmailIcon> = {
   'laptop': LaptopIcon,
   'location-dot': LocationDotIcon,
   'dollar-sign': DollarSignIcon,
-  'wechat': WechatIcon
+  'wechat': WechatIcon,
+  'edit': CommentIcon,
+  'rotate-left': FanIcon,
+  'file-export': LinkIcon
 }
 
 // 使用计算属性来动态选择图标组件

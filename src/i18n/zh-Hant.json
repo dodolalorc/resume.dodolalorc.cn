@@ -14,5 +14,22 @@
       "city": "意向城市",
       "salary": "期望薪資"
     }
+  },
+  "actions": {
+    "theme": "主題",
+    "editMode": "編輯模式",
+    "closeEdit": "關閉",
+    "exportPdf": "導出PDF",
+    "exportJson": "導出JSON",
+    "reset": "重置",
+    "autosave": "自動保存",
+    "lastSaved": "上次保存",
+    "exporting": "導出中..."
+  },
+  "section": {
+    "education": "教育經歷",
+    "experience": "工作經歷",
+    "projects": "項目經歷",
+    "awards": "獎項"
   }
 }

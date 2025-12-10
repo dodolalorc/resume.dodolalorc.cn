@@ -1,12 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 @import 'tailwindcss';
 @import './base.css';
 
+:root {
+  color-scheme: light;
+}
+
+* {
+  font-family:
+    'Space Grotesk',
+    'Inter',
+    'Noto Sans SC',
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.12), transparent 25%),
+    radial-gradient(circle at 80% 0%, rgba(234, 88, 12, 0.12), transparent 25%),
+    linear-gradient(180deg, #f8fbff, #f5f7fb 50%, #eef2f6);
+  color: #0f172a;
+}
+
 #app {
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 }
 
 a {
@@ -14,23 +39,23 @@ a {
   text-decoration: none;
   position: relative;
   transition: color 0.3s ease;
+}
 
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background-color: rgba(59, 130, 246, 0.7);
-    transition: width 0.3s ease;
-  }
+a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: rgba(37, 99, 235, 0.7);
+  transition: width 0.3s ease;
+}
 
-  &:hover {
-    color: rgba(59, 130, 246, 0.8);
+a:hover {
+  color: rgba(37, 99, 235, 0.9);
+}
 
-    &::after {
-      width: 100%;
-    }
-  }
+a:hover::after {
+  width: 100%;
 }

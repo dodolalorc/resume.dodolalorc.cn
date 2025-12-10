@@ -5,7 +5,7 @@
     "phone": "电话",
     "github": "GitHub",
     "blog": "博客",
-    "zhihu": "知乎",  
+    "zhihu": "知乎",
     "xiaohongshu": "小红书",
     "workExpYear": "工作经验",
     "wechat": "微信",
@@ -14,5 +14,22 @@
       "city": "意向城市",
       "salary": "期望薪资"
     }
+  },
+  "actions": {
+    "theme": "主题",
+    "editMode": "编辑模式",
+    "closeEdit": "关闭",
+    "exportPdf": "导出PDF",
+    "exportJson": "导出JSON",
+    "reset": "重置",
+    "autosave": "自动保存",
+    "lastSaved": "上次保存",
+    "exporting": "导出中..."
+  },
+  "section": {
+    "education": "教育经历",
+    "experience": "工作经历",
+    "projects": "项目经历",
+    "awards": "奖项"
   }
 }

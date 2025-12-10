@@ -1,41 +1,87 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import ViewLayout from '@/layout/view-layout.vue'
-import type {
-  ResumeConfig,
-  Profile,
-  EducationConfig,
-  ExperienceConfig,
-  Project,
-  Award,
-} from '@/types/resumeConfig'
-import LogoIcon from '@/components/IconLogo.vue'
-import profileCard from './components/ProfileCard.vue'
-import eduCard from './components/EduCard.vue'
-import expCard from './components/ExpCard.vue'
-import projectCard from './components/ProjectCard.vue'
-import awardCard from './components/AwardCard.vue'
-import cvData from '@/data/cv.json'
+import ProfileCard from './components/ProfileCard.vue'
+import EduCard from './components/EduCard.vue'
+import ExpCard from './components/ExpCard.vue'
+import ProjectCard from './components/ProjectCard.vue'
+import AwardCard from './components/AwardCard.vue'
+import ResumeToolbar from './components/ResumeToolbar.vue'
+import ResumeEditorDrawer from './components/ResumeEditorDrawer.vue'
+import { useResumeStore, type ThemeKey } from '@/stores/resume'
+import type { EditorSection } from './types'
 
-const config = ref<Partial<ResumeConfig>>({})
-const profile = ref<Profile>({})
-const education = ref<EducationConfig[]>([])
-const experience = ref<ExperienceConfig[]>([])
-const projects = ref<Project[]>([]) // 项目经历
-const awards = ref<Award[]>([]) // 奖项
-const isExporting = ref(false) // 导出状态
+const resumeStore = useResumeStore()
+const { resume, currentTheme, themes, themeKey, autosaveEnabled, lastSavedAt } = storeToRefs(resumeStore)
 
-// PDF导出功能 - 优化文件大小（降分辨率 + JPEG压缩）
+const isEditing = ref(false)
+const activeSection = ref<EditorSection>('profile')
+const isExporting = ref(false)
+const resumeRoot = ref<HTMLElement | null>(null)
+
+const themeVars = computed(() => ({
+  '--color-primary': currentTheme.value.colors.primary,
+  '--color-secondary': currentTheme.value.colors.secondary,
+  '--color-accent': currentTheme.value.colors.accent,
+  '--color-surface': currentTheme.value.colors.surface,
+  '--color-muted': currentTheme.value.colors.muted,
+  '--color-text': currentTheme.value.colors.text,
+}))
+
+const lastSavedText = computed(() => {
+  if (!lastSavedAt.value) return '未保存'
+  const date = new Date(lastSavedAt.value)
+  return `${date.getHours().toString().padStart(2, '0')}:${date
+    .getMinutes()
+    .toString()
+    .padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
+})
+
+const ensureArrays = () => {
+  resume.value.education ??= []
+  resume.value.experience ??= []
+  resume.value.projects ??= []
+  resume.value.awards ??= []
+
+  resume.value.profile.avatar ??= { url: '', rounded: true, size: 140 }
+  resume.value.profile.jobIntention ??= { city: '', position: '', salary: '' }
+  resume.value.profile.prepend ??= 'both'
+
+  resume.value.education.forEach((item) => {
+    item.eduTime ??= ['', '']
+  })
+  resume.value.experience.forEach((item) => {
+    item.jobTime ??= ['', '']
+    item.jobDesc ??= ['']
+  })
+  resume.value.projects.forEach((item) => {
+    item.projectTime ??= ['', '']
+    item.techStack ??= []
+    item.projectAchievements ??= []
+    item.mainWork ??= []
+  })
+  resume.value.awards.forEach((item) => {
+    item.level ??= ''
+    item.date ??= ''
+  })
+}
+
+ensureArrays()
+
+onMounted(() => {
+  resumeStore.load()
+  ensureArrays()
+})
+
 const exportToPDF = async () => {
+  if (!resumeRoot.value) return
+
   try {
     isExporting.value = true
-
-    const element = document.querySelector('.resume-shell') as HTMLElement
-    if (!element) throw new Error('找不到简历容器')
-
-    // 使用较低的 scale，结合之后的重新缩放与JPEG压缩，显著减小文件体积
+    const element = resumeRoot.value
     const scale = Math.min(1.2, window.devicePixelRatio || 1)
     const canvas = await html2canvas(element, {
       scale,
@@ -46,7 +92,6 @@ const exportToPDF = async () => {
       windowHeight: element.scrollHeight,
     })
 
-    // 限制最大像素宽度，避免超大图片（而不是直接使用canvas的原始分辨率）
     const MAX_WIDTH_PX = 1200
     let finalCanvas = canvas
     if (canvas.width > MAX_WIDTH_PX) {
@@ -58,10 +103,7 @@ const exportToPDF = async () => {
       finalCanvas = off
     }
 
-    // 使用JPEG并设置较低质量以压缩体积
     const imgData = finalCanvas.toDataURL('image/jpeg', 0.7)
-
-    // 生成PDF并将图片按比例放入单页
     const pdf = new jsPDF('p', 'mm', 'a4')
     const pdfWidth = 210
     const pdfHeight = 297
@@ -81,7 +123,9 @@ const exportToPDF = async () => {
     const y = (pdfHeight - drawHeight) / 2
     pdf.addImage(imgData, 'JPEG', x, y, drawWidth, drawHeight)
 
-    const fileName = `${profile.value.name || 'resume'}_${new Date().toISOString().split('T')[0]}.pdf`
+    const fileName = `${resume.value.profile?.name || 'resume'}_${new Date()
+      .toISOString()
+      .split('T')[0]}.pdf`
     pdf.save(fileName)
   } catch (error) {
     console.error('PDF导出失败:', error)
@@ -91,120 +135,60 @@ const exportToPDF = async () => {
   }
 }
 
-onMounted(() => {
-  try {
-    // 直接使用导入的JSON数据
-    config.value = cvData as ResumeConfig
-    profile.value = config.value.profile || {}
-    education.value = config.value.education || []
-    experience.value = config.value.experience || []
-    projects.value = config.value.projects || []
-    awards.value = config.value.awards || []
-  } catch (error) {
-    console.error('Error loading config:', error)
-  }
-})
+const exportJson = () => {
+  resumeStore.exportJson()
+}
+
+const resetData = () => {
+  const ok = confirm('确定重置到默认数据吗？此操作会覆盖当前更改。')
+  if (!ok) return
+  resumeStore.reset()
+  ensureArrays()
+}
+
+const toggleEditing = () => {
+  isEditing.value = !isEditing.value
+}
+
+const setTheme = (key: ThemeKey) => {
+  resumeStore.setTheme(key)
+}
 </script>
 
 <template>
   <ViewLayout>
-    <!-- 导出按钮 -->
-    <div class="export-toolbar">
-      <button @click="exportToPDF" :disabled="isExporting" class="export-btn">
-        <logo-icon v-if="!isExporting" name="file-pdf" />
-        <div v-else class="loading-spinner"></div>
-        {{ isExporting ? '导出中...' : '导出PDF' }}
-      </button>
+    <div class="w-full max-w-6xl px-6 pb-10 pt-6" :style="themeVars">
+      <ResumeToolbar :themes="themes" :theme-key="themeKey" v-model:autosave-enabled="autosaveEnabled"
+        :last-saved-text="lastSavedText" :is-editing="isEditing" :is-exporting="isExporting"
+        @toggle-edit="toggleEditing" @export-pdf="exportToPDF" @export-json="exportJson" @reset="resetData"
+        @set-theme="setTheme" />
+
+      <div ref="resumeRoot" class="resume-shell">
+        <ProfileCard v-model:profile="resume.profile" />
+        <div class="mt-6 flex flex-col gap-8">
+          <EduCard v-model:education="resume.education" />
+          <ExpCard v-model:experience="resume.experience" />
+          <ProjectCard v-if="resume.projects?.length" v-model:projects="resume.projects" />
+          <AwardCard v-if="resume.awards?.length" v-model:awards="resume.awards" />
+        </div>
+      </div>
     </div>
 
-    <div class="resume-shell">
-      <!-- 个人基本信息 -->
-      <profile-card v-model:profile="profile" />
-      <!-- 教育经历 -->
-      <edu-card v-model:education="education" />
-      <!-- 工作经历 -->
-      <exp-card v-model:experience="experience" />
-      <!-- 项目经历 -->
-      <project-card v-if="projects.length" v-model:projects="projects" />
-      <!-- 奖项 -->
-      <award-card v-if="awards.length" v-model:awards="awards" />
-    </div>
+    <ResumeEditorDrawer v-model:open="isEditing" v-model:section="activeSection" v-model:resume="resume" />
   </ViewLayout>
 </template>
 
 <style scoped>
-.export-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 16px;
-}
-
-.export-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background-color: #007acc;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.export-btn:hover:not(:disabled) {
-  background-color: #005a9e;
-  transform: translateY(-1px);
-}
-
-.export-btn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.loading-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid transparent;
-  border-top: 2px solid currentColor;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 .resume-shell {
-  width: 1000px;
-  /* 进一步缩小宽度 */
-  height: fit-content;
-  min-height: auto;
-  /* 移除最小高度限制 */
-  display: flex;
-  flex-direction: column;
-
-  /* 简洁边框设计 */
-  border: none;
-  border-radius: 0;
-
-  padding: 20px 25px;
-  margin: 16px auto;
-
-  /* 纯白背景，适合打印 */
-  background-color: #ffffff;
-  box-sizing: border-box;
-
-  /* 添加轻微阴影，但仅在屏幕显示时 */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 1080px;
+  min-height: 100%;
+  background: linear-gradient(135deg, var(--color-surface), #ffffff);
+  border: 1px solid var(--color-muted);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  margin: 0 auto;
 }
 </style>

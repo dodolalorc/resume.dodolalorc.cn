@@ -14,5 +14,22 @@
       "city": "Intended City",
       "salary": "Expected Salary"
     }
+  },
+  "actions": {
+    "theme": "Theme",
+    "editMode": "Edit Mode",
+    "closeEdit": "Close",
+    "exportPdf": "Export PDF",
+    "exportJson": "Export JSON",
+    "reset": "Reset",
+    "autosave": "Autosave",
+    "lastSaved": "Last saved",
+    "exporting": "Exporting..."
+  },
+  "section": {
+    "education": "Education",
+    "experience": "Experience",
+    "projects": "Projects",
+    "awards": "Awards"
   }
 }

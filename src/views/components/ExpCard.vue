@@ -8,103 +8,206 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
 })
 </script>
 <template>
-  <div class="exp-shell">
-    <div class="exp-header">
-      <h2 class="exp-title">工作经历</h2>
-      <hr class="exp-divider" />
-    </div>
-    <div v-for="(item, index) in experience" :key="index" class="exp-item">
-      <span class="exp-company">{{ item.company }}</span>
-      <span class="exp-partment">{{ item.partment }}</span>
-      <span class="exp-title">{{ item.jobTitle }}</span>
-      <span class="exp-time">{{ item.jobTime?.join(' - ') }}</span>
-      <div class="exp-desc">
-        <div class="exp-desc-title">主要工作：</div>
-        <div class="exp-desc-content">
-          <div class="exp-desc-item" v-for="(desc, descIndex) in item.jobDesc" :key="descIndex" v-html="desc"></div>
-        </div>
+  <section class="section-card">
+    <header class="section-header">
+      <div class="section-title">
+        <h2>{{ $t('section.experience') }}</h2>
+        <p class="eyebrow">Experience</p>
       </div>
+      <div class="section-line" aria-hidden="true"></div>
+      <span class="section-pill">{{ experience.length }} 段</span>
+    </header>
+
+    <div class="entry-list">
+      <article v-for="(item, index) in experience" :key="index" class="entry">
+        <div class="entry-head">
+          <div class="entry-title-block">
+            <div class="entry-title-row">
+              <span class="entry-title">{{ item.company || '未填写公司' }}</span>
+              <span v-if="item.partment" class="entry-sub">· {{ item.partment }}</span>
+            </div>
+            <div class="entry-meta">
+              <span class="pill">{{ item.jobTitle || '职位' }}</span>
+              <span v-if="item.jobTime?.length" class="text-slate-500">{{ item.jobTime.join(' · ') }}</span>
+            </div>
+          </div>
+          <span class="entry-index">#{{ index + 1 }}</span>
+        </div>
+
+        <ul v-if="item.jobDesc?.length" class="entry-desc">
+          <li v-for="(desc, dIdx) in item.jobDesc" :key="dIdx" class="entry-desc-item">
+            <span class="bullet">●</span>
+            <span v-html="desc"></span>
+          </li>
+        </ul>
+      </article>
     </div>
-  </div>
+  </section>
 </template>
 
 <style scoped>
-.exp-shell {
-  width: 100%;
+.section-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
-  .exp-header {
-    display: flex;
-    align-items: center;
-    margin: 10px 0;
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-    .exp-title {
-      font-size: 24px;
-      font-weight: bold;
-      margin: 0;
-    }
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
 
-    .exp-divider {
-      flex: 1;
-      height: 1px;
-      background-color: #eee;
-      margin-left: 20px;
-    }
-  }
+.section-title .eyebrow {
+  margin-right: 2px;
+}
 
-  .exp-item {
-    margin: 8px 0;
+.section-title h2 {
+  margin-right: 2px;
+}
 
-    .exp-company {
-      font-size: 18px;
-      font-weight: bold;
-    }
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.25rem;
+}
 
-    .exp-partment {
-      margin-left: 10px;
-      color: #666;
-    }
+.section-title h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: #0f172a;
+  line-height: 1.25rem;
+}
 
-    .exp-title {
-      display: inline-block;
-      margin-left: 10px;
-      color: #666;
-      /* background: #f3f3f3; */
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
+.section-pill {
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
 
-    .exp-time {
-      float: right;
-      color: #999;
-    }
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: var(--color-muted);
+  opacity: 0.8;
+}
 
-    .exp-desc {
-      margin-top: 8px;
-      display: flex;
-      flex-direction: row;
+.entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-      .exp-desc-title {
-        min-width: 80px;
-        font-weight: bold;
-      }
-      .exp-desc-content {
-        flex: 1;
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0 12px;
+  border-bottom: 1px solid var(--color-muted);
+}
 
-        .exp-desc-item {
-          display: flex;
-          align-items: flex-start;
-          margin-bottom: 4px;
-        }
-        .exp-desc-item::before {
-          content: '•';
-          color: #666;
-          flex: none;
-          margin-right: 8px;
-          line-height: 1;
-          margin-top: 0.15em; /* 微调垂直位置以和首行对齐 */
-        }
-      }
-    }
-  }
+.entry:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.entry-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.entry-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.entry-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.entry-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.entry-sub {
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.entry-index {
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.entry-desc {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entry-desc-item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.bullet {
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+ul :deep(a) {
+  color: var(--color-primary);
 }
 </style>
