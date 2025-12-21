@@ -23,13 +23,12 @@ jobs:
           fetch-depth: 1
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: ".bun-version"
+          bun-version: 'latest'
       - name: Install Dependencies
         run: bun install
       - name: Build Vite site
         run: |
           bun run build
-          touch dist/.nojekyll
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
