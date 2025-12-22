@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import type { ResumeConfig, EducationConfig, ExperienceConfig, Project, Award } from '@/types/resumeConfig'
-import type { EditorSection } from '../types'
+import type {
+  ResumeConfig,
+  EducationConfig,
+  ExperienceConfig,
+  Project,
+  Award,
+} from '@/types/resume'
+import type { EditorSection } from '@/types/resume'
 import FormInput from './FormInput.vue'
 
 const open = defineModel<boolean>('open', { required: true })
@@ -9,7 +15,8 @@ const section = defineModel<EditorSection>('section', { required: true })
 const resume = defineModel<ResumeConfig>('resume', { required: true })
 
 const profileAvatar = () => (resume.value.profile.avatar ??= { url: '', rounded: true, size: 140 })
-const jobIntention = () => (resume.value.profile.jobIntention ??= { city: '', position: '', salary: '' })
+const jobIntention = () =>
+  (resume.value.profile.jobIntention ??= { city: '', position: '', salary: '' })
 
 const educationList = () => (resume.value.education ??= [])
 const experienceList = () => (resume.value.experience ??= [])
@@ -25,13 +32,14 @@ const ensureMainWork = (item: Project) => (item.mainWork ??= [])
 
 const inputClass = computed(
   () =>
-    'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30'
+    'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30',
 )
 const textareaClass = computed(() => `${inputClass.value} min-h-[96px] resize-vertical`)
 const cardClass = 'rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm'
 const pillBtn =
   'rounded-full px-3 py-1 text-sm transition bg-slate-100 text-slate-600 hover:bg-slate-200'
-const pillBtnActive = 'rounded-full px-3 py-1 text-sm transition bg-[var(--color-primary)] text-white shadow'
+const pillBtnActive =
+  'rounded-full px-3 py-1 text-sm transition bg-[var(--color-primary)] text-white shadow'
 const ghostBtn =
   'inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
 const primaryBtn =
@@ -107,7 +115,7 @@ const addAward = () => {
   resume.value.awards.push({ title: '', level: '', date: '' } as Award)
 }
 
-const removeItem = <T>(list: T[] | undefined, index: number) => {
+const removeItem = <T,>(list: T[] | undefined, index: number) => {
   if (!list) return
   list.splice(index, 1)
 }
@@ -121,16 +129,21 @@ const promptAdd = (list: string[] | undefined) => {
 <template>
   <Transition name="fade">
     <div v-if="open" class="fixed inset-0 z-50 flex justify-end bg-slate-900/40 backdrop-blur">
-      <div class="flex h-full w-full max-w-[720px] flex-col bg-white shadow-2xl">
+      <div class="flex h-full w-full max-w-180 flex-col bg-white shadow-2xl">
         <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <div class="flex items-center gap-3">
             <span
-              class="rounded-full bg-[var(--color-primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--color-primary)]">{{
-                $t('actions.editMode') }}</span>
+              class="rounded-full bg-[var(--color-primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--color-primary)]"
+              >{{ $t('actions.editMode') }}
+            </span>
             <div class="flex gap-2 text-sm font-medium text-slate-600">
-              <button v-for="item in ['profile', 'education', 'experience', 'projects', 'awards']" :key="item"
-                :class="section === (item as EditorSection) ? pillBtnActive : pillBtn" class="capitalize"
-                @click="section = item as EditorSection">
+              <button
+                v-for="item in ['profile', 'education', 'experience', 'projects', 'awards']"
+                :key="item"
+                :class="section === (item as EditorSection) ? pillBtnActive : pillBtn"
+                class="capitalize"
+                @click="section = item as EditorSection"
+              >
                 {{ item }}
               </button>
             </div>
@@ -142,7 +155,12 @@ const promptAdd = (list: string[] | undefined) => {
           <div v-if="section === 'profile'" class="space-y-4">
             <div class="grid gap-4 md:grid-cols-2">
               <FormInput v-model="resume.profile.name" label="姓名" placeholder="Your name" />
-              <FormInput v-model="profileAvatar().url" label="头像 URL" type="url" placeholder="https://" />
+              <FormInput
+                v-model="profileAvatar().url"
+                label="头像 URL"
+                type="url"
+                placeholder="https://"
+              />
               <FormInput v-model="resume.profile.email" label="邮箱" type="email" />
               <FormInput v-model="resume.profile.phone" label="电话" />
               <FormInput v-model="resume.profile.github" label="GitHub" type="url" />
@@ -175,7 +193,13 @@ const promptAdd = (list: string[] | undefined) => {
                   <FormInput v-model="ensureEduTime(item)[0]" label="开始时间" />
                   <FormInput v-model="ensureEduTime(item)[1]" label="结束时间" />
                 </div>
-                <FormInput v-model="item.eduDesc" label="描述 (支持 markdown)" textarea :rows="3" class="md:col-span-2" />
+                <FormInput
+                  v-model="item.eduDesc"
+                  label="描述 (支持 markdown)"
+                  textarea
+                  :rows="3"
+                  class="md:col-span-2"
+                />
               </div>
             </div>
           </div>
@@ -201,13 +225,25 @@ const promptAdd = (list: string[] | undefined) => {
                 <div class="md:col-span-2">
                   <div class="flex items-center justify-between">
                     <span class="text-sm font-medium text-slate-700">工作内容</span>
-                    <button :class="ghostBtn" @click="promptAdd(ensureJobDesc(item))">添加一条</button>
+                    <button :class="ghostBtn" @click="promptAdd(ensureJobDesc(item))">
+                      添加一条
+                    </button>
                   </div>
                   <div class="space-y-2">
-                    <div v-for="(desc, dIdx) in ensureJobDesc(item)" :key="dIdx" class="flex items-start gap-2">
-                      <textarea v-model="ensureJobDesc(item)[dIdx]" :class="textareaClass" class="flex-1"
-                        rows="2"></textarea>
-                      <button :class="ghostBtn" @click="removeItem(ensureJobDesc(item), dIdx)">删</button>
+                    <div
+                      v-for="(desc, dIdx) in ensureJobDesc(item)"
+                      :key="dIdx"
+                      class="flex items-start gap-2"
+                    >
+                      <textarea
+                        v-model="ensureJobDesc(item)[dIdx]"
+                        :class="textareaClass"
+                        class="flex-1"
+                        rows="2"
+                      ></textarea>
+                      <button :class="ghostBtn" @click="removeItem(ensureJobDesc(item), dIdx)">
+                        删
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -235,42 +271,76 @@ const promptAdd = (list: string[] | undefined) => {
                 </div>
                 <label class="flex flex-col gap-2 text-sm font-medium text-slate-700 md:col-span-2">
                   <span>技术栈 (逗号分隔)</span>
-                  <input :value="item.techStack?.join(', ')" :class="inputClass" placeholder="Vue, TypeScript, Tailwind"
+                  <input
+                    :value="item.techStack?.join(', ')"
+                    :class="inputClass"
+                    placeholder="Vue, TypeScript, Tailwind"
                     @input="
                       item.techStack = (($event.target as HTMLInputElement).value || '')
                         .split(',')
                         .map((s) => s.trim())
                         .filter(Boolean)
-                      " />
+                    "
+                  />
                 </label>
-                <FormInput v-model="item.projectDesc" label="描述" textarea :rows="3" class="md:col-span-2" />
+                <FormInput
+                  v-model="item.projectDesc"
+                  label="描述"
+                  textarea
+                  :rows="3"
+                  class="md:col-span-2"
+                />
               </div>
               <div class="grid gap-3 md:grid-cols-2">
                 <div>
                   <div class="flex items-center justify-between">
                     <span class="text-sm font-medium text-slate-700">主要工作</span>
-                    <button :class="ghostBtn" @click="ensureMainWork(item).push({ title: '', desc: '' })">新增</button>
+                    <button
+                      :class="ghostBtn"
+                      @click="ensureMainWork(item).push({ title: '', desc: '' })"
+                    >
+                      新增
+                    </button>
                   </div>
                   <div class="space-y-2">
-                    <div v-for="(work, wIdx) in ensureMainWork(item)" :key="wIdx"
-                      class="rounded-lg border border-slate-200 p-3">
+                    <div
+                      v-for="(work, wIdx) in ensureMainWork(item)"
+                      :key="wIdx"
+                      class="rounded-lg border border-slate-200 p-3"
+                    >
                       <FormInput v-model="work.title" label="标题" />
                       <FormInput v-model="work.desc" label="描述" textarea :rows="2" />
-                      <button :class="ghostBtn" @click="removeItem(ensureMainWork(item), wIdx)">删除</button>
+                      <button :class="ghostBtn" @click="removeItem(ensureMainWork(item), wIdx)">
+                        删除
+                      </button>
                     </div>
                   </div>
                 </div>
                 <div>
                   <div class="flex items-center justify-between">
                     <span class="text-sm font-medium text-slate-700">项目成果</span>
-                    <button :class="ghostBtn" @click="promptAdd(ensureProjectAchievements(item))">新增</button>
+                    <button :class="ghostBtn" @click="promptAdd(ensureProjectAchievements(item))">
+                      新增
+                    </button>
                   </div>
                   <div class="space-y-2">
-                    <div v-for="(ach, aIdx) in ensureProjectAchievements(item)" :key="aIdx"
-                      class="flex items-start gap-2">
-                      <textarea v-model="ensureProjectAchievements(item)[aIdx]" :class="textareaClass" class="flex-1"
-                        rows="2"></textarea>
-                      <button :class="ghostBtn" @click="removeItem(ensureProjectAchievements(item), aIdx)">删</button>
+                    <div
+                      v-for="(ach, aIdx) in ensureProjectAchievements(item)"
+                      :key="aIdx"
+                      class="flex items-start gap-2"
+                    >
+                      <textarea
+                        v-model="ensureProjectAchievements(item)[aIdx]"
+                        :class="textareaClass"
+                        class="flex-1"
+                        rows="2"
+                      ></textarea>
+                      <button
+                        :class="ghostBtn"
+                        @click="removeItem(ensureProjectAchievements(item), aIdx)"
+                      >
+                        删
+                      </button>
                     </div>
                   </div>
                 </div>

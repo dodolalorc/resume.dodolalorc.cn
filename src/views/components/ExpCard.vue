@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ExperienceConfig } from '@/types/resumeConfig'
+import type { ExperienceConfig } from '@/types/resume'
 
 const experience = defineModel<ExperienceConfig[]>('experience', {
   type: Array as () => ExperienceConfig[],
@@ -28,7 +28,9 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
             </div>
             <div class="entry-meta">
               <span class="pill">{{ item.jobTitle || '职位' }}</span>
-              <span v-if="item.jobTime?.length" class="text-slate-500">{{ item.jobTime.join(' · ') }}</span>
+              <span v-if="item.jobTime?.length" class="text-slate-500">{{
+                item.jobTime.join(' · ')
+              }}</span>
             </div>
           </div>
           <span class="entry-index">#{{ index + 1 }}</span>

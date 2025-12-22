@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Project } from '@/types/resumeConfig'
+import type { Project } from '@/types/resume'
 const projects = defineModel<Project[]>('projects', {
   type: Array as () => Project[],
   required: true,
@@ -23,13 +23,21 @@ const projects = defineModel<Project[]>('projects', {
           <div class="entry-title-block">
             <div class="entry-title-row">
               <span>{{ item.name }}</span>
-              <a v-if="item.link" :href="item.link" target="_blank" rel="noopener" class="entry-link">
+              <a
+                v-if="item.link"
+                :href="item.link"
+                target="_blank"
+                rel="noopener"
+                class="entry-link"
+              >
                 {{ item.link }}
               </a>
             </div>
             <div class="entry-meta">
               <span class="pill">{{ item.role || '角色' }}</span>
-              <span v-if="item.projectTime?.length" class="text-slate-500">{{ item.projectTime.join(' · ') }}</span>
+              <span v-if="item.projectTime?.length" class="text-slate-500">{{
+                item.projectTime.join(' · ')
+              }}</span>
             </div>
           </div>
           <span class="entry-index">#{{ index + 1 }}</span>
@@ -41,7 +49,11 @@ const projects = defineModel<Project[]>('projects', {
           </span>
         </div>
 
-        <div v-if="item.projectDesc" class="entry-desc prose prose-sm" v-html="item.projectDesc"></div>
+        <div
+          v-if="item.projectDesc"
+          class="entry-desc prose prose-sm"
+          v-html="item.projectDesc"
+        ></div>
 
         <div v-if="item.mainWork?.length" class="entry-block">
           <p class="entry-block-title">主要工作</p>

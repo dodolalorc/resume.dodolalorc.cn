@@ -12,7 +12,7 @@ import AwardCard from './components/AwardCard.vue'
 import ResumeToolbar from './components/ResumeToolbar.vue'
 import ResumeEditorDrawer from './components/ResumeEditorDrawer.vue'
 import { useResumeStore, type ThemeKey } from '@/stores/resume'
-import type { EditorSection } from './types'
+import type { EditorSection } from '@/types/resume'
 
 const resumeStore = useResumeStore()
 const { resume, currentTheme, themes, themeKey, autosaveEnabled, lastSavedAt } = storeToRefs(resumeStore)

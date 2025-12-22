@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EducationConfig } from '@/types/resumeConfig'
+import type { EducationConfig } from '@/types/resume'
 
 const edu = defineModel<EducationConfig[]>('education', {
   type: Array as () => EducationConfig[],
@@ -27,7 +27,9 @@ const edu = defineModel<EducationConfig[]>('education', {
           </div>
           <div class="entry-meta">
             <span class="pill">{{ item.degree || '学位' }}</span>
-            <span v-if="item.eduTime?.length" class="text-slate-500">{{ item.eduTime.join(' · ') }}</span>
+            <span v-if="item.eduTime?.length" class="text-slate-500">{{
+              item.eduTime.join(' · ')
+            }}</span>
           </div>
         </div>
         <div v-if="item.eduDesc" class="entry-desc" v-html="item.eduDesc"></div>

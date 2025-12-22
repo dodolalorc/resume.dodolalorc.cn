@@ -1,6 +1,6 @@
 import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import type { ResumeConfig } from '@/types/resumeConfig'
+import type { ResumeConfig } from '@/types/resume'
 import defaultCv from '@/data/cv.json'
 
 export type ThemeKey = 'calm' | 'sunset' | 'forest' | 'mono'

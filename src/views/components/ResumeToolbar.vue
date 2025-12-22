@@ -26,26 +26,41 @@ const emit = defineEmits<{
 <template>
   <div class="mb-4 flex flex-wrap items-center gap-3">
     <div
-      class="flex items-center gap-2 rounded-2xl bg-white/70 px-3 py-2 shadow-sm ring-1 ring-slate-200 backdrop-blur">
-      <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ $t('actions.theme') }}</span>
+      class="flex items-center gap-2 rounded-2xl bg-white/70 px-3 py-2 shadow-sm ring-1 ring-slate-200 backdrop-blur"
+    >
+      <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{
+        $t('actions.theme')
+      }}</span>
       <div class="flex flex-wrap gap-2">
-        <button v-for="theme in props.themes" :key="theme.key"
-          class="flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium transition" :class="[
+        <button
+          v-for="theme in props.themes"
+          :key="theme.key"
+          class="flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium transition"
+          :class="[
             props.themeKey === theme.key
               ? 'border-transparent bg-[var(--color-primary)] text-white shadow'
               : 'border-slate-200 bg-white text-slate-700 hover:border-[var(--color-muted)]',
-          ]" @click="emit('set-theme', theme.key)">
-          <span class="inline-block h-3 w-3 rounded-full" :style="{ background: theme.colors.primary }"></span>
+          ]"
+          @click="emit('set-theme', theme.key)"
+        >
+          <span
+            class="inline-block h-3 w-3 rounded-full"
+            :style="{ background: theme.colors.primary }"
+          ></span>
           {{ theme.name }}
         </button>
       </div>
     </div>
 
     <div
-      class="flex flex-wrap items-center gap-2 rounded-2xl bg-white/70 px-3 py-2 text-xs font-medium text-slate-600 shadow-sm ring-1 ring-slate-200 backdrop-blur">
+      class="flex flex-wrap items-center gap-2 rounded-2xl bg-white/70 px-3 py-2 text-xs font-medium text-slate-600 shadow-sm ring-1 ring-slate-200 backdrop-blur"
+    >
       <label class="flex cursor-pointer items-center gap-2">
-        <input v-model="autosaveEnabled" type="checkbox"
-          class="h-4 w-4 rounded border-slate-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]" />
+        <input
+          v-model="autosaveEnabled"
+          type="checkbox"
+          class="h-4 w-4 rounded border-slate-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+        />
         <span>{{ $t('actions.autosave') }}</span>
       </label>
       <span class="text-slate-400">| {{ $t('actions.lastSaved') }} {{ props.lastSavedText }}</span>
@@ -94,7 +109,9 @@ const emit = defineEmits<{
 
 .primary-btn:hover:not(:disabled) {
   transform: translateY(-0.125rem);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 .primary-btn:disabled {
