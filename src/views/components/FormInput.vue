@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-
 interface Props {
   label: string
   modelValue: string | undefined
@@ -21,25 +19,18 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
-const inputClass = computed(
-  () =>
-    'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30',
-)
-
-const textareaClass = computed(() => `${inputClass.value} min-h-[96px] resize-vertical`)
-
 const handleInput = (e: Event) => {
   emit('update:modelValue', (e.target as HTMLInputElement | HTMLTextAreaElement).value)
 }
 </script>
 
 <template>
-  <label class="flex flex-col gap-2 text-sm font-medium text-slate-700">
+  <label class="form-label">
     <span>{{ label }}</span>
     <textarea
       v-if="textarea"
       :value="modelValue"
-      :class="textareaClass"
+      class="form-textarea"
       :rows="rows"
       :placeholder="placeholder"
       @input="handleInput"
@@ -48,9 +39,46 @@ const handleInput = (e: Event) => {
       v-else
       :value="modelValue"
       :type="type"
-      :class="inputClass"
+      class="form-input"
       :placeholder="placeholder"
       @input="handleInput"
     />
   </label>
 </template>
+
+<style scoped>
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #1e293b;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 34, 197, 94), 0.3);
+}
+
+.form-textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+</style>

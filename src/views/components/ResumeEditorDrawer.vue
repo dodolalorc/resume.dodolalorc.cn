@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import type {
   ResumeConfig,
   EducationConfig,
@@ -29,21 +29,6 @@ const ensureJobDesc = (item: ExperienceConfig) => (item.jobDesc ??= [''])
 const ensureProjectTime = (item: Project) => (item.projectTime ??= ['', ''])
 const ensureProjectAchievements = (item: Project) => (item.projectAchievements ??= [])
 const ensureMainWork = (item: Project) => (item.mainWork ??= [])
-
-const inputClass = computed(
-  () =>
-    'w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30',
-)
-const textareaClass = computed(() => `${inputClass.value} min-h-[96px] resize-vertical`)
-const cardClass = 'rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm'
-const pillBtn =
-  'rounded-full px-3 py-1 text-sm transition bg-slate-100 text-slate-600 hover:bg-slate-200'
-const pillBtnActive =
-  'rounded-full px-3 py-1 text-sm transition bg-[var(--color-primary)] text-white shadow'
-const ghostBtn =
-  'inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
-const primaryBtn =
-  'inline-flex items-center gap-2 rounded-full border border-transparent bg-[var(--color-primary)] px-3 py-1 text-xs font-semibold text-white shadow transition hover:-translate-y-0.5 hover:shadow-lg'
 
 const normalize = () => {
   resume.value.profile.avatar ??= { url: '', rounded: true, size: 140 }
@@ -128,32 +113,28 @@ const promptAdd = (list: string[] | undefined) => {
 
 <template>
   <Transition name="fade">
-    <div v-if="open" class="fixed inset-0 z-50 flex justify-end bg-slate-900/40 backdrop-blur">
-      <div class="flex h-full w-full max-w-180 flex-col bg-white shadow-2xl">
-        <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-          <div class="flex items-center gap-3">
-            <span
-              class="rounded-full bg-(--color-primary)/10 px-3 py-1 text-xs font-semibold text-(--color-primary)"
-              >{{ $t('actions.editMode') }}
-            </span>
-            <div class="flex gap-2 text-sm font-medium text-slate-600">
+    <div v-if="open" class="drawer-overlay">
+      <div class="drawer-container">
+        <div class="drawer-header">
+          <div class="header-left">
+            <span class="edit-mode-badge">{{ $t('actions.editMode') }}</span>
+            <div class="nav-buttons">
               <button
                 v-for="item in ['profile', 'education', 'experience', 'projects', 'awards']"
                 :key="item"
-                :class="section === (item as EditorSection) ? pillBtnActive : pillBtn"
-                class="capitalize"
+                :class="['nav-button', section === (item as EditorSection) ? 'active' : '']"
                 @click="section = item as EditorSection"
               >
                 {{ item }}
               </button>
             </div>
           </div>
-          <button :class="ghostBtn" @click="open = false">{{ $t('actions.closeEdit') }}</button>
+          <button class="ghost-btn" @click="open = false">{{ $t('actions.closeEdit') }}</button>
         </div>
 
-        <div class="h-[80vh] overflow-y-auto px-6 py-4">
-          <div v-if="section === 'profile'" class="space-y-4">
-            <div class="grid gap-4 md:grid-cols-2">
+        <div class="drawer-content">
+          <div v-if="section === 'profile'" class="section-content">
+            <div class="form-grid">
               <FormInput v-model="resume.profile.name" label="姓名" placeholder="Your name" />
               <FormInput
                 v-model="profileAvatar().url"
@@ -168,80 +149,80 @@ const promptAdd = (list: string[] | undefined) => {
               <FormInput v-model="resume.profile.wechat" label="微信" />
               <FormInput v-model="resume.profile.workExpYear" label="工作年限" />
             </div>
-            <div class="grid gap-4 md:grid-cols-3">
+            <div class="form-grid-3">
               <FormInput v-model="jobIntention().city" label="意向城市" />
               <FormInput v-model="jobIntention().position" label="意向职位" />
               <FormInput v-model="jobIntention().salary" label="期望薪资" />
             </div>
           </div>
 
-          <div v-else-if="section === 'education'" class="space-y-4">
-            <div class="flex items-center justify-between">
-              <h3 class="text-base font-semibold text-slate-800">教育经历</h3>
-              <button :class="primaryBtn" @click="addEducation">新增</button>
+          <div v-else-if="section === 'education'" class="section-content">
+            <div class="section-header">
+              <h3 class="section-title">教育经历</h3>
+              <button class="primary-btn" @click="addEducation">新增</button>
             </div>
-            <div v-for="(item, idx) in educationList()" :key="idx" :class="cardClass">
-              <div class="flex items-center justify-between text-sm text-slate-500">
+            <div v-for="(item, idx) in educationList()" :key="idx" class="card">
+              <div class="card-header">
                 <span>第 {{ idx + 1 }} 条</span>
-                <button :class="ghostBtn" @click="removeItem(educationList(), idx)">删除</button>
+                <button class="ghost-btn" @click="removeItem(educationList(), idx)">删除</button>
               </div>
-              <div class="grid gap-3 md:grid-cols-2">
+              <div class="form-grid">
                 <FormInput v-model="item.school" label="学校" />
                 <FormInput v-model="item.degree" label="学位" />
                 <FormInput v-model="item.major" label="专业" />
-                <div class="grid grid-cols-2 gap-3">
+                <div class="time-grid">
                   <FormInput v-model="ensureEduTime(item)[0]" label="开始时间" />
                   <FormInput v-model="ensureEduTime(item)[1]" label="结束时间" />
                 </div>
-                <FormInput
-                  v-model="item.eduDesc"
-                  label="描述 (支持 markdown)"
-                  textarea
-                  :rows="3"
-                  class="md:col-span-2"
-                />
+                <div class="full-width">
+                  <FormInput
+                    v-model="item.eduDesc"
+                    label="描述 (支持 markdown)"
+                    textarea
+                    :rows="3"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          <div v-else-if="section === 'experience'" class="space-y-4">
-            <div class="flex items-center justify-between">
-              <h3 class="text-base font-semibold text-slate-800">工作经历</h3>
-              <button :class="primaryBtn" @click="addExperience">新增</button>
+          <div v-else-if="section === 'experience'" class="section-content">
+            <div class="section-header">
+              <h3 class="section-title">工作经历</h3>
+              <button class="primary-btn" @click="addExperience">新增</button>
             </div>
-            <div v-for="(item, idx) in experienceList()" :key="idx" :class="cardClass">
-              <div class="flex items-center justify-between text-sm text-slate-500">
+            <div v-for="(item, idx) in experienceList()" :key="idx" class="card">
+              <div class="card-header">
                 <span>第 {{ idx + 1 }} 条</span>
-                <button :class="ghostBtn" @click="removeItem(experienceList(), idx)">删除</button>
+                <button class="ghost-btn" @click="removeItem(experienceList(), idx)">删除</button>
               </div>
-              <div class="grid gap-3 md:grid-cols-2">
+              <div class="form-grid">
                 <FormInput v-model="item.company" label="公司" />
                 <FormInput v-model="item.partment" label="部门" />
                 <FormInput v-model="item.jobTitle" label="职位" />
-                <div class="grid grid-cols-2 gap-3">
+                <div class="time-grid">
                   <FormInput v-model="ensureJobTime(item)[0]" label="开始时间" />
                   <FormInput v-model="ensureJobTime(item)[1]" label="结束时间" />
                 </div>
-                <div class="md:col-span-2">
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium text-slate-700">工作内容</span>
-                    <button :class="ghostBtn" @click="promptAdd(ensureJobDesc(item))">
+                <div class="full-width">
+                  <div class="list-header">
+                    <span class="list-title">工作内容</span>
+                    <button class="ghost-btn" @click="promptAdd(ensureJobDesc(item))">
                       添加一条
                     </button>
                   </div>
-                  <div class="space-y-2">
+                  <div class="list-items">
                     <div
                       v-for="(desc, dIdx) in ensureJobDesc(item)"
                       :key="dIdx"
-                      class="flex items-start gap-2"
+                      class="list-item"
                     >
                       <textarea
                         v-model="ensureJobDesc(item)[dIdx]"
-                        :class="textareaClass"
-                        class="flex-1"
+                        class="form-textarea flex-1"
                         rows="2"
                       ></textarea>
-                      <button :class="ghostBtn" @click="removeItem(ensureJobDesc(item), dIdx)">
+                      <button class="ghost-btn" @click="removeItem(ensureJobDesc(item), dIdx)">
                         删
                       </button>
                     </div>
@@ -251,29 +232,29 @@ const promptAdd = (list: string[] | undefined) => {
             </div>
           </div>
 
-          <div v-else-if="section === 'projects'" class="space-y-4">
-            <div class="flex items-center justify-between">
-              <h3 class="text-base font-semibold text-slate-800">项目经历</h3>
-              <button :class="primaryBtn" @click="addProject">新增</button>
+          <div v-else-if="section === 'projects'" class="section-content">
+            <div class="section-header">
+              <h3 class="section-title">项目经历</h3>
+              <button class="primary-btn" @click="addProject">新增</button>
             </div>
-            <div v-for="(item, idx) in projectList()" :key="idx" :class="cardClass">
-              <div class="flex items-center justify-between text-sm text-slate-500">
+            <div v-for="(item, idx) in projectList()" :key="idx" class="card">
+              <div class="card-header">
                 <span>第 {{ idx + 1 }} 条</span>
-                <button :class="ghostBtn" @click="removeItem(projectList(), idx)">删除</button>
+                <button class="ghost-btn" @click="removeItem(projectList(), idx)">删除</button>
               </div>
-              <div class="grid gap-3 md:grid-cols-2">
+              <div class="form-grid">
                 <FormInput v-model="item.name" label="名称" />
                 <FormInput v-model="item.role" label="角色" />
                 <FormInput v-model="item.link" label="链接" />
-                <div class="grid grid-cols-2 gap-3">
+                <div class="time-grid">
                   <FormInput v-model="ensureProjectTime(item)[0]" label="开始时间" />
                   <FormInput v-model="ensureProjectTime(item)[1]" label="结束时间" />
                 </div>
-                <label class="flex flex-col gap-2 text-sm font-medium text-slate-700 md:col-span-2">
+                <label class="form-label full-width">
                   <span>技术栈 (逗号分隔)</span>
                   <input
                     :value="item.techStack?.join(', ')"
-                    :class="inputClass"
+                    class="form-input"
                     placeholder="Vue, TypeScript, Tailwind"
                     @input="
                       item.techStack = (($event.target as HTMLInputElement).value || '')
@@ -283,60 +264,60 @@ const promptAdd = (list: string[] | undefined) => {
                     "
                   />
                 </label>
-                <FormInput
-                  v-model="item.projectDesc"
-                  label="描述"
-                  textarea
-                  :rows="3"
-                  class="md:col-span-2"
-                />
+                <div class="full-width">
+                  <FormInput
+                    v-model="item.projectDesc"
+                    label="描述"
+                    textarea
+                    :rows="3"
+                  />
+                </div>
               </div>
-              <div class="grid gap-3 md:grid-cols-2">
+              <div class="project-details">
                 <div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium text-slate-700">主要工作</span>
+                  <div class="list-header">
+                    <span class="list-title">主要工作</span>
                     <button
-                      :class="ghostBtn"
+                      class="ghost-btn"
                       @click="ensureMainWork(item).push({ title: '', desc: '' })"
                     >
                       新增
                     </button>
                   </div>
-                  <div class="space-y-2">
+                  <div class="list-items">
                     <div
                       v-for="(work, wIdx) in ensureMainWork(item)"
                       :key="wIdx"
-                      class="rounded-lg border border-slate-200 p-3"
+                      class="work-item"
                     >
                       <FormInput v-model="work.title" label="标题" />
                       <FormInput v-model="work.desc" label="描述" textarea :rows="2" />
-                      <button :class="ghostBtn" @click="removeItem(ensureMainWork(item), wIdx)">
+                      <button class="ghost-btn" @click="removeItem(ensureMainWork(item), wIdx)">
                         删除
                       </button>
                     </div>
                   </div>
                 </div>
                 <div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium text-slate-700">项目成果</span>
-                    <button :class="ghostBtn" @click="promptAdd(ensureProjectAchievements(item))">
+                  <div class="list-header">
+                    <span class="list-title">项目成果</span>
+                    <button class="ghost-btn" @click="promptAdd(ensureProjectAchievements(item))">
                       新增
                     </button>
                   </div>
-                  <div class="space-y-2">
+                  <div class="list-items">
                     <div
                       v-for="(ach, aIdx) in ensureProjectAchievements(item)"
                       :key="aIdx"
-                      class="flex items-start gap-2"
+                      class="list-item"
                     >
                       <textarea
                         v-model="ensureProjectAchievements(item)[aIdx]"
-                        :class="textareaClass"
-                        class="flex-1"
+                        class="form-textarea flex-1"
                         rows="2"
                       ></textarea>
                       <button
-                        :class="ghostBtn"
+                        class="ghost-btn"
                         @click="removeItem(ensureProjectAchievements(item), aIdx)"
                       >
                         删
@@ -348,17 +329,17 @@ const promptAdd = (list: string[] | undefined) => {
             </div>
           </div>
 
-          <div v-else-if="section === 'awards'" class="space-y-4">
-            <div class="flex items-center justify-between">
-              <h3 class="text-base font-semibold text-slate-800">奖项</h3>
-              <button :class="primaryBtn" @click="addAward">新增</button>
+          <div v-else-if="section === 'awards'" class="section-content">
+            <div class="section-header">
+              <h3 class="section-title">奖项</h3>
+              <button class="primary-btn" @click="addAward">新增</button>
             </div>
-            <div v-for="(item, idx) in awardList()" :key="idx" :class="cardClass">
-              <div class="flex items-center justify-between text-sm text-slate-500">
+            <div v-for="(item, idx) in awardList()" :key="idx" class="card">
+              <div class="card-header">
                 <span>第 {{ idx + 1 }} 条</span>
-                <button :class="ghostBtn" @click="removeItem(awardList(), idx)">删除</button>
+                <button class="ghost-btn" @click="removeItem(awardList(), idx)">删除</button>
               </div>
-              <div class="grid gap-3 md:grid-cols-3">
+              <div class="form-grid-3">
                 <FormInput v-model="item.title" label="名称" />
                 <FormInput v-model="item.level" label="等级" />
                 <FormInput v-model="item.date" label="时间" />
@@ -380,5 +361,284 @@ const promptAdd = (list: string[] | undefined) => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: flex-end;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.drawer-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  max-width: 45rem;
+  flex-direction: column;
+  background-color: white;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1rem 1.5rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.edit-mode-badge {
+  border-radius: 9999px;
+  background-color: rgba(var(--color-primary-rgb, 34, 197, 94), 0.1);
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+.nav-button {
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  text-transform: capitalize;
+  transition: all 0.2s;
+  background-color: #f1f5f9;
+  color: #475569;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-button:hover {
+  background-color: #e2e8f0;
+}
+
+.nav-button.active {
+  background-color: var(--color-primary);
+  color: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+  background-color: white;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #334155;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.ghost-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-color: var(--color-primary);
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.drawer-content {
+  height: 80vh;
+  overflow-y: auto;
+  padding: 1rem 1.5rem;
+}
+
+.section-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.card {
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 1rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 0.75rem;
+}
+
+.form-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.form-grid-3 {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .form-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+.form-input {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #1e293b;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 34, 197, 94), 0.3);
+}
+
+.form-textarea {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #1e293b;
+  min-height: 96px;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-textarea:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 34, 197, 94), 0.3);
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.list-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+.list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.project-details {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .project-details {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.work-item {
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 </style>
