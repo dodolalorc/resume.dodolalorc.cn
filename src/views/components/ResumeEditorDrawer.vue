@@ -133,7 +133,7 @@ const promptAdd = (list: string[] | undefined) => {
         <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <div class="flex items-center gap-3">
             <span
-              class="rounded-full bg-[var(--color-primary)]/10 px-3 py-1 text-xs font-semibold text-[var(--color-primary)]"
+              class="rounded-full bg-(--color-primary)/10 px-3 py-1 text-xs font-semibold text-(--color-primary)"
               >{{ $t('actions.editMode') }}
             </span>
             <div class="flex gap-2 text-sm font-medium text-slate-600">

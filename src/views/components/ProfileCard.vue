@@ -82,15 +82,15 @@ const avatarSize = computed(() => profile.value.avatar?.size || 140)
 
 <template>
   <section
-    class="rounded-2xl border border-[var(--color-muted)] bg-white/80 p-6 shadow-sm shadow-slate-200/70"
+    class="rounded-2xl border border-(--color-muted) bg-white/80 p-6 shadow-sm shadow-slate-200/70"
   >
     <div class="flex flex-col gap-6 md:flex-row md:items-center">
       <div class="flex-1 space-y-4">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]">
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-(--color-primary)">
             Resume
           </p>
-          <h1 class="text-3xl font-semibold text-[var(--color-text)] md:text-4xl">
+          <h1 class="text-3xl font-semibold text-(--color-text) md:text-4xl">
             {{ profile.name || '未填写姓名' }}
           </h1>
         </div>
@@ -101,7 +101,7 @@ const avatarSize = computed(() => profile.value.avatar?.size || 140)
             :key="item.key"
             class="flex items-center gap-2 text-sm text-slate-600"
           >
-            <span v-if="showIcon" class="text-[var(--color-primary)]">
+            <span v-if="showIcon" class="text-(--color-primary)">
               <IconLogo :name="item.icon" class="h-4 w-4" />
             </span>
             <span v-if="showText" class="font-medium text-slate-700">{{
@@ -111,7 +111,7 @@ const avatarSize = computed(() => profile.value.avatar?.size || 140)
             <a
               v-if="item.href"
               :href="item.href"
-              class="truncate hover:text-[var(--color-primary)]"
+              class="truncate hover:text-(--color-primary)"
             >
               {{ item.value }}
             </a>
@@ -123,7 +123,7 @@ const avatarSize = computed(() => profile.value.avatar?.size || 140)
           <div
             v-for="item in intentions"
             :key="item.label"
-            class="flex items-center gap-2 rounded-full bg-[var(--color-secondary)]/10 px-3 py-1 text-xs font-semibold text-[var(--color-secondary)]"
+            class="flex items-center gap-2 rounded-full bg-(--color-secondary)/10 px-3 py-1 text-xs font-semibold text-(--color-secondary)"
           >
             <IconLogo :name="item.icon" class="h-4 w-4" />
             <span>{{ $t(item.label) }} · {{ item.value }}</span>

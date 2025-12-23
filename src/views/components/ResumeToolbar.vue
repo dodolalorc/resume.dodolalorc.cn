@@ -38,8 +38,8 @@ const emit = defineEmits<{
           class="flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium transition"
           :class="[
             props.themeKey === theme.key
-              ? 'border-transparent bg-[var(--color-primary)] text-white shadow'
-              : 'border-slate-200 bg-white text-slate-700 hover:border-[var(--color-muted)]',
+              ? 'border-transparent bg-(--color-primary) text-white shadow'
+              : 'border-slate-200 bg-white text-slate-700 hover:border-(--color-muted)',
           ]"
           @click="emit('set-theme', theme.key)"
         >
@@ -59,7 +59,7 @@ const emit = defineEmits<{
         <input
           v-model="autosaveEnabled"
           type="checkbox"
-          class="h-4 w-4 rounded border-slate-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+          class="h-4 w-4 rounded border-slate-300 text-(--color-primary) focus:ring-(--color-primary)"
         />
         <span>{{ $t('actions.autosave') }}</span>
       </label>
