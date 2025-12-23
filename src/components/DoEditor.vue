@@ -1,6 +1,12 @@
 <template>
   <div class="do-editor">
-    <textarea v-model="rawContent" @input="parseContent" placeholder="请输入内容..." rows="10" class="editor-textarea"></textarea>
+    <textarea
+      v-model="rawContent"
+      @input="parseContent"
+      placeholder="请输入内容..."
+      rows="10"
+      class="editor-textarea"
+    ></textarea>
     <div class="editor-preview" v-html="parsedContent"></div>
   </div>
 </template>
@@ -12,7 +18,8 @@ const rawContent = ref('')
 const parsedContent = ref('')
 
 function escapeHtml(text: string) {
-  return text.replace(/&/g, '&amp;')
+  return text
+    .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
@@ -22,7 +29,8 @@ function escapeHtml(text: string) {
 function parseContent() {
   let html = escapeHtml(rawContent.value)
   // 标题 ####、###、##、#
-  html = html.replace(/^#### (.*)$/gm, '<h4>$1</h4>')
+  html = html
+    .replace(/^#### (.*)$/gm, '<h4>$1</h4>')
     .replace(/^### (.*)$/gm, '<h3>$1</h3>')
     .replace(/^## (.*)$/gm, '<h2>$1</h2>')
     .replace(/^# (.*)$/gm, '<h1>$1</h1>')
@@ -68,7 +76,10 @@ function parseContent() {
   padding: 1rem;
   overflow: auto;
 }
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   margin: 0.5em 0;
 }
 blockquote {

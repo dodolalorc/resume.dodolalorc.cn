@@ -30,39 +30,38 @@ const name = defineModel('name', { type: String, required: true })
 
 // 图标映射表
 const iconMap: Record<string, typeof EmailIcon> = {
-  'email': EmailIcon,
-  'phone': PhoneIcon,
-  'github': GithubIcon,
+  email: EmailIcon,
+  phone: PhoneIcon,
+  github: GithubIcon,
   'github-alt': GithubAltIcon,
-  'blog': BlogIcon,
-  'bilibili': BilibiliIcon,
-  'zhihu': ZhihuIcon,
-  'briefcase': BriefcaseIcon,
+  blog: BlogIcon,
+  bilibili: BilibiliIcon,
+  zhihu: ZhihuIcon,
+  briefcase: BriefcaseIcon,
   'graduation-cap': GraduationCapIcon,
-  'star': StarIcon,
-  'trophy': TrophyIcon,
-  'link': LinkIcon,
+  star: StarIcon,
+  trophy: TrophyIcon,
+  link: LinkIcon,
   'file-pdf': FilePdfIcon,
-  'fan': FanIcon,
-  'comment': CommentIcon,
+  fan: FanIcon,
+  comment: CommentIcon,
   'thumbs-up': ThumbsUpIcon,
-  'heart': HeartIcon,
+  heart: HeartIcon,
   'face-smile': FaceSmileIcon,
-  'book': BookIcon,
-  'laptop': LaptopIcon,
+  book: BookIcon,
+  laptop: LaptopIcon,
   'location-dot': LocationDotIcon,
   'dollar-sign': DollarSignIcon,
-  'wechat': WechatIcon,
-  'edit': CommentIcon,
+  wechat: WechatIcon,
+  edit: CommentIcon,
   'rotate-left': FanIcon,
-  'file-export': LinkIcon
+  'file-export': LinkIcon,
 }
 
 // 使用计算属性来动态选择图标组件
 const iconComponent = computed(() => {
   return iconMap[name.value] || FaceSmileIcon // 如果找不到对应图标，使用默认的笑脸图标
 })
-
 </script>
 
 <template>

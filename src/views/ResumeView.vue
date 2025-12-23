@@ -15,7 +15,8 @@ import { useResumeStore, type ThemeKey } from '@/stores/resume'
 import type { EditorSection } from '@/types/resume'
 
 const resumeStore = useResumeStore()
-const { resume, currentTheme, themes, themeKey, autosaveEnabled, lastSavedAt } = storeToRefs(resumeStore)
+const { resume, currentTheme, themes, themeKey, autosaveEnabled, lastSavedAt } =
+  storeToRefs(resumeStore)
 
 const isEditing = ref(false)
 const activeSection = ref<EditorSection>('profile')
@@ -123,9 +124,9 @@ const exportToPDF = async () => {
     const y = (pdfHeight - drawHeight) / 2
     pdf.addImage(imgData, 'JPEG', x, y, drawWidth, drawHeight)
 
-    const fileName = `${resume.value.profile?.name || 'resume'}_${new Date()
-      .toISOString()
-      .split('T')[0]}.pdf`
+    const fileName = `${resume.value.profile?.name || 'resume'}_${
+      new Date().toISOString().split('T')[0]
+    }.pdf`
     pdf.save(fileName)
   } catch (error) {
     console.error('PDF导出失败:', error)
@@ -158,10 +159,19 @@ const setTheme = (key: ThemeKey) => {
 <template>
   <ViewLayout>
     <div class="w-full max-w-6xl px-6 pb-10 pt-6" :style="themeVars">
-      <ResumeToolbar :themes="themes" :theme-key="themeKey" v-model:autosave-enabled="autosaveEnabled"
-        :last-saved-text="lastSavedText" :is-editing="isEditing" :is-exporting="isExporting"
-        @toggle-edit="toggleEditing" @export-pdf="exportToPDF" @export-json="exportJson" @reset="resetData"
-        @set-theme="setTheme" />
+      <ResumeToolbar
+        :themes="themes"
+        :theme-key="themeKey"
+        v-model:autosave-enabled="autosaveEnabled"
+        :last-saved-text="lastSavedText"
+        :is-editing="isEditing"
+        :is-exporting="isExporting"
+        @toggle-edit="toggleEditing"
+        @export-pdf="exportToPDF"
+        @export-json="exportJson"
+        @reset="resetData"
+        @set-theme="setTheme"
+      />
 
       <div ref="resumeRoot" class="resume-shell">
         <ProfileCard v-model:profile="resume.profile" />
@@ -174,7 +184,11 @@ const setTheme = (key: ThemeKey) => {
       </div>
     </div>
 
-    <ResumeEditorDrawer v-model:open="isEditing" v-model:section="activeSection" v-model:resume="resume" />
+    <ResumeEditorDrawer
+      v-model:open="isEditing"
+      v-model:section="activeSection"
+      v-model:resume="resume"
+    />
   </ViewLayout>
 </template>
 
@@ -188,7 +202,9 @@ const setTheme = (key: ThemeKey) => {
   border-radius: 24px;
   padding: 32px;
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   margin: 0 auto;
 }
 </style>
