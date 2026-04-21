@@ -1,19 +1,19 @@
 {
   "profile": {
-    "name": "哆哆啦",
+    "name": "匿名候选人",
     "avatar": {
-      "url": "https://avatars.githubusercontent.com/u/114007020?v=4",
+      "url": "https://example.com/avatar.jpg",
       "rounded": true,
       "size": 150
     },
     "prepend": "both",
-    "email": "dodolalorc@gmail.com",
-    "phone": "123****4567",
-    "github": "https://github.com/dodolalorc",
-    "blog": "https://dodolalorc.cn/",
+    "email": "candidate@example.com",
+    "phone": "138****0000",
+    "github": "https://github.com/anonymous-candidate",
+    "blog": "https://example.com/",
     "zhihu": "",
     "xiaohongshu": "",
-    "wechat": "dodolalorc",
+    "wechat": "wechat_hidden",
     "workExpYear": "",
     "jobIntention": {
       "city": "杭州/上海/深圳/北京",
