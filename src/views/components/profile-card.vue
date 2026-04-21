@@ -41,8 +41,18 @@ const contactItems = computed(() => {
       value: profile.value.phone,
       href: profile.value.phone ? `tel:${profile.value.phone}` : '',
     },
-    { key: 'github', icon: 'github', value: profile.value.github, href: profile.value.github },
-    { key: 'blog', icon: 'blog', value: profile.value.blog, href: profile.value.blog },
+    {
+      key: 'github',
+      icon: 'github',
+      value: profile.value.github?.label,
+      href: profile.value.github?.url,
+    },
+    {
+      key: 'blog',
+      icon: 'blog',
+      value: profile.value.blog?.label,
+      href: profile.value.blog?.url,
+    },
     { key: 'zhihu', icon: 'zhihu', value: profile.value.zhihu, href: profile.value.zhihu },
     {
       key: 'xiaohongshu',
@@ -188,6 +198,7 @@ const avatarSize = computed(() => profile.value.avatar?.size || 140)
 .contact-item {
   display: flex;
   align-items: center;
+  line-height: 1.5;
   gap: 0.5rem;
   font-size: 0.875rem;
   color: #475569;
@@ -195,6 +206,10 @@ const avatarSize = computed(() => profile.value.avatar?.size || 140)
 
 .contact-icon {
   color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
 }
 
 .icon-size {
@@ -212,9 +227,9 @@ const avatarSize = computed(() => profile.value.avatar?.size || 140)
 }
 
 .contact-link {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: inline;
+  white-space: normal;
+  word-break: break-word;
   text-decoration: none;
   color: inherit;
 }

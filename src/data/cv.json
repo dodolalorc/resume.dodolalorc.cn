@@ -9,8 +9,14 @@
     "prepend": "both",
     "email": "dodolalorc@gmail.com",
     "phone": "138****0000",
-    "github": "https://github.com/dodolalorc",
-    "blog": "https://dodolalorc.cn/",
+    "github": {
+      "url": "https://github.com/dodolalorc",
+      "label": "github.com/dodolalorc"
+    },
+    "blog": {
+      "url": "https://dodolalorc.cn/",
+      "label": "dodolalorc.cn"
+    },
     "zhihu": "",
     "xiaohongshu": "",
     "wechat": "wechat_hidden",

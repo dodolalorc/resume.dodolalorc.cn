@@ -13,14 +13,19 @@ export interface jobIntention {
 
 export type prependType = 'icon' | 'text' | 'both' | 'none' // 基本信息的前置内容
 
+export interface LinkField {
+  url: string // 实际跳转链接
+  label: string // 显示文字
+}
+
 export interface Profile {
   name?: string // 姓名
   avatar?: avatarConfig // 照片
   prepend?: prependType // 基本信息的前置内容
   email?: string // 邮箱
   phone?: string // 电话
-  github?: string // GitHub 链接
-  blog?: string // 个人博客链接
+  github?: LinkField // GitHub 链接
+  blog?: LinkField // 个人博客链接
   zhihu?: string // 知乎链接
   xiaohongshu?: string // 小红书链接
   wechat?: string // 微信链接
