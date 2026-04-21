@@ -52,7 +52,10 @@
   "projects": [
     {
       "name": "哈佛教育论坛——新兴科技与未来人才联合论坛网站",
-      "link": "https://harvardces.eduhk.hk/",
+      "link": {
+        "url": "https://harvardces.eduhk.hk/",
+        "label": "harvardces.eduhk.hk"
+      },
       "role": "前端负责人",
       "techStack": [
         "Nuxt",
@@ -81,7 +84,10 @@
     },
     {
       "name": "东北师范大学第二学士学位报名审核系统",
-      "link": "https://tslxbm.nenu.edu.cn/",
+      "link": {
+        "url": "https://tslxbm.nenu.edu.cn/",
+        "label": "tslxbm.nenu.edu.cn"
+      },
       "role": "前端负责人",
       "techStack": [
         "Vue3",
@@ -113,7 +119,10 @@
     },
     {
       "name": "东北师范大学高考信息查询系统",
-      "link": "https://gkcx.nenu.edu.cn/",
+      "link": {
+        "url": "https://gkcx.nenu.edu.cn/",
+        "label": "gkcx.nenu.edu.cn"
+      },
       "role": "前端负责人",
       "techStack": [
         "TypeScript",

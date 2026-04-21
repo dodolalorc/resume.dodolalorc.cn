@@ -86,7 +86,7 @@ const addProject = () => {
   resume.value.projects.push({
     name: '',
     role: '',
-    link: '',
+    link: { url: '', label: '' },
     techStack: [],
     projectTime: ['', ''],
     projectDesc: '',
@@ -241,7 +241,8 @@ const promptAdd = (list: string[] | undefined) => {
               <div class="form-grid">
                 <FormInput v-model="item.name" label="名称" />
                 <FormInput v-model="item.role" label="角色" />
-                <FormInput v-model="item.link" label="链接" />
+                <FormInput v-model="item.link!.url" label="链接 URL" />
+                <FormInput v-model="item.link!.label" label="链接显示文字" />
                 <div class="time-grid">
                   <FormInput v-model="ensureProjectTime(item)[0]" label="开始时间" />
                   <FormInput v-model="ensureProjectTime(item)[1]" label="结束时间" />

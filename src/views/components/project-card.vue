@@ -16,9 +16,9 @@ const projects = defineModel<Project[]>('projects', {
       <span class="project-name">{{ item.name }}</span>
       <span class="project-time">{{ item.projectTime?.join(' - ') }}</span>
       <span class="project-role">{{ item.role }}</span>
-      <span class="project-link">
+      <span v-if="item.link" class="project-link">
         <span>链接：</span>
-        <a :href="item.link" target="_blank">{{ item.link }}</a>
+        <a :href="item.link.url" target="_blank" rel="noopener noreferrer">{{ item.link.label }}</a>
       </span>
 
       <div v-if="item.techStack && item.techStack.length" class="project-row">

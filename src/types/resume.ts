@@ -44,9 +44,14 @@ export interface EducationConfig {
   eduDesc?: string // 在校描述(支持 markdown)
 }
 
+export interface ProjectLink {
+  url: string // 实际跳转链接
+  label: string // 显示文字
+}
+
 export interface Project {
   name: string // 项目名称
-  link?: string // 项目链接
+  link?: ProjectLink // 项目链接
   role?: string // 在项目中的角色
   techStack?: string[] // 技术栈
   projectTime?: string[] // 项目时间
