@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import LogoIcon from '@/components/IconLogo.vue'
+import LogoIcon from '@/components/icon-logo.vue'
 import type { ThemeDefinition, ThemeKey } from '@/stores/resume'
 
 const props = defineProps<{

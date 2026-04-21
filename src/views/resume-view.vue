@@ -11,12 +11,12 @@ import type {
   Project,
   Award,
 } from '@/types/resume'
-import LogoIcon from '@/components/IconLogo.vue'
-import profileCard from './components/ProfileCard.vue'
-import eduCard from './components/EduCard.vue'
-import expCard from './components/ExpCard.vue'
-import projectCard from './components/ProjectCard.vue'
-import awardCard from './components/AwardCard.vue'
+import LogoIcon from '@/components/icon-logo.vue'
+import profileCard from './components/profile-card.vue'
+import eduCard from './components/edu-card.vue'
+import expCard from './components/exp-card.vue'
+import projectCard from './components/project-card.vue'
+import awardCard from './components/award-card.vue'
 import cvData from '@/data/cv.json'
 
 const config = ref<Partial<ResumeConfig>>({})

@@ -8,7 +8,7 @@ import type {
   Award,
 } from '@/types/resume'
 import type { EditorSection } from '@/types/resume'
-import FormInput from './FormInput.vue'
+import FormInput from './form-input.vue'
 
 const open = defineModel<boolean>('open', { required: true })
 const section = defineModel<EditorSection>('section', { required: true })
