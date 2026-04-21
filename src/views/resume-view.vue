@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import html2canvas from 'html2canvas'
-import jsPDF from 'jspdf'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import ViewLayout from '@/layout/view-layout.vue'
 import type {
   ResumeConfig,
@@ -18,6 +16,7 @@ import expCard from './components/exp-card.vue'
 import projectCard from './components/project-card.vue'
 import awardCard from './components/award-card.vue'
 import cvData from '@/data/cv.json'
+import { exportResumeHTML, exportResumePDF } from '@/utils/resume-export'
 
 const config = ref<Partial<ResumeConfig>>({})
 const profile = ref<Profile>({})
@@ -25,73 +24,65 @@ const education = ref<EducationConfig[]>([])
 const experience = ref<ExperienceConfig[]>([])
 const projects = ref<Project[]>([]) // 项目经历
 const awards = ref<Award[]>([]) // 奖项
-const isExporting = ref(false) // 导出状态
+const exportingType = ref<'none' | 'pdf-screen' | 'pdf-print' | 'html'>('none') // 导出状态
+const showExportMenu = ref(false)
+const exportMenuRef = ref<HTMLElement | null>(null)
 
-// PDF导出功能 - 优化文件大小（降分辨率 + JPEG压缩）
-const exportToPDF = async () => {
+const isExporting = computed(() => exportingType.value !== 'none')
+
+const exportingText = computed(() => {
+  if (exportingType.value === 'html') return '导出HTML中...'
+  if (exportingType.value === 'pdf-screen') return '导出PDF(屏幕)中...'
+  if (exportingType.value === 'pdf-print') return '导出PDF(打印)中...'
+  return '导出'
+})
+
+const toggleExportMenu = () => {
+  if (isExporting.value) return
+  showExportMenu.value = !showExportMenu.value
+}
+
+const handleDocumentClick = (event: MouseEvent) => {
+  if (!showExportMenu.value) return
+  const target = event.target as Node | null
+  if (!target) return
+  if (exportMenuRef.value?.contains(target)) return
+  showExportMenu.value = false
+}
+
+const startExport = async (mode: 'html' | 'pdf-screen' | 'pdf-print') => {
+  if (isExporting.value) return
+  showExportMenu.value = false
+
   try {
-    isExporting.value = true
+    const fileBaseName = profile.value.name || 'resume'
 
-    const element = document.querySelector('.resume-shell') as HTMLElement
-    if (!element) throw new Error('找不到简历容器')
+    if (mode === 'html') {
+      exportingType.value = 'html'
+      exportResumeHTML({
+        surfaceSelector: '.resume-export-surface',
+        fileBaseName,
+      })
+      return
+    }
 
-    // 使用较低的 scale，结合之后的重新缩放与JPEG压缩，显著减小文件体积
-    const scale = Math.min(1.2, window.devicePixelRatio || 1)
-    const canvas = await html2canvas(element, {
-      scale,
-      useCORS: true,
-      allowTaint: false,
-      backgroundColor: '#ffffff',
-      height: element.scrollHeight,
-      windowHeight: element.scrollHeight,
+    exportingType.value = mode
+    await exportResumePDF({
+      mode: mode === 'pdf-print' ? 'print' : 'screen',
+      resumeSelector: '.resume-shell',
+      fileBaseName,
     })
-
-    // 限制最大像素宽度，避免超大图片（而不是直接使用canvas的原始分辨率）
-    const MAX_WIDTH_PX = 1200
-    let finalCanvas = canvas
-    if (canvas.width > MAX_WIDTH_PX) {
-      const off = document.createElement('canvas')
-      off.width = MAX_WIDTH_PX
-      off.height = Math.round((canvas.height * MAX_WIDTH_PX) / canvas.width)
-      const ctx = off.getContext('2d')
-      if (ctx) ctx.drawImage(canvas, 0, 0, off.width, off.height)
-      finalCanvas = off
-    }
-
-    // 使用JPEG并设置较低质量以压缩体积
-    const imgData = finalCanvas.toDataURL('image/jpeg', 0.7)
-
-    // 生成PDF并将图片按比例放入单页
-    const pdf = new jsPDF('p', 'mm', 'a4')
-    const pdfWidth = 210
-    const pdfHeight = 297
-    const margin = 10
-    const imgWidthMm = pdfWidth - margin * 2
-    const imgHeightMm = (finalCanvas.height * imgWidthMm) / finalCanvas.width
-
-    let drawWidth = imgWidthMm
-    let drawHeight = imgHeightMm
-    if (imgHeightMm > pdfHeight - margin * 2) {
-      const scaleFactor = (pdfHeight - margin * 2) / imgHeightMm
-      drawWidth = imgWidthMm * scaleFactor
-      drawHeight = imgHeightMm * scaleFactor
-    }
-
-    const x = (pdfWidth - drawWidth) / 2
-    const y = (pdfHeight - drawHeight) / 2
-    pdf.addImage(imgData, 'JPEG', x, y, drawWidth, drawHeight)
-
-    const fileName = `${profile.value.name || 'resume'}_${new Date().toISOString().split('T')[0]}.pdf`
-    pdf.save(fileName)
   } catch (error) {
-    console.error('PDF导出失败:', error)
-    alert('PDF导出失败，请稍后重试')
+    console.error('导出失败:', error)
+    alert('导出失败，请稍后重试')
   } finally {
-    isExporting.value = false
+    exportingType.value = 'none'
   }
 }
 
 onMounted(() => {
+  document.addEventListener('click', handleDocumentClick)
+
   try {
     // 直接使用导入的JSON数据
     config.value = cvData as ResumeConfig
@@ -104,30 +95,44 @@ onMounted(() => {
     console.error('Error loading config:', error)
   }
 })
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleDocumentClick)
+})
 </script>
 
 <template>
   <ViewLayout>
     <!-- 导出按钮 -->
     <div class="export-toolbar">
-      <button @click="exportToPDF" :disabled="isExporting" class="export-btn">
-        <logo-icon v-if="!isExporting" name="file-pdf" />
-        <div v-else class="loading-spinner"></div>
-        {{ isExporting ? '导出中...' : '导出PDF' }}
-      </button>
+      <div ref="exportMenuRef" class="export-menu">
+        <button @click="toggleExportMenu" :disabled="isExporting" class="export-btn">
+          <logo-icon v-if="!isExporting" name="file-export" />
+          <div v-else class="loading-spinner"></div>
+          {{ exportingText }}
+        </button>
+
+        <div v-if="showExportMenu && !isExporting" class="export-options">
+          <button class="export-option" @click="startExport('html')">导出 HTML</button>
+          <button class="export-option" @click="startExport('pdf-screen')">导出 PDF（屏幕）</button>
+          <button class="export-option" @click="startExport('pdf-print')">导出 PDF（打印）</button>
+        </div>
+      </div>
     </div>
 
-    <div class="resume-shell">
-      <!-- 个人基本信息 -->
-      <profile-card v-model:profile="profile" />
-      <!-- 教育经历 -->
-      <edu-card v-model:education="education" />
-      <!-- 工作经历 -->
-      <exp-card v-model:experience="experience" />
-      <!-- 项目经历 -->
-      <project-card v-if="projects.length" v-model:projects="projects" />
-      <!-- 奖项 -->
-      <award-card v-if="awards.length" v-model:awards="awards" />
+    <div class="resume-export-surface">
+      <div class="resume-shell">
+        <!-- 个人基本信息 -->
+        <profile-card v-model:profile="profile" />
+        <!-- 教育经历 -->
+        <edu-card v-model:education="education" />
+        <!-- 工作经历 -->
+        <exp-card v-model:experience="experience" />
+        <!-- 项目经历 -->
+        <project-card v-if="projects.length" v-model:projects="projects" />
+        <!-- 奖项 -->
+        <award-card v-if="awards.length" v-model:awards="awards" />
+      </div>
     </div>
   </ViewLayout>
 </template>
@@ -137,8 +142,47 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   width: 100%;
-  max-width: 920px;
+  max-width: min(210mm, calc(100vw - 24px));
   margin: 0 auto 10px;
+}
+
+.export-menu {
+  position: relative;
+}
+
+.export-options {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 180px;
+  background-color: #fffdf7;
+  border: 1px solid #d6d0c4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.export-option {
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #2f2a24;
+  cursor: pointer;
+}
+
+.export-option:hover {
+  background-color: #f6f1e7;
+}
+
+.resume-export-surface {
+  width: 100%;
+  max-width: min(210mm, calc(100vw - 24px));
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .export-btn {
@@ -186,7 +230,7 @@ onMounted(() => {
 
 .resume-shell {
   width: 100%;
-  max-width: 920px;
+  max-width: none;
   height: fit-content;
   min-height: auto;
   display: flex;

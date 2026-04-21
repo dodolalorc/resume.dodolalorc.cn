@@ -23,6 +23,7 @@ import LaptopIcon from '@/assets/icons/laptop.svg'
 import LocationDotIcon from '@/assets/icons/location-dot.svg'
 import DollarSignIcon from '@/assets/icons/dollar-sign.svg'
 import WechatIcon from '@/assets/icons/wechat.svg'
+import HtmlFileIcon from '@/assets/icons/file-html.svg'
 
 import { computed } from 'vue'
 
@@ -56,6 +57,7 @@ const iconMap: Record<string, typeof EmailIcon> = {
   edit: CommentIcon,
   'rotate-left': FanIcon,
   'file-export': LinkIcon,
+  'file-html': HtmlFileIcon,
 }
 
 // 使用计算属性来动态选择图标组件
