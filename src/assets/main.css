@@ -1,32 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 @import 'tailwindcss';
 @import './base.css';
 
 :root {
-  color-scheme: light;
+  --paper-bg: #f3efe6;
+  --paper-surface: #fffdf7;
+  --paper-text: #1f1f1f;
+  --paper-muted: #57534e;
+  --paper-line: #d6d0c4;
+  --paper-accent: #2f2a24;
 }
 
-* {
-  font-family:
-    "Monaco",
-    LXGW Bright Medium,
-    PingFang SC,
-    'Space Grotesk',
-    'Inter',
-    'Noto Sans SC',
-    system-ui,
-    -apple-system,
-    sans-serif;
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.12), transparent 25%),
-    radial-gradient(circle at 80% 0%, rgba(234, 88, 12, 0.12), transparent 25%),
-    linear-gradient(180deg, #f8fbff, #f5f7fb 50%, #eef2f6);
-  color: #0f172a;
+  background-color: var(--paper-bg);
+  color: var(--paper-text);
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', serif;
 }
 
 #app {
@@ -35,30 +29,16 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  padding: 24px 16px;
+  box-sizing: border-box;
 }
 
 a {
-  color: inherit;
+  color: var(--paper-accent);
   text-decoration: none;
-  position: relative;
-  transition: color 0.3s ease;
-}
-
-a::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background-color: rgba(37, 99, 235, 0.7);
-  transition: width 0.3s ease;
 }
 
 a:hover {
-  color: rgba(37, 99, 235, 0.9);
-}
-
-a:hover::after {
-  width: 100%;
+  text-decoration: underline;
+  text-decoration-color: var(--paper-line);
 }

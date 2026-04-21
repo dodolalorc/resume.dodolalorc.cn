@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Award } from '@/types/resume'
+import type { Award } from '@/types/resumeConfig'
 const awards = defineModel<Award[]>('awards', {
   type: Array as () => Award[],
   required: true,
@@ -7,137 +7,62 @@ const awards = defineModel<Award[]>('awards', {
 })
 </script>
 <template>
-  <section class="section-card">
-    <header class="section-header">
-      <div class="section-title">
-        <h2>{{ $t('section.awards') }}</h2>
-        <p class="eyebrow">Awards</p>
-      </div>
-      <div class="section-line" aria-hidden="true"></div>
-      <span class="section-pill">{{ awards.length }} 项</span>
-    </header>
-
-    <div class="entry-list">
-      <article v-for="(item, index) in awards" :key="index" class="entry">
-        <div class="entry-head">
-          <div>
-            <h3 class="entry-title">{{ item.title }}</h3>
-            <p v-if="item.level" class="entry-sub">{{ item.level }}</p>
-          </div>
-          <span v-if="item.date" class="entry-tag">{{ item.date }}</span>
-        </div>
-      </article>
+  <div class="award-shell">
+    <div class="award-header">
+      <h2 class="award-title">奖项</h2>
+      <hr class="award-divider" />
     </div>
-  </section>
+    <div v-for="(item, index) in awards" :key="index" class="award-item">
+      <span class="award-name">{{ item.title }}</span>
+      <span class="award-level" v-if="item.level">{{ item.level }}</span>
+      <span class="award-time" v-if="item.date">{{ item.date }}</span>
+    </div>
+  </div>
 </template>
 <style scoped>
-.section-card {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+.award-shell {
+  width: 100%;
 
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+  .award-header {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
 
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
+    .award-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 0;
+    }
 
-.section-title .eyebrow {
-  margin-right: 2px;
-}
+    .award-divider {
+      flex: 1;
+      height: 1px;
+      background-color: #eee;
+      margin-left: 20px;
+      border: 0;
+    }
+  }
 
-.section-title h2 {
-  margin-right: 2px;
-}
+  .award-item {
+    margin: 8px 0;
 
-.eyebrow {
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #64748b;
-  margin: 0;
-  line-height: 1.25rem;
-}
+    .award-name {
+      font-size: 18px;
+      font-weight: bold;
+    }
 
-.section-title h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0;
-  color: #0f172a;
-  line-height: 1.25rem;
-}
+    .award-level {
+      margin-left: 10px;
+      color: #666;
+      /* background: #f3f3f3; */
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
 
-.section-line {
-  flex: 1;
-  height: 1px;
-  background: var(--color-muted);
-  opacity: 0.8;
-}
-
-.section-pill {
-  padding: 6px 12px;
-  border-radius: 9999px;
-  background: var(--color-secondary);
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.85rem;
-}
-
-.entry-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.entry {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 4px 0 10px;
-  border-bottom: 1px solid var(--color-muted);
-}
-
-.entry:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.entry-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.entry-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0;
-}
-
-.entry-sub {
-  margin: 4px 0 0;
-  color: var(--color-primary);
-  font-size: 0.95rem;
-}
-
-.entry-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #e2e8f0;
-  color: #0f172a;
-  font-weight: 600;
-  font-size: 0.85rem;
+    .award-time {
+      float: right;
+      color: #999;
+    }
+  }
 }
 </style>

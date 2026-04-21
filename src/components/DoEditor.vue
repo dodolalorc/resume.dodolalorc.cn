@@ -56,23 +56,25 @@ function parseContent() {
 <style scoped>
 .do-editor {
   display: flex;
-  gap: 2rem;
+  gap: 1rem;
 }
 .editor-textarea {
   width: 40%;
   min-height: 300px;
   font-size: 1rem;
   padding: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  border: 0;
+  border-radius: 0;
+  background: #fffdf7;
+  color: #1f1f1f;
   resize: vertical;
 }
 .editor-preview {
   width: 60%;
   min-height: 300px;
-  background: #fafafa;
-  border: 1px solid #eee;
-  border-radius: 8px;
+  background: #fffdf7;
+  border: 0;
+  border-radius: 0;
   padding: 1rem;
   overflow: auto;
 }
@@ -83,9 +85,9 @@ h4 {
   margin: 0.5em 0;
 }
 blockquote {
-  border-left: 4px solid #ccc;
+  border-left: 2px solid #d6d0c4;
   padding-left: 1em;
-  color: #666;
+  color: #57534e;
   margin: 1em 0;
 }
 ul {
