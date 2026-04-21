@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ExperienceConfig } from '@/types/resumeConfig'
+import type { ExperienceConfig } from '@/types/resume'
 
 const experience = defineModel<ExperienceConfig[]>('experience', {
   type: Array as () => ExperienceConfig[],

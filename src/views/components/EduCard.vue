@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EducationConfig } from '@/types/resumeConfig'
+import type { EducationConfig } from '@/types/resume'
 
 const edu = defineModel<EducationConfig[]>('education', {
   type: Array as () => EducationConfig[],

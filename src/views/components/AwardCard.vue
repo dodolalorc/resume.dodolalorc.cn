@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Award } from '@/types/resumeConfig'
+import type { Award } from '@/types/resume'
 const awards = defineModel<Award[]>('awards', {
   type: Array as () => Award[],
   required: true,

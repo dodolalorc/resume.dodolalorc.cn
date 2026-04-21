@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Project } from '@/types/resumeConfig'
+import type { Project } from '@/types/resume'
 const projects = defineModel<Project[]>('projects', {
   type: Array as () => Project[],
   required: true,

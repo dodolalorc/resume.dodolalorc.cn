@@ -10,7 +10,7 @@ import type {
   ExperienceConfig,
   Project,
   Award,
-} from '@/types/resumeConfig'
+} from '@/types/resume'
 import LogoIcon from '@/components/IconLogo.vue'
 import profileCard from './components/ProfileCard.vue'
 import eduCard from './components/EduCard.vue'
