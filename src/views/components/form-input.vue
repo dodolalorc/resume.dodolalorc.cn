@@ -50,35 +50,43 @@ const handleInput = (e: Event) => {
 .form-label {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+  gap: 4px;
+  font-size: 12px;
   font-weight: 500;
-  color: #334155;
+  color: #7a7060;
 }
 
 .form-input,
 .form-textarea {
   width: 100%;
-  border-radius: 0.75rem;
-  border: 1px solid #e2e8f0;
-  background-color: #f8fafc;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  color: #1e293b;
+  border-radius: 0;
+  border: 1px solid #d6d0c4;
+  background: #fffdf7;
+  padding: 6px 8px;
+  font-size: 13px;
+  color: #2f2a24;
+  font-family: inherit;
   transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+    border-color 0.15s,
+    box-shadow 0.15s;
+  box-sizing: border-box;
 }
 
 .form-input:focus,
 .form-textarea:focus {
-  border-color: var(--color-primary);
+  border-color: #9c8f7a;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 34, 197, 94), 0.3);
+  box-shadow: 0 0 0 2px rgba(156, 143, 122, 0.2);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: #b0a898;
 }
 
 .form-textarea {
-  min-height: 96px;
+  min-height: 80px;
   resize: vertical;
+  line-height: 1.5;
 }
 </style>

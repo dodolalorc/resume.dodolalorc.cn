@@ -1,5 +1,14 @@
 <script setup lang="ts">
 import type { ExperienceConfig } from '@/types/resume'
+import IconLogo from '@/components/icon-logo.vue'
+
+defineProps<{
+  editable?: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'edit'): void
+}>()
 
 const experience = defineModel<ExperienceConfig[]>('experience', {
   type: Array as () => ExperienceConfig[],
@@ -12,6 +21,9 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
     <div class="exp-header">
       <h2 class="exp-title">工作经历</h2>
       <hr class="exp-divider" />
+      <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
+        <IconLogo name="edit" />
+      </button>
     </div>
     <div v-for="(item, index) in experience" :key="index" class="exp-item">
       <span class="exp-company">{{ item.company }}</span>
@@ -54,6 +66,18 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
       background-color: #eee;
       margin-left: 20px;
       border: 0;
+    }
+
+    .section-edit-btn {
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      color: #666;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-left: 10px;
     }
   }
 

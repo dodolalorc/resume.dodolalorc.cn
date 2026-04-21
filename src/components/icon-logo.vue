@@ -24,6 +24,9 @@ import LocationDotIcon from '@/assets/icons/location-dot.svg'
 import DollarSignIcon from '@/assets/icons/dollar-sign.svg'
 import WechatIcon from '@/assets/icons/wechat.svg'
 import HtmlFileIcon from '@/assets/icons/file-html.svg'
+import ExportIcon from '@/assets/icons/export.svg'
+import EditIcon from '@/assets/icons/edit.svg'
+import ImportIcon from '@/assets/icons/import.svg'
 
 import { computed } from 'vue'
 
@@ -54,10 +57,12 @@ const iconMap: Record<string, typeof EmailIcon> = {
   'location-dot': LocationDotIcon,
   'dollar-sign': DollarSignIcon,
   wechat: WechatIcon,
-  edit: CommentIcon,
+  edit: EditIcon,
   'rotate-left': FanIcon,
-  'file-export': LinkIcon,
   'file-html': HtmlFileIcon,
+  'file-export': ExportIcon,
+  'file-import': ImportIcon,
+
 }
 
 // 使用计算属性来动态选择图标组件

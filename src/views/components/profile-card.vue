@@ -3,6 +3,14 @@ import { computed } from 'vue'
 import type { Profile } from '@/types/resume'
 import IconLogo from '@/components/icon-logo.vue'
 
+defineProps<{
+  editable?: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'edit'): void
+}>()
+
 const profile = defineModel<Profile>('profile', {
   type: Object,
   required: true,
@@ -95,7 +103,12 @@ const avatarSize = computed(() => profile.value.avatar?.size || 140)
     <div class="profile-container">
       <div class="profile-content">
         <div>
-          <p class="resume-label">Resume</p>
+          <div class="profile-title-row">
+            <p class="resume-label">Resume</p>
+            <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
+              <IconLogo name="edit" />
+            </button>
+          </div>
           <h1 class="profile-name">
             {{ profile.name || '未填写姓名' }}
           </h1>
@@ -170,6 +183,23 @@ const avatarSize = computed(() => profile.value.avatar?.size || 140)
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: var(--color-primary);
+}
+
+.profile-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-edit-btn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: #666;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
 
 .profile-name {

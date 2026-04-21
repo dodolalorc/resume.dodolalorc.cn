@@ -1,5 +1,14 @@
 <script setup lang="ts">
 import type { EducationConfig } from '@/types/resume'
+import IconLogo from '@/components/icon-logo.vue'
+
+defineProps<{
+  editable?: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'edit'): void
+}>()
 
 const edu = defineModel<EducationConfig[]>('education', {
   type: Array as () => EducationConfig[],
@@ -12,6 +21,9 @@ const edu = defineModel<EducationConfig[]>('education', {
     <div class="edu-header">
       <h2 class="edu-title">教育经历</h2>
       <hr class="edu-divider" />
+      <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
+        <IconLogo name="edit" />
+      </button>
     </div>
     <div v-for="(item, index) in edu" :key="index" class="edu-item">
       <span class="edu-school">{{ item.school }}</span>
@@ -41,6 +53,18 @@ const edu = defineModel<EducationConfig[]>('education', {
       background-color: #eee;
       margin-left: 20px;
       border: 0;
+    }
+
+    .section-edit-btn {
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      color: #666;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-left: 10px;
     }
   }
 

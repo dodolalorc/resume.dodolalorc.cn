@@ -1,5 +1,15 @@
 <script setup lang="ts">
 import type { Award } from '@/types/resume'
+import IconLogo from '@/components/icon-logo.vue'
+
+defineProps<{
+  editable?: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'edit'): void
+}>()
+
 const awards = defineModel<Award[]>('awards', {
   type: Array as () => Award[],
   required: true,
@@ -11,6 +21,9 @@ const awards = defineModel<Award[]>('awards', {
     <div class="award-header">
       <h2 class="award-title">奖项</h2>
       <hr class="award-divider" />
+      <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
+        <IconLogo name="edit" />
+      </button>
     </div>
     <div v-for="(item, index) in awards" :key="index" class="award-item">
       <span class="award-name">{{ item.title }}</span>
@@ -40,6 +53,18 @@ const awards = defineModel<Award[]>('awards', {
       background-color: #eee;
       margin-left: 20px;
       border: 0;
+    }
+
+    .section-edit-btn {
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      color: #666;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-left: 10px;
     }
   }
 

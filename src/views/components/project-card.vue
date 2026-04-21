@@ -1,5 +1,15 @@
 <script setup lang="ts">
 import type { Project } from '@/types/resume'
+import IconLogo from '@/components/icon-logo.vue'
+
+defineProps<{
+  editable?: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'edit'): void
+}>()
+
 const projects = defineModel<Project[]>('projects', {
   type: Array as () => Project[],
   required: true,
@@ -11,6 +21,9 @@ const projects = defineModel<Project[]>('projects', {
     <div class="project-header">
       <h2 class="project-title">项目经历</h2>
       <hr class="project-divider" />
+      <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
+        <IconLogo name="edit" />
+      </button>
     </div>
     <div v-for="(item, index) in projects" :key="index" class="project-item">
       <span class="project-name">{{ item.name }}</span>
@@ -66,6 +79,18 @@ const projects = defineModel<Project[]>('projects', {
       background-color: #eee;
       margin-left: 20px;
       border: 0;
+    }
+
+    .section-edit-btn {
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      color: #666;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-left: 10px;
     }
   }
 
