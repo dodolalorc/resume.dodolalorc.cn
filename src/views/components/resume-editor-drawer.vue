@@ -212,11 +212,7 @@ const promptAdd = (list: string[] | undefined) => {
                     </button>
                   </div>
                   <div class="list-items">
-                    <div
-                      v-for="(desc, dIdx) in ensureJobDesc(item)"
-                      :key="dIdx"
-                      class="list-item"
-                    >
+                    <div v-for="(desc, dIdx) in ensureJobDesc(item)" :key="dIdx" class="list-item">
                       <textarea
                         v-model="ensureJobDesc(item)[dIdx]"
                         class="form-textarea flex-1"
@@ -265,12 +261,7 @@ const promptAdd = (list: string[] | undefined) => {
                   />
                 </label>
                 <div class="full-width">
-                  <FormInput
-                    v-model="item.projectDesc"
-                    label="描述"
-                    textarea
-                    :rows="3"
-                  />
+                  <FormInput v-model="item.projectDesc" label="描述" textarea :rows="3" />
                 </div>
               </div>
               <div class="project-details">
@@ -285,11 +276,7 @@ const promptAdd = (list: string[] | undefined) => {
                     </button>
                   </div>
                   <div class="list-items">
-                    <div
-                      v-for="(work, wIdx) in ensureMainWork(item)"
-                      :key="wIdx"
-                      class="work-item"
-                    >
+                    <div v-for="(work, wIdx) in ensureMainWork(item)" :key="wIdx" class="work-item">
                       <FormInput v-model="work.title" label="标题" />
                       <FormInput v-model="work.desc" label="描述" textarea :rows="2" />
                       <button class="ghost-btn" @click="removeItem(ensureMainWork(item), wIdx)">
@@ -433,7 +420,9 @@ const promptAdd = (list: string[] | undefined) => {
 .nav-button.active {
   background-color: var(--color-primary);
   color: white;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
 .ghost-btn {
@@ -468,14 +457,18 @@ const promptAdd = (list: string[] | undefined) => {
   font-size: 0.75rem;
   font-weight: 600;
   color: white;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
   transition: all 0.2s;
   cursor: pointer;
 }
 
 .primary-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .drawer-content {
@@ -568,7 +561,9 @@ const promptAdd = (list: string[] | undefined) => {
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
   color: #1e293b;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .form-input:focus {
@@ -587,7 +582,9 @@ const promptAdd = (list: string[] | undefined) => {
   color: #1e293b;
   min-height: 96px;
   resize: vertical;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .form-textarea:focus {
