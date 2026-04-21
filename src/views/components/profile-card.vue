@@ -131,11 +131,7 @@ const avatarSize = computed(() => profile.value.avatar?.size || 140)
 
 <style scoped>
 .profile-card {
-  border-radius: 1rem;
-  border: 1px solid var(--color-muted);
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 1.5rem;
-  box-shadow: 0 1px 2px 0 rgba(226, 232, 240, 0.7);
+  padding: 1.5rem 0;
 }
 
 .profile-container {
@@ -251,15 +247,7 @@ const avatarSize = computed(() => profile.value.avatar?.size || 140)
 
 .avatar-ring {
   position: relative;
-  padding: 6px;
   border-radius: 50%;
-  background: conic-gradient(
-    from 120deg,
-    var(--color-primary),
-    var(--color-secondary),
-    var(--color-accent)
-  );
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15);
 }
 
 .avatar-wrapper {
@@ -268,7 +256,6 @@ const avatarSize = computed(() => profile.value.avatar?.size || 140)
   border-radius: 50%;
   overflow: hidden;
   background: #fff;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
 }
 
 .avatar-image {
