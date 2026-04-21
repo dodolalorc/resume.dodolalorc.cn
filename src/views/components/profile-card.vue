@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { Profile } from '@/types/resume'
 import IconLogo from '@/components/icon-logo.vue'
+import localAvatarUrl from '@/data/avatar.png'
 
 defineProps<{
   editable?: boolean
@@ -96,6 +97,25 @@ const intentions = computed(() => {
 })
 
 const avatarSize = computed(() => profile.value.avatar?.size || 140)
+
+const avatarUrl = computed(() => {
+  const rawUrl = profile.value.avatar?.url?.trim()
+  if (!rawUrl) return localAvatarUrl
+
+  const normalized = rawUrl.replace(/\\/g, '/')
+  const localAvatarTokens = new Set([
+    'avatar.png',
+    './avatar.png',
+    'data/avatar.png',
+    './data/avatar.png',
+    'src/data/avatar.png',
+    '/src/data/avatar.png',
+    '@/data/avatar.png',
+  ])
+
+  if (localAvatarTokens.has(normalized)) return localAvatarUrl
+  return rawUrl
+})
 </script>
 
 <template>
@@ -140,7 +160,7 @@ const avatarSize = computed(() => profile.value.avatar?.size || 140)
         <div class="avatar-ring">
           <div class="avatar-wrapper">
             <img
-              :src="profile.avatar?.url"
+              :src="avatarUrl"
               :alt="profile.name"
               class="avatar-image"
               :style="{ borderRadius: profile.avatar?.rounded ? '50%' : '16px' }"
