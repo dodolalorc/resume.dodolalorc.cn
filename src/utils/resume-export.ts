@@ -35,7 +35,9 @@ const getElement = (selector: string, errorText: string) => {
 const todayString = () => new Date().toISOString().split('T')[0]
 
 const PRINT_PAGE_MARGIN_MM = 12
-const MAX_EXPORT_HTML_BYTES = 1_500_000
+const PRINT_EXPORT_REQUEST_TIMEOUT_MS = 30_000
+const EXPORT_FONT_FAMILY =
+  "'LXGW Bright', 'LXGW WenKai', 'PingFang SC', 'Microsoft YaHei', sans-serif"
 
 const createPrintSnapshotElement = (source: HTMLElement) => {
   const wrapper = document.createElement('div')
@@ -86,11 +88,26 @@ const collectStyleText = () => {
   return chunks.join('\n')
 }
 
+const escapeHTMLAttr = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+
 const collectStylesheetLinks = () =>
   Array.from(document.querySelectorAll('link[rel="stylesheet"][href]'))
     .map((link) => link.getAttribute('href')?.trim())
     .filter((href): href is string => Boolean(href))
-    .map((href) => `<link rel="stylesheet" href="${href.replace(/"/g, '&quot;')}" />`)
+    .map((href) => {
+      try {
+        const resolvedHref = new URL(href, window.location.href).toString()
+        return `<link rel="stylesheet" href="${escapeHTMLAttr(resolvedHref)}" />`
+      } catch {
+        return ''
+      }
+    })
+    .filter(Boolean)
     .join('\n')
 
 const downloadBlob = (blob: Blob, fileName: string) => {
@@ -146,7 +163,7 @@ export const buildExportHTML = ({
       justify-content: center;
       padding: ${bodyPaddingForMode};
       box-sizing: border-box;
-      font-family: 'LXGW Bright', 'LXGW WenKai', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-family: ${EXPORT_FONT_FAMILY};
     }
 
     .resume-shell {
@@ -305,13 +322,12 @@ export const exportResumePDFPrintViaServer = async ({
     surfaceSelector,
     fileBaseName,
   })
-  const htmlBytes = new TextEncoder().encode(html).length
-  if (htmlBytes > MAX_EXPORT_HTML_BYTES) {
-    throw new Error('导出内容过大，请删减后重试')
-  }
 
   const timeoutController = new AbortController()
-  const timeoutId = window.setTimeout(() => timeoutController.abort(), 30_000)
+  const timeoutId = window.setTimeout(
+    () => timeoutController.abort(),
+    PRINT_EXPORT_REQUEST_TIMEOUT_MS,
+  )
 
   try {
     const response = await fetch(apiEndpoint, {

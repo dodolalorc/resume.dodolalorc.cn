@@ -4,6 +4,7 @@ import { chromium as playwrightChromium } from 'playwright-core'
 const MAX_HTML_BYTES = 1_500_000
 const MAX_FILE_NAME_BYTES = 120
 const REQUEST_TIMEOUT_MS = 30_000
+const FONT_LOAD_TIMEOUT_MS = 10_000
 
 interface ExportPdfBody {
   html: string
@@ -38,9 +39,20 @@ const parseBody = (body: unknown): ExportPdfBody | null => {
 
 const htmlSize = (html: string) => Buffer.byteLength(html, 'utf8')
 
+const trimByByteLength = (value: string, maxBytes: number) => {
+  let output = ''
+  for (const char of value) {
+    if (Buffer.byteLength(output + char, 'utf8') > maxBytes) break
+    output += char
+  }
+  return output
+}
+
 const safeFileName = (value?: string) => {
   const raw = value?.trim() || 'resume_print.pdf'
-  const base = raw.replace(/[^\w\u4e00-\u9fa5.\-() ]/g, '_').slice(0, MAX_FILE_NAME_BYTES).trim()
+  // \u4e00-\u9fa5: commonly used CJK Unified Ideographs
+  const normalized = raw.replace(/[^\w\u4e00-\u9fa5.\-() ]/g, '_').trim()
+  const base = trimByByteLength(normalized, MAX_FILE_NAME_BYTES).trim()
   return base.endsWith('.pdf') ? base : `${base || 'resume_print'}.pdf`
 }
 
@@ -76,7 +88,6 @@ export default async function handler(req: VercelLikeRequest, res: VercelLikeRes
   }
 
   const fileName = safeFileName(body.fileName)
-  const timeoutAbort = AbortSignal.timeout(REQUEST_TIMEOUT_MS)
 
   try {
     const executablePath = await chromium.executablePath()
@@ -96,16 +107,18 @@ export default async function handler(req: VercelLikeRequest, res: VercelLikeRes
       })
 
       await page.evaluate(
-        () =>
+        (fontLoadTimeoutMs) =>
           Promise.race([
             document.fonts?.ready ?? Promise.resolve(),
-            new Promise((resolve) => setTimeout(resolve, 10_000)),
+            new Promise((resolve) =>
+              setTimeout(() => {
+                console.warn('Font loading timeout reached; continue generating PDF.')
+                resolve(undefined)
+              }, fontLoadTimeoutMs),
+            ),
           ]),
+        FONT_LOAD_TIMEOUT_MS,
       )
-
-      if (timeoutAbort.aborted) {
-        throw new Error('PDF rendering timed out')
-      }
 
       const pdf = await page.pdf({
         format: 'A4',
@@ -115,7 +128,11 @@ export default async function handler(req: VercelLikeRequest, res: VercelLikeRes
       })
 
       res.setHeader('Content-Type', 'application/pdf')
-      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`)
+      const headerFileName = fileName.replace(/["\\]/g, '_')
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${headerFileName}"; filename*=UTF-8''${encodeURIComponent(fileName)}`,
+      )
       res.setHeader('Cache-Control', 'no-store')
       res.status(200).send(Buffer.from(pdf))
     } finally {
