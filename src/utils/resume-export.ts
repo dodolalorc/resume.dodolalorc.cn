@@ -14,6 +14,18 @@ interface ExportHTMLOptions {
   fileBaseName?: string
 }
 
+interface BuildExportHTMLOptions {
+  mode?: PdfExportMode | 'html'
+  surfaceSelector?: string
+  fileBaseName?: string
+}
+
+interface ExportPrintPDFViaServerOptions {
+  apiEndpoint?: string
+  surfaceSelector?: string
+  fileBaseName?: string
+}
+
 const getElement = (selector: string, errorText: string) => {
   const element = document.querySelector(selector) as HTMLElement | null
   if (!element) throw new Error(errorText)
@@ -21,6 +33,9 @@ const getElement = (selector: string, errorText: string) => {
 }
 
 const todayString = () => new Date().toISOString().split('T')[0]
+
+const PRINT_PAGE_MARGIN_MM = 12
+const MAX_EXPORT_HTML_BYTES = 1_500_000
 
 const createPrintSnapshotElement = (source: HTMLElement) => {
   const wrapper = document.createElement('div')
@@ -69,6 +84,128 @@ const collectStyleText = () => {
   }
 
   return chunks.join('\n')
+}
+
+const collectStylesheetLinks = () =>
+  Array.from(document.querySelectorAll('link[rel="stylesheet"][href]'))
+    .map((link) => link.getAttribute('href')?.trim())
+    .filter((href): href is string => Boolean(href))
+    .map((href) => `<link rel="stylesheet" href="${href.replace(/"/g, '&quot;')}" />`)
+    .join('\n')
+
+const downloadBlob = (blob: Blob, fileName: string) => {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = fileName
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+export const buildExportHTML = ({
+  mode = 'html',
+  surfaceSelector = '.resume-export-surface',
+  fileBaseName = 'resume',
+}: BuildExportHTMLOptions = {}) => {
+  const element = getElement(surfaceSelector, '找不到简历容器')
+  const styleText = collectStyleText()
+  const stylesheetLinks = collectStylesheetLinks()
+  const bodyBg = getComputedStyle(document.body).backgroundColor || '#f3efe6'
+  const title = `${fileBaseName}_${todayString()}`
+  const bodyBgForMode = mode === 'print' ? '#ffffff' : bodyBg
+  const bodyDisplayForMode = mode === 'print' ? 'block' : 'flex'
+  const bodyPaddingForMode = mode === 'print' ? '0' : '24px 16px'
+
+  const html = `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${title}</title>
+  ${stylesheetLinks}
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    html,
+    body {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: ${bodyBgForMode};
+      display: ${bodyDisplayForMode};
+      justify-content: center;
+      padding: ${bodyPaddingForMode};
+      box-sizing: border-box;
+      font-family: 'LXGW Bright', 'LXGW WenKai', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    .resume-shell {
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: ${PRINT_PAGE_MARGIN_MM}mm;
+    }
+
+    @media print {
+      html,
+      body {
+        background: #ffffff !important;
+      }
+
+      body {
+        display: block !important;
+        padding: 0 !important;
+      }
+
+      .resume-shell {
+        max-width: none !important;
+        width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+      }
+
+      .profile-card,
+      .edu-shell,
+      .exp-shell,
+      .project-shell,
+      .award-shell,
+      .edu-item,
+      .exp-item,
+      .project-item,
+      .award-item {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+    }
+
+    ${styleText}
+  </style>
+</head>
+<body>
+  ${element.outerHTML}
+</body>
+</html>`
+
+  return {
+    html,
+    title,
+  }
 }
 
 export const exportResumePDF = async ({
@@ -158,98 +295,60 @@ export const exportResumePDF = async ({
   }
 }
 
+export const exportResumePDFPrintViaServer = async ({
+  apiEndpoint = '/api/export/pdf',
+  surfaceSelector = '.resume-export-surface',
+  fileBaseName = 'resume',
+}: ExportPrintPDFViaServerOptions = {}) => {
+  const { html, title } = buildExportHTML({
+    mode: 'print',
+    surfaceSelector,
+    fileBaseName,
+  })
+  const htmlBytes = new TextEncoder().encode(html).length
+  if (htmlBytes > MAX_EXPORT_HTML_BYTES) {
+    throw new Error('导出内容过大，请删减后重试')
+  }
+
+  const timeoutController = new AbortController()
+  const timeoutId = window.setTimeout(() => timeoutController.abort(), 30_000)
+
+  try {
+    const response = await fetch(apiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        html,
+        fileName: `${title}_print.pdf`,
+      }),
+      signal: timeoutController.signal,
+    })
+
+    if (!response.ok) {
+      throw new Error(`打印 PDF 服务失败（${response.status}）`)
+    }
+
+    const blob = await response.blob()
+    if (!blob.size) {
+      throw new Error('打印 PDF 服务返回空文件')
+    }
+    downloadBlob(blob, `${title}_print.pdf`)
+  } finally {
+    window.clearTimeout(timeoutId)
+  }
+}
+
 export const exportResumeHTML = ({
   surfaceSelector = '.resume-export-surface',
   fileBaseName = 'resume',
 }: ExportHTMLOptions) => {
-  const element = getElement(surfaceSelector, '找不到简历容器')
-  const styleText = collectStyleText()
-  const bodyBg = getComputedStyle(document.body).backgroundColor || '#f3efe6'
-  const title = `${fileBaseName}_${todayString()}`
-
-  const html = `<!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${title}</title>
-  <style>
-    :root {
-      color-scheme: light;
-    }
-
-    * {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-
-    body {
-      margin: 0;
-      background: ${bodyBg};
-      display: flex;
-      justify-content: center;
-      padding: 24px 16px;
-      box-sizing: border-box;
-    }
-
-    .resume-shell {
-      width: 100%;
-      max-width: 920px;
-      margin: 0 auto;
-      box-sizing: border-box;
-    }
-
-    @page {
-      size: A4 portrait;
-      margin: 12mm;
-    }
-
-    @media print {
-      html,
-      body {
-        background: #ffffff !important;
-      }
-
-      body {
-        display: block !important;
-        padding: 0 !important;
-      }
-
-      .resume-shell {
-        max-width: none !important;
-        width: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: #ffffff !important;
-      }
-
-      .profile-card,
-      .edu-shell,
-      .exp-shell,
-      .project-shell,
-      .award-shell,
-      .edu-item,
-      .exp-item,
-      .project-item,
-      .award-item {
-        break-inside: avoid;
-        page-break-inside: avoid;
-      }
-    }
-
-    ${styleText}
-  </style>
-</head>
-<body>
-  ${element.outerHTML}
-</body>
-</html>`
-
+  const { html, title } = buildExportHTML({
+    mode: 'html',
+    surfaceSelector,
+    fileBaseName,
+  })
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${title}.html`
-  a.click()
-  URL.revokeObjectURL(url)
+  downloadBlob(blob, `${title}.html`)
 }
