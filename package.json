@@ -16,10 +16,12 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@sparticuz/chromium": "^138.0.2",
     "@tailwindcss/vite": "^4.1.18",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.4",
     "pinia": "^3.0.4",
+    "playwright-core": "^1.55.1",
     "tailwindcss": "^4.1.18",
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.5.26",

@@ -32,7 +32,7 @@
 | 格式                | 说明                                                 |
 | ------------------- | ---------------------------------------------------- |
 | **PDF（屏幕模式）** | 以屏幕渲染效果截图为 PDF，多页自动分割，JPEG 压缩    |
-| **PDF（打印模式）** | 以白底 A4 纸张规格渲染导出，适合打印投递             |
+| **PDF（打印模式）** | 走服务端 Chromium 原生打印（A4 / `@page`），适合打印投递 |
 | **HTML**            | 导出为独立 HTML 文件，内联样式，可离线查看或直接发送 |
 | **JSON**            | 导出当前简历全部数据为 JSON，用于备份或迁移          |
 
@@ -86,6 +86,29 @@ bun dev
 ```
 
 浏览器打开 `http://localhost:5173` 即可看到效果。
+
+### 打印模式 PDF（Serverless）说明
+
+- `PDF（屏幕模式）`：仍使用前端 `html2canvas + jsPDF`，无需后端。
+- `PDF（打印模式）`：调用 `/api/export/pdf`，由 Playwright/Chromium 生成 A4 PDF（`printBackground: true` + `preferCSSPageSize: true`），分页遵循 `@page` / `break-inside`。
+- 当前仓库已包含 Vercel Function：`api/export/pdf.ts`（Node Runtime）。
+
+#### 本地开发运行方式
+
+```bash
+# 方式 1（推荐）：同时跑前端 + /api
+npx vercel dev
+
+# 方式 2：仅跑 Vite（/api 不可用）
+bun dev
+```
+
+- 仅跑 Vite 时，点击 `PDF（打印）` 会自动回退到原有截图导出。
+
+#### 部署说明
+
+- 推荐部署到 **Vercel**（同仓库前端 + Serverless 一体化）。
+- 若使用 **Cloudflare**，可作为可选方案单独实现（例如 Browser Rendering/其他服务端渲染方案）；本仓库当前未提供 Workers 版实现。
 
 ### 常用命令
 
@@ -210,7 +233,7 @@ resume-view.vue（主视图）
 | 路由     | Vue Router 4              |
 | 样式     | TailwindCSS 4             |
 | 国际化   | vue-i18n 11               |
-| PDF 导出 | html2canvas + jsPDF       |
+| PDF 导出 | html2canvas + jsPDF（屏幕） + Playwright/Chromium（打印） |
 | 代码质量 | ESLint + Biome + Prettier |
 | 测试     | Vitest                    |
 

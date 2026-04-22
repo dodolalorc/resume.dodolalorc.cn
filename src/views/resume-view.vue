@@ -18,7 +18,7 @@ import expCard from './components/exp-card.vue'
 import projectCard from './components/project-card.vue'
 import awardCard from './components/award-card.vue'
 import cvData from '@/data/cv.json'
-import { exportResumeHTML, exportResumePDF } from '@/utils/resume-export'
+import { exportResumeHTML, exportResumePDF, exportResumePDFPrintViaServer } from '@/utils/resume-export'
 
 const config = ref<Partial<ResumeConfig>>({})
 const profile = ref<Profile>({})
@@ -133,8 +133,26 @@ const startExport = async (mode: 'html' | 'pdf-screen' | 'pdf-print' | 'json') =
     }
 
     exportingType.value = mode
+
+    if (mode === 'pdf-print') {
+      try {
+        await exportResumePDFPrintViaServer({
+          surfaceSelector: '.resume-export-surface',
+          fileBaseName,
+        })
+      } catch (error) {
+        console.warn('打印模式服务端导出失败，回退到本地截图导出:', error)
+        await exportResumePDF({
+          mode: 'print',
+          resumeSelector: '.resume-shell',
+          fileBaseName,
+        })
+      }
+      return
+    }
+
     await exportResumePDF({
-      mode: mode === 'pdf-print' ? 'print' : 'screen',
+      mode: 'screen',
       resumeSelector: '.resume-shell',
       fileBaseName,
     })
