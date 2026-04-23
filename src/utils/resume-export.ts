@@ -1,6 +1,7 @@
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import type { ResumeSize } from '@/types/resume'
+import exportResumeTemplate from '@/templates/export-resume.html?raw'
 
 export type PdfExportMode = 'screen' | 'print'
 
@@ -129,6 +130,12 @@ const downloadBlob = (blob: Blob, fileName: string) => {
   URL.revokeObjectURL(url)
 }
 
+const applyTemplate = (template: string, replacements: Record<string, string>) => {
+  return Object.entries(replacements).reduce((html, [key, value]) => {
+    return html.split(`__${key}__`).join(value)
+  }, template)
+}
+
 export const buildExportHTML = ({
   mode = 'html',
   surfaceSelector = '.resume-export-surface',
@@ -151,102 +158,18 @@ export const buildExportHTML = ({
   const bodyDisplayForMode = mode === 'print' ? 'block' : 'flex'
   const bodyPaddingForMode = mode === 'print' ? '0' : '24px 16px'
 
-  const html = `<!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${title}</title>
-  ${stylesheetLinks}
-  <style>
-    :root {
-      color-scheme: light;
-    }
-
-    * {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-
-    html,
-    body {
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: ${bodyBgForMode};
-      display: ${bodyDisplayForMode};
-      justify-content: center;
-      padding: ${bodyPaddingForMode};
-      box-sizing: border-box;
-      font-family: ${bodyFontFamily};
-    }
-
-    .resume-export-surface {
-      width: 100%;
-      max-width: 920px;
-      margin: 0 auto;
-      box-sizing: border-box;
-    }
-
-    .resume-shell {
-      width: 100%;
-      max-width: none;
-      box-sizing: border-box;
-    }
-
-    @page {
-      size: A4 portrait;
-      margin: ${PRINT_PAGE_MARGIN_MM}mm;
-    }
-
-    @media print {
-      html,
-      body {
-        background: #ffffff !important;
-      }
-
-      body {
-        display: block !important;
-        padding: 0 !important;
-      }
-
-      .resume-export-surface {
-        max-width: none !important;
-        width: auto !important;
-        margin: 0 !important;
-        background: ${bodyBgForMode} !important;
-      }
-
-      .resume-shell {
-        max-width: none !important;
-        width: auto !important;
-        margin: 0 !important;
-      }
-
-      .profile-card,
-      .edu-shell,
-      .exp-shell,
-      .project-shell,
-      .award-shell,
-      .edu-item,
-      .exp-item,
-      .project-item,
-      .award-item {
-        break-inside: avoid;
-        page-break-inside: avoid;
-      }
-    }
-
-    ${styleText}
-  </style>
-</head>
-<body>
-  ${element.outerHTML}
-</body>
-</html>`
+  const html = applyTemplate(exportResumeTemplate, {
+    EXPORT_TITLE: title,
+    STYLESHEET_LINKS: stylesheetLinks,
+    INLINE_STYLES: styleText,
+    BODY_BACKGROUND: bodyBgForMode,
+    SURFACE_BACKGROUND: exportBackground,
+    BODY_DISPLAY: bodyDisplayForMode,
+    BODY_PADDING: bodyPaddingForMode,
+    BODY_FONT_FAMILY: bodyFontFamily,
+    PRINT_MARGIN: `${PRINT_PAGE_MARGIN_MM}mm`,
+    RESUME_CONTENT: element.outerHTML,
+  })
 
   return {
     html,

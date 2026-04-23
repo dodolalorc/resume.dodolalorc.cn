@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>__EXPORT_TITLE__</title>
+  __STYLESHEET_LINKS__
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    html,
+    body {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: __BODY_BACKGROUND__;
+      display: __BODY_DISPLAY__;
+      justify-content: center;
+      padding: __BODY_PADDING__;
+      box-sizing: border-box;
+      font-family: __BODY_FONT_FAMILY__;
+    }
+
+    .resume-export-surface {
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+      box-sizing: border-box;
+      background: __SURFACE_BACKGROUND__;
+    }
+
+    .resume-shell {
+      width: 100%;
+      max-width: none;
+      box-sizing: border-box;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: __PRINT_MARGIN__;
+    }
+
+    @media print {
+      html,
+      body {
+        background: #ffffff !important;
+      }
+
+      body {
+        display: block !important;
+        padding: 0 !important;
+      }
+
+      .resume-export-surface {
+        max-width: none !important;
+        width: auto !important;
+        margin: 0 !important;
+        background: __SURFACE_BACKGROUND__ !important;
+      }
+
+      .resume-shell {
+        max-width: none !important;
+        width: auto !important;
+        margin: 0 !important;
+      }
+
+      .profile-card,
+      .edu-shell,
+      .exp-shell,
+      .project-shell,
+      .award-shell,
+      .edu-item,
+      .exp-item,
+      .project-item,
+      .award-item {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+    }
+
+    __INLINE_STYLES__
+  </style>
+</head>
+<body>
+  __RESUME_CONTENT__
+</body>
+</html>
