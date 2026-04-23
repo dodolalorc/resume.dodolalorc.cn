@@ -70,26 +70,26 @@ const RESUME_SIZE_PRESETS: Array<{
     key: 'xsmall',
     label: '极小',
     shortLabel: '极小',
-    scale: 0.88,
-    titleScale: 0.84,
-    avatarScale: 0.86,
+    scale: 0.82,
+    titleScale: 0.8,
+    avatarScale: 0.82,
   },
-  { key: 'small', label: '小', shortLabel: '小', scale: 0.94, titleScale: 0.92, avatarScale: 0.92 },
+  { key: 'small', label: '小', shortLabel: '小', scale: 0.88, titleScale: 0.86, avatarScale: 0.88 },
   {
     key: 'standard',
     label: '标准',
     shortLabel: '默认',
-    scale: 1,
-    titleScale: 0.97,
-    avatarScale: 0.97,
+    scale: 0.94,
+    titleScale: 0.91,
+    avatarScale: 0.93,
   },
   {
     key: 'large',
     label: '加大',
     shortLabel: '加大',
-    scale: 1.08,
-    titleScale: 1.04,
-    avatarScale: 1.04,
+    scale: 1,
+    titleScale: 0.97,
+    avatarScale: 0.98,
   },
 ]
 
@@ -440,25 +440,6 @@ onBeforeUnmount(() => {
       </div>
 
       <div class="toolbar-actions">
-        <div class="theme-switcher" role="radiogroup" aria-label="简历主题">
-          <button
-            v-for="theme in resumeThemes"
-            :key="theme.key"
-            class="theme-pill"
-            :class="{ active: theme.key === currentTheme.key }"
-            :aria-checked="theme.key === currentTheme.key"
-            role="radio"
-            @click="setTheme(theme.key)"
-          >
-            <span
-              class="theme-pill-chip"
-              :style="{ backgroundColor: theme.palette.primary }"
-            ></span>
-            <span class="theme-pill-name">{{ theme.name }}</span>
-            <span class="theme-pill-category">{{ theme.category }}</span>
-          </button>
-        </div>
-
         <div ref="exportMenuRef" class="export-menu">
           <button class="export-btn" :disabled="isExporting" @click="toggleExportMenu">
             <LogoIcon v-if="!isExporting" name="file-export" />
@@ -494,13 +475,43 @@ onBeforeUnmount(() => {
           <div v-if="fontSizeMenuOpen" class="font-size-panel">
             <div class="theme-panel-heading">
               <div>
-                <div class="theme-panel-title">主题风格</div>
+                <div class="theme-panel-title">设置</div>
                 <div class="theme-panel-subtitle">{{ currentTheme.audience }}</div>
               </div>
               <div class="theme-panel-tags">
                 <span v-for="tag in currentTheme.previewTags" :key="tag" class="theme-panel-tag">{{
                   tag
                 }}</span>
+              </div>
+            </div>
+
+            <div class="panel-section">
+              <div class="font-size-panel-header compact">
+                <span class="font-size-panel-title">主题风格</span>
+                <span class="font-size-panel-value">{{ currentTheme.name }}</span>
+              </div>
+
+              <div
+                class="theme-switcher settings-theme-switcher"
+                role="radiogroup"
+                aria-label="简历主题"
+              >
+                <button
+                  v-for="theme in resumeThemes"
+                  :key="theme.key"
+                  class="theme-pill"
+                  :class="{ active: theme.key === currentTheme.key }"
+                  :aria-checked="theme.key === currentTheme.key"
+                  role="radio"
+                  @click="setTheme(theme.key)"
+                >
+                  <span
+                    class="theme-pill-chip"
+                    :style="{ backgroundColor: theme.palette.primary }"
+                  ></span>
+                  <span class="theme-pill-name">{{ theme.name }}</span>
+                  <span class="theme-pill-category">{{ theme.category }}</span>
+                </button>
               </div>
             </div>
 
@@ -522,7 +533,9 @@ onBeforeUnmount(() => {
                   role="radio"
                   @click="setResumeSize(preset.key)"
                 >
-                  <span class="font-size-step-dot"></span>
+                  <span class="font-size-step-axis">
+                    <span class="font-size-step-dot"></span>
+                  </span>
                   <span class="font-size-step-label">{{ preset.shortLabel }}</span>
                 </button>
               </div>
@@ -717,16 +730,13 @@ onBeforeUnmount(() => {
   width: 100%;
   max-width: min(210mm, calc(100vw - 24px));
   margin: 0 auto 14px;
-  padding: 16px 18px;
-  border: 1px solid var(--resume-theme-border);
-  border-radius: 24px;
-  background: var(--resume-theme-toolbar-bg);
-  box-shadow: var(--resume-theme-shadow);
+  padding: 4px 2px 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   box-sizing: border-box;
-  transition:
-    background-color 0.24s ease,
-    border-color 0.24s ease,
-    box-shadow 0.24s ease;
+  transition: color 0.24s ease;
 }
 
 .toolbar-meta {
@@ -772,6 +782,11 @@ onBeforeUnmount(() => {
   justify-content: flex-end;
   gap: 8px;
   max-width: 640px;
+}
+
+.settings-theme-switcher {
+  justify-content: flex-start;
+  max-width: none;
 }
 
 .theme-pill {
@@ -898,7 +913,7 @@ onBeforeUnmount(() => {
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  align-items: end;
+  align-items: start;
   gap: 12px;
 }
 
@@ -907,7 +922,7 @@ onBeforeUnmount(() => {
   position: absolute;
   left: 10px;
   right: 10px;
-  top: 13px;
+  top: 15px;
   height: 4px;
   border-radius: 999px;
   background: linear-gradient(
@@ -923,12 +938,20 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   border: 0;
   background: transparent;
   padding: 0;
   cursor: pointer;
   color: var(--resume-theme-subtle);
+}
+
+.font-size-step-axis {
+  height: 32px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .font-size-step-dot {
@@ -1121,13 +1144,13 @@ onBeforeUnmount(() => {
 }
 
 .resume-shell {
-  --resume-text-sm: calc(13px * var(--resume-font-scale));
-  --resume-text-md: calc(14px * var(--resume-font-scale));
-  --resume-text-base: calc(15px * var(--resume-font-scale));
-  --resume-text-lg: calc(18px * var(--resume-font-scale));
-  --resume-text-xl: calc(24px * var(--resume-title-scale));
-  --resume-text-hero: calc(30px * var(--resume-title-scale));
-  --resume-text-hero-desktop: calc(36px * var(--resume-title-scale));
+  --resume-text-sm: calc(12px * var(--resume-font-scale));
+  --resume-text-md: calc(13px * var(--resume-font-scale));
+  --resume-text-base: calc(14px * var(--resume-font-scale));
+  --resume-text-lg: calc(16px * var(--resume-font-scale));
+  --resume-text-xl: calc(20px * var(--resume-title-scale));
+  --resume-text-hero: calc(26px * var(--resume-title-scale));
+  --resume-text-hero-desktop: calc(30px * var(--resume-title-scale));
   display: flex;
   flex-direction: column;
   gap: var(--resume-shell-gap);
@@ -1282,8 +1305,7 @@ onBeforeUnmount(() => {
 
 @media (max-width: 640px) {
   .export-toolbar {
-    padding: 14px;
-    border-radius: 18px;
+    padding: 2px 0 6px;
   }
 
   .theme-pill {
