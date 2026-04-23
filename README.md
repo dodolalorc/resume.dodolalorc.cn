@@ -108,6 +108,12 @@ bun dev
 #### 部署说明
 
 - 推荐部署到 **Vercel**（同仓库前端 + Serverless 一体化）。
+- 仓库已提供 `vercel.json`，默认导入即可部署，无需在 Vercel UI 手动填写命令：
+  - `installCommand`: `bun install`
+  - `buildCommand`: `bun run build`
+  - `outputDirectory`: `dist`
+  - 路由：`/api/*` 保持走 Serverless Function，其他路径回退到 `index.html`（Vue Router history mode）。
+- 已在 `package.json` 声明 `packageManager: bun@1.3.5`（与 `.bun-version` 一致），避免平台误判包管理器导致的安装/构建不一致。
 - 若使用 **Cloudflare**，可作为可选方案单独实现（例如 Browser Rendering/其他服务端渲染方案）；本仓库当前未提供 Workers 版实现。
 
 ### 常用命令
