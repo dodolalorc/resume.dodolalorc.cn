@@ -76,7 +76,7 @@ export default async function handler(req: VercelLikeRequest, res: VercelLikeRes
   }
 
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST')
+    res.setHeader('Allow', 'POST, OPTIONS')
     res.status(405).send('Method Not Allowed')
     return
   }
@@ -105,7 +105,7 @@ export default async function handler(req: VercelLikeRequest, res: VercelLikeRes
     const browser = await playwrightChromium.launch({
       args: chromium.args,
       executablePath,
-      headless: chromium.headless,
+      headless: true,
     })
 
     try {
@@ -135,7 +135,6 @@ export default async function handler(req: VercelLikeRequest, res: VercelLikeRes
         format: 'A4',
         printBackground: true,
         preferCSSPageSize: true,
-        timeout: REQUEST_TIMEOUT_MS,
       })
 
       res.setHeader('Content-Type', 'application/pdf')
