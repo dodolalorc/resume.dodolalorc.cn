@@ -39,8 +39,8 @@ const projects = defineModel<Project[]>('projects', {
         <span class="project-content project-item-stack">{{ item.techStack.join(', ') }}</span>
       </div>
       <div v-if="item.projectDesc" class="project-row">
-        <span class="project-content project-item-title">项目描述：</span>
-        <span v-html="item.projectDesc" />
+        <span class="project-item-title">项目描述：</span>
+        <span class="project-content" v-html="item.projectDesc" />
       </div>
       <div v-if="item.mainWork && item.mainWork.length" class="project-row">
         <span class="project-item-title">主要工作：</span>

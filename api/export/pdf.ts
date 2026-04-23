@@ -21,6 +21,11 @@ type VercelLikeResponse = {
   send: (body: string | Buffer | object) => void
 }
 
+const setApiHeaders = (res: VercelLikeResponse) => {
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+}
+
 const parseBody = (body: unknown): ExportPdfBody | null => {
   if (!body) return null
   if (typeof body === 'string') {
@@ -63,6 +68,13 @@ export const config = {
 }
 
 export default async function handler(req: VercelLikeRequest, res: VercelLikeResponse) {
+  setApiHeaders(res)
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('')
+    return
+  }
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST')
     res.status(405).send('Method Not Allowed')

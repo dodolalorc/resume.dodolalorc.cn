@@ -77,6 +77,7 @@ const edu = defineModel<EducationConfig[]>('education', {
     .edu-time {
       margin-left: 10px;
       color: #666;
+      font-size: var(--resume-text-sm, 13px);
     }
     .edu-degree {
       display: inline-block;
@@ -92,12 +93,17 @@ const edu = defineModel<EducationConfig[]>('education', {
     .edu-major {
       margin-left: 10px;
       color: #666;
+      font-size: var(--resume-text-sm, 13px);
     }
     .edu-desc {
       margin-top: 8px;
       line-height: 1.6;
       font-size: var(--resume-text-base, 15px);
       color: #333;
+
+      :deep(*) {
+        font-size: inherit;
+      }
     }
   }
 }

@@ -239,21 +239,20 @@ const avatarUrl = computed(() => {
 .contact-grid {
   display: grid;
   gap: 0.5rem;
-}
-
-@media (min-width: 640px) {
-  .contact-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .contact-item {
   display: flex;
   align-items: center;
   line-height: 1.5;
-  gap: 0.5rem;
+  gap: 0.35rem;
   font-size: var(--resume-text-md, 14px);
   color: #475569;
+}
+
+.contact-item .separator {
+  margin-inline: 0;
 }
 
 .contact-icon {
@@ -299,10 +298,10 @@ const avatarUrl = computed(() => {
 .intention-badge {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
   border-radius: 9999px;
   background-color: rgba(var(--color-secondary-rgb, 59, 130, 246), 0.1);
-  padding: 0.25rem 0.75rem;
+  padding: 0.2rem 0.6rem;
   font-size: calc(12px * var(--resume-font-scale, 1));
   font-weight: 600;
   color: var(--color-secondary);
@@ -329,5 +328,17 @@ const avatarUrl = computed(() => {
   height: 100%;
   width: 100%;
   object-fit: cover;
+}
+</style>
+
+<style>
+.resume-shell[data-export-size='small'] .contact-grid,
+.resume-shell[data-export-size='xsmall'] .contact-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.resume-shell[data-export-size='standard'] .contact-grid,
+.resume-shell[data-export-size='large'] .contact-grid {
+  grid-template-columns: repeat(2, 1fr);
 }
 </style>

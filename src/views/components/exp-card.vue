@@ -92,6 +92,7 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
     .exp-partment {
       margin-left: 10px;
       color: #666;
+      font-size: var(--resume-text-base, 15px);
     }
 
     .exp-title {
