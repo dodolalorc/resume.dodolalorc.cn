@@ -40,6 +40,11 @@ interface ExportPrintPDFViaServerOptions {
   backgroundColor?: string
 }
 
+interface CanvasRenderAttempt {
+  foreignObjectRendering: boolean
+  scale: number
+}
+
 const getElement = (selector: string, errorText: string) => {
   const element = document.querySelector(selector) as HTMLElement | null
   if (!element) throw new Error(errorText)
@@ -136,6 +141,85 @@ const applyTemplate = (template: string, replacements: Record<string, string>) =
   }, template)
 }
 
+const isCanvasLikelyBlank = (canvas: HTMLCanvasElement) => {
+  const context = canvas.getContext('2d', { willReadFrequently: true })
+  if (!context) return false
+
+  const sampleSize = 12
+  const stepX = Math.max(1, Math.floor(canvas.width / sampleSize))
+  const stepY = Math.max(1, Math.floor(canvas.height / sampleSize))
+  const reference = context.getImageData(0, 0, 1, 1).data
+  let differentPixels = 0
+
+  for (let y = 0; y < canvas.height; y += stepY) {
+    for (let x = 0; x < canvas.width; x += stepX) {
+      const pixel = context.getImageData(x, y, 1, 1).data
+      if (
+        Math.abs(pixel[0] - reference[0]) > 4 ||
+        Math.abs(pixel[1] - reference[1]) > 4 ||
+        Math.abs(pixel[2] - reference[2]) > 4 ||
+        Math.abs(pixel[3] - reference[3]) > 4
+      ) {
+        differentPixels += 1
+        if (differentPixels >= 3) return false
+      }
+    }
+  }
+
+  return true
+}
+
+const renderResumeCanvas = async (
+  element: HTMLElement,
+  bgColor: string,
+  mode: PdfExportMode,
+) => {
+  const baseScale = Math.min(Math.max(window.devicePixelRatio || 1, 2.6), 4.5)
+  const area = element.scrollWidth * element.scrollHeight
+  const maxPixels = mode === 'print' ? 42_000_000 : 32_000_000
+  const adaptiveScale = Math.min(baseScale, Math.sqrt(maxPixels / Math.max(area, 1)))
+  const preferredScale = Math.max(2.2, adaptiveScale)
+  const fallbackScale = Math.max(1.8, Math.min(preferredScale, 2.4))
+
+  const attempts: CanvasRenderAttempt[] = [
+    { foreignObjectRendering: true, scale: preferredScale },
+    { foreignObjectRendering: false, scale: preferredScale },
+    { foreignObjectRendering: false, scale: fallbackScale },
+  ]
+
+  let lastCanvas: HTMLCanvasElement | null = null
+
+  for (const attempt of attempts) {
+    const canvas = await html2canvas(element, {
+      scale: attempt.scale,
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: bgColor,
+      logging: false,
+      foreignObjectRendering: attempt.foreignObjectRendering,
+      scrollX: 0,
+      scrollY: 0,
+      width: element.scrollWidth,
+      height: element.scrollHeight,
+      windowHeight: element.scrollHeight,
+      windowWidth: element.scrollWidth,
+    })
+
+    lastCanvas = canvas
+
+    if (!isCanvasLikelyBlank(canvas)) {
+      return canvas
+    }
+
+    console.warn(
+      `检测到 PDF 导出画布可能为空白，回退重试（foreignObject=${String(attempt.foreignObjectRendering)}, scale=${attempt.scale.toFixed(2)}）`,
+    )
+  }
+
+  if (!lastCanvas) throw new Error('简历导出失败：未生成画布')
+  return lastCanvas
+}
+
 export const buildExportHTML = ({
   mode = 'html',
   surfaceSelector = '.resume-export-surface',
@@ -198,27 +282,7 @@ export const exportResumePDF = async ({
     element.style.backgroundColor = exportBackground
 
     const bgColor = exportBackground
-
-    const baseScale = Math.min(Math.max(window.devicePixelRatio || 1, 2.6), 4.5)
-    const area = element.scrollWidth * element.scrollHeight
-    const maxPixels = mode === 'print' ? 42_000_000 : 32_000_000
-    const adaptiveScale = Math.min(baseScale, Math.sqrt(maxPixels / Math.max(area, 1)))
-    const scale = Math.max(2.2, adaptiveScale)
-
-    const canvas = await html2canvas(element, {
-      scale,
-      useCORS: true,
-      allowTaint: false,
-      backgroundColor: bgColor,
-      logging: false,
-      foreignObjectRendering: true,
-      scrollX: 0,
-      scrollY: 0,
-      width: element.scrollWidth,
-      height: element.scrollHeight,
-      windowHeight: element.scrollHeight,
-      windowWidth: element.scrollWidth,
-    })
+    const canvas = await renderResumeCanvas(element, bgColor, mode)
 
     const maxWidthPx = mode === 'print' ? 3600 : 3200
     let finalCanvas = canvas
