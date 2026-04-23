@@ -42,8 +42,12 @@ const importingFromUrl = ref(false)
 const importFileInputRef = ref<HTMLInputElement | null>(null)
 const fontSizeMenuOpen = ref(false)
 const resumeSize = ref<ResumeSize>('standard')
+const preserveExportBackground = ref(true)
+const resumeBackground = ref('#fffdf7')
 
 const RESUME_SIZE_STORAGE_KEY = 'resume-font-size-v1'
+const RESUME_BACKGROUND_STORAGE_KEY = 'resume-background-v1'
+const RESUME_PRESERVE_BG_STORAGE_KEY = 'resume-preserve-bg-v1'
 const RESUME_SIZE_PRESETS: Array<{
   key: ResumeSize
   label: string
@@ -57,6 +61,16 @@ const RESUME_SIZE_PRESETS: Array<{
   { key: 'standard', label: '标准', shortLabel: '默认', scale: 1, titleScale: 0.97, avatarScale: 0.97 },
   { key: 'large', label: '加大', shortLabel: '加大', scale: 1.08, titleScale: 1.04, avatarScale: 1.04 },
 ]
+const RESUME_BACKGROUND_OPTIONS = [
+  { key: 'white', label: '纯白', value: '#ffffff' },
+  { key: 'gray-white', label: '灰白', value: '#f5f5f4' },
+  { key: 'mist', label: '雾灰白', value: '#f2f4f5' },
+  { key: 'blue-white', label: '浅蓝白', value: '#f3f7fb' },
+  { key: 'beige', label: '米白', value: '#f7f2e8' },
+  { key: 'linen', label: '亚麻白', value: '#f6f1eb' },
+  { key: 'warm-sand', label: '暖沙白', value: '#f3ede2' },
+  { key: 'soft-green', label: '浅鼠尾草', value: '#eff3ee' },
+] as const
 
 const isExporting = computed(() => exportingType.value !== 'none')
 const modeText = computed(() => (isEditing.value ? '编辑模式' : '预览模式'))
@@ -67,6 +81,7 @@ const resumeScaleStyle = computed(() => ({
   '--resume-font-scale': String(currentSizePreset.value.scale),
   '--resume-title-scale': String(currentSizePreset.value.titleScale),
   '--resume-avatar-scale': String(currentSizePreset.value.avatarScale),
+  '--resume-surface-bg': resumeBackground.value,
 }))
 
 const resumeData = computed<ResumeConfig>({
@@ -125,11 +140,28 @@ const toggleFontSizeMenu = () => {
 
 const setResumeSize = (size: ResumeSize) => {
   resumeSize.value = size
-  fontSizeMenuOpen.value = false
   try {
     localStorage.setItem(RESUME_SIZE_STORAGE_KEY, size)
   } catch (error) {
     console.warn('保存字体大小配置失败:', error)
+  }
+}
+
+const setResumeBackground = (color: string) => {
+  resumeBackground.value = color
+  try {
+    localStorage.setItem(RESUME_BACKGROUND_STORAGE_KEY, color)
+  } catch (error) {
+    console.warn('保存背景色配置失败:', error)
+  }
+}
+
+const togglePreserveExportBackground = () => {
+  preserveExportBackground.value = !preserveExportBackground.value
+  try {
+    localStorage.setItem(RESUME_PRESERVE_BG_STORAGE_KEY, JSON.stringify(preserveExportBackground.value))
+  } catch (error) {
+    console.warn('保存导出背景配置失败:', error)
   }
 }
 
@@ -175,6 +207,8 @@ const startExport = async (mode: 'html' | 'pdf-screen' | 'pdf-print' | 'json') =
         surfaceSelector: '.resume-export-surface',
         fileBaseName,
         size: resumeSize.value,
+        preserveBackground: preserveExportBackground.value,
+        backgroundColor: resumeBackground.value,
       })
       return
     }
@@ -187,14 +221,18 @@ const startExport = async (mode: 'html' | 'pdf-screen' | 'pdf-print' | 'json') =
           surfaceSelector: '.resume-export-surface',
           fileBaseName,
           size: resumeSize.value,
+          preserveBackground: preserveExportBackground.value,
+          backgroundColor: resumeBackground.value,
         })
       } catch (error) {
         console.warn('打印模式服务端导出失败，回退到本地截图导出:', error)
         await exportResumePDF({
           mode: 'print',
-          resumeSelector: '.resume-shell',
+          resumeSelector: '.resume-export-surface',
           fileBaseName,
           size: resumeSize.value,
+          preserveBackground: preserveExportBackground.value,
+          backgroundColor: resumeBackground.value,
         })
       }
       return
@@ -202,9 +240,11 @@ const startExport = async (mode: 'html' | 'pdf-screen' | 'pdf-print' | 'json') =
 
     await exportResumePDF({
       mode: 'screen',
-      resumeSelector: '.resume-shell',
+      resumeSelector: '.resume-export-surface',
       fileBaseName,
       size: resumeSize.value,
+      preserveBackground: preserveExportBackground.value,
+      backgroundColor: resumeBackground.value,
     })
   } catch (error) {
     console.error('导出失败:', error)
@@ -280,6 +320,24 @@ onMounted(() => {
     }
   } catch (error) {
     console.warn('读取字体大小配置失败:', error)
+  }
+
+  try {
+    const cachedBackground = localStorage.getItem(RESUME_BACKGROUND_STORAGE_KEY)
+    if (cachedBackground && RESUME_BACKGROUND_OPTIONS.some((item) => item.value === cachedBackground)) {
+      resumeBackground.value = cachedBackground
+    }
+  } catch (error) {
+    console.warn('读取背景色配置失败:', error)
+  }
+
+  try {
+    const cachedPreserveBackground = localStorage.getItem(RESUME_PRESERVE_BG_STORAGE_KEY)
+    if (cachedPreserveBackground !== null) {
+      preserveExportBackground.value = JSON.parse(cachedPreserveBackground)
+    }
+  } catch (error) {
+    console.warn('读取导出背景配置失败:', error)
   }
 
   try {
@@ -360,6 +418,43 @@ onBeforeUnmount(() => {
                 <span class="font-size-step-dot"></span>
                 <span class="font-size-step-label">{{ preset.shortLabel }}</span>
               </button>
+            </div>
+
+            <div class="panel-section">
+              <label class="toggle-row">
+                <input
+                  :checked="preserveExportBackground"
+                  type="checkbox"
+                  @change="togglePreserveExportBackground"
+                />
+                <span>导出时保留当前背景色</span>
+              </label>
+            </div>
+
+            <div class="panel-section">
+              <div class="font-size-panel-header compact">
+                <span class="font-size-panel-title">简历背景色</span>
+                <span class="font-size-panel-value">
+                  {{
+                    RESUME_BACKGROUND_OPTIONS.find((item) => item.value === resumeBackground)?.label ||
+                    '自定义'
+                  }}
+                </span>
+              </div>
+
+              <div class="background-swatches">
+                <button
+                  v-for="option in RESUME_BACKGROUND_OPTIONS"
+                  :key="option.key"
+                  class="background-swatch"
+                  :class="{ active: option.value === resumeBackground }"
+                  :title="option.label"
+                  @click="setResumeBackground(option.value)"
+                >
+                  <span class="background-swatch-chip" :style="{ backgroundColor: option.value }"></span>
+                  <span class="background-swatch-label">{{ option.label }}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -513,6 +608,10 @@ onBeforeUnmount(() => {
   color: #8a7d69;
 }
 
+.font-size-panel-header.compact {
+  margin-bottom: 10px;
+}
+
 .font-size-track {
   position: relative;
   display: grid;
@@ -577,6 +676,68 @@ onBeforeUnmount(() => {
   font-weight: 600;
 }
 
+.panel-section {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #e5ddd0;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #4f483d;
+  cursor: pointer;
+}
+
+.toggle-row input {
+  width: 16px;
+  height: 16px;
+  accent-color: #6f624d;
+}
+
+.background-swatches {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.background-swatch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: 1px solid #ddd4c7;
+  background: #fffdfa;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.background-swatch:hover,
+.background-swatch.active {
+  border-color: #6f624d;
+  box-shadow: 0 0 0 3px rgba(111, 98, 77, 0.1);
+  transform: translateY(-1px);
+}
+
+.background-swatch-chip {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(47, 42, 36, 0.12);
+  flex: 0 0 auto;
+}
+
+.background-swatch-label {
+  font-size: 12px;
+  color: #3e382f;
+}
+
 .export-options {
   position: absolute;
   right: 0;
@@ -610,6 +771,7 @@ onBeforeUnmount(() => {
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
+  background-color: var(--resume-surface-bg, #fffdf7);
 }
 
 .export-btn {
@@ -688,6 +850,7 @@ onBeforeUnmount(() => {
   margin: 0 auto;
 
   background-color: #fffdf7;
+  background-color: var(--resume-surface-bg, #fffdf7);
   box-sizing: border-box;
   box-shadow: none;
 }

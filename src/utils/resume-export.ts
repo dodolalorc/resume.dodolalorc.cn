@@ -9,12 +9,16 @@ interface ExportPDFOptions {
   resumeSelector?: string
   fileBaseName?: string
   size?: ResumeSize
+  preserveBackground?: boolean
+  backgroundColor?: string
 }
 
 interface ExportHTMLOptions {
   surfaceSelector?: string
   fileBaseName?: string
   size?: ResumeSize
+  preserveBackground?: boolean
+  backgroundColor?: string
 }
 
 interface BuildExportHTMLOptions {
@@ -22,6 +26,8 @@ interface BuildExportHTMLOptions {
   surfaceSelector?: string
   fileBaseName?: string
   size?: ResumeSize
+  preserveBackground?: boolean
+  backgroundColor?: string
 }
 
 interface ExportPrintPDFViaServerOptions {
@@ -29,6 +35,8 @@ interface ExportPrintPDFViaServerOptions {
   surfaceSelector?: string
   fileBaseName?: string
   size?: ResumeSize
+  preserveBackground?: boolean
+  backgroundColor?: string
 }
 
 const getElement = (selector: string, errorText: string) => {
@@ -41,9 +49,6 @@ const todayString = () => new Date().toISOString().split('T')[0]
 
 const PRINT_PAGE_MARGIN_MM = 12
 const PRINT_EXPORT_REQUEST_TIMEOUT_MS = 30_000
-const EXPORT_FONT_FAMILY =
-  "'LXGW Bright', 'LXGW WenKai', 'PingFang SC', 'Microsoft YaHei', sans-serif"
-
 const createPrintSnapshotElement = (source: HTMLElement) => {
   const wrapper = document.createElement('div')
   const clone = source.cloneNode(true) as HTMLElement
@@ -129,15 +134,20 @@ export const buildExportHTML = ({
   surfaceSelector = '.resume-export-surface',
   fileBaseName = 'resume',
   size = 'standard',
+  preserveBackground = true,
+  backgroundColor,
 }: BuildExportHTMLOptions = {}) => {
   const sourceElement = getElement(surfaceSelector, '找不到简历容器')
   const element = sourceElement.cloneNode(true) as HTMLElement
   element.setAttribute('data-export-size', size)
+  const bodyBg = getComputedStyle(document.body).backgroundColor || '#f3efe6'
+  const exportBackground = preserveBackground ? bodyBg : backgroundColor || '#ffffff'
+  element.style.backgroundColor = exportBackground
   const styleText = collectStyleText()
   const stylesheetLinks = collectStylesheetLinks()
-  const bodyBg = getComputedStyle(document.body).backgroundColor || '#f3efe6'
+  const bodyFontFamily = getComputedStyle(document.body).fontFamily
   const title = `${fileBaseName}_${todayString()}`
-  const bodyBgForMode = mode === 'print' ? '#ffffff' : bodyBg
+  const bodyBgForMode = exportBackground
   const bodyDisplayForMode = mode === 'print' ? 'block' : 'flex'
   const bodyPaddingForMode = mode === 'print' ? '0' : '24px 16px'
 
@@ -171,13 +181,19 @@ export const buildExportHTML = ({
       justify-content: center;
       padding: ${bodyPaddingForMode};
       box-sizing: border-box;
-      font-family: ${EXPORT_FONT_FAMILY};
+      font-family: ${bodyFontFamily};
+    }
+
+    .resume-export-surface {
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+      box-sizing: border-box;
     }
 
     .resume-shell {
       width: 100%;
-      max-width: 920px;
-      margin: 0 auto;
+      max-width: none;
       box-sizing: border-box;
     }
 
@@ -197,12 +213,17 @@ export const buildExportHTML = ({
         padding: 0 !important;
       }
 
+      .resume-export-surface {
+        max-width: none !important;
+        width: auto !important;
+        margin: 0 !important;
+        background: ${bodyBgForMode} !important;
+      }
+
       .resume-shell {
         max-width: none !important;
         width: auto !important;
         margin: 0 !important;
-        padding: 0 !important;
-        background: #ffffff !important;
       }
 
       .profile-card,
@@ -235,27 +256,31 @@ export const buildExportHTML = ({
 
 export const exportResumePDF = async ({
   mode,
-  resumeSelector = '.resume-shell',
+  resumeSelector = '.resume-export-surface',
   fileBaseName = 'resume',
   size = 'standard',
+  preserveBackground = true,
+  backgroundColor,
 }: ExportPDFOptions) => {
   let cleanupSnapshot: (() => void) | null = null
 
   try {
     const source = getElement(resumeSelector, '找不到简历内容容器')
-    source.setAttribute('data-export-size', size)
-    const snapshot = mode === 'print' ? createPrintSnapshotElement(source) : null
-    const element = snapshot?.element ?? source
-    cleanupSnapshot = snapshot?.cleanup ?? null
+    const sourceBg = getComputedStyle(document.body).backgroundColor || '#f3efe6'
+    const exportBackground = preserveBackground ? sourceBg : backgroundColor || '#ffffff'
+    const snapshot = createPrintSnapshotElement(source)
+    const element = snapshot.element
+    cleanupSnapshot = snapshot.cleanup
+    element.setAttribute('data-export-size', size)
+    element.style.backgroundColor = exportBackground
 
-    const bgColor =
-      mode === 'print' ? '#ffffff' : getComputedStyle(document.body).backgroundColor || '#f3efe6'
+    const bgColor = exportBackground
 
-    const baseScale = Math.min(Math.max(window.devicePixelRatio || 1, 1.7), 3)
+    const baseScale = Math.min(Math.max(window.devicePixelRatio || 1, 2.6), 4.5)
     const area = element.scrollWidth * element.scrollHeight
-    const maxPixels = mode === 'print' ? 16_000_000 : 12_000_000
+    const maxPixels = mode === 'print' ? 42_000_000 : 32_000_000
     const adaptiveScale = Math.min(baseScale, Math.sqrt(maxPixels / Math.max(area, 1)))
-    const scale = Math.max(1.6, adaptiveScale)
+    const scale = Math.max(2.2, adaptiveScale)
 
     const canvas = await html2canvas(element, {
       scale,
@@ -263,6 +288,7 @@ export const exportResumePDF = async ({
       allowTaint: false,
       backgroundColor: bgColor,
       logging: false,
+      foreignObjectRendering: true,
       scrollX: 0,
       scrollY: 0,
       width: element.scrollWidth,
@@ -271,7 +297,7 @@ export const exportResumePDF = async ({
       windowWidth: element.scrollWidth,
     })
 
-    const maxWidthPx = mode === 'print' ? 2480 : 2200
+    const maxWidthPx = mode === 'print' ? 3600 : 3200
     let finalCanvas = canvas
     if (canvas.width > maxWidthPx) {
       const off = document.createElement('canvas')
@@ -286,10 +312,7 @@ export const exportResumePDF = async ({
       finalCanvas = off
     }
 
-    const usePng = mode === 'print'
-    const imgData = usePng
-      ? finalCanvas.toDataURL('image/png')
-      : finalCanvas.toDataURL('image/jpeg', 0.92)
+    const imgData = finalCanvas.toDataURL('image/png')
 
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -297,7 +320,7 @@ export const exportResumePDF = async ({
       format: 'a4',
       compress: true,
       putOnlyUsedFonts: true,
-      precision: 2,
+      precision: 12,
     })
 
     const pageWidthMm = 210
@@ -306,13 +329,13 @@ export const exportResumePDF = async ({
     let heightLeft = imgHeightMm
     let yOffset = 0
 
-    pdf.addImage(imgData, usePng ? 'PNG' : 'JPEG', 0, yOffset, pageWidthMm, imgHeightMm)
+    pdf.addImage(imgData, 'PNG', 0, yOffset, pageWidthMm, imgHeightMm)
     heightLeft -= pageHeightMm
 
     while (heightLeft > 0) {
       yOffset = heightLeft - imgHeightMm
       pdf.addPage()
-      pdf.addImage(imgData, usePng ? 'PNG' : 'JPEG', 0, yOffset, pageWidthMm, imgHeightMm)
+      pdf.addImage(imgData, 'PNG', 0, yOffset, pageWidthMm, imgHeightMm)
       heightLeft -= pageHeightMm
     }
 
@@ -327,12 +350,16 @@ export const exportResumePDFPrintViaServer = async ({
   surfaceSelector = '.resume-export-surface',
   fileBaseName = 'resume',
   size = 'standard',
+  preserveBackground = true,
+  backgroundColor,
 }: ExportPrintPDFViaServerOptions = {}) => {
   const { html, title } = buildExportHTML({
     mode: 'print',
     surfaceSelector,
     fileBaseName,
     size,
+    preserveBackground,
+    backgroundColor,
   })
 
   const timeoutController = new AbortController()
@@ -351,6 +378,8 @@ export const exportResumePDFPrintViaServer = async ({
         html,
         fileName: `${title}_print.pdf`,
         size,
+        preserveBackground,
+        backgroundColor,
       }),
       signal: timeoutController.signal,
     })
@@ -373,12 +402,16 @@ export const exportResumeHTML = ({
   surfaceSelector = '.resume-export-surface',
   fileBaseName = 'resume',
   size = 'standard',
+  preserveBackground = true,
+  backgroundColor,
 }: ExportHTMLOptions) => {
   const { html, title } = buildExportHTML({
     mode: 'html',
     surfaceSelector,
     fileBaseName,
     size,
+    preserveBackground,
+    backgroundColor,
   })
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
   downloadBlob(blob, `${title}.html`)

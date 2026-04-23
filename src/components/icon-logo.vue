@@ -87,4 +87,13 @@ const iconComponent = computed(() => {
   height: 24px;
   padding: 2px;
 }
+
+.icon-logo :deep(svg) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  stroke: none;
+  shape-rendering: geometricPrecision;
+}
 </style>
