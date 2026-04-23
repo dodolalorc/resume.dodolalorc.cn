@@ -52,10 +52,10 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
   .exp-header {
     display: flex;
     align-items: center;
-    margin: 10px 0;
+    margin: var(--resume-block-gap, 10px) 0;
 
     .exp-title {
-      font-size: 24px;
+      font-size: var(--resume-text-xl, 24px);
       font-weight: bold;
       margin: 0;
     }
@@ -82,10 +82,10 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
   }
 
   .exp-item {
-    margin: 8px 0;
+    margin: var(--resume-section-gap, 8px) 0;
 
     .exp-company {
-      font-size: 18px;
+      font-size: var(--resume-text-lg, 18px);
       font-weight: bold;
     }
 
@@ -98,6 +98,7 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
       display: inline-block;
       margin-left: 10px;
       color: #666;
+      font-size: var(--resume-text-base, 15px);
       /* background: #f3f3f3; */
       padding: 2px 6px;
       border-radius: 4px;
@@ -105,6 +106,7 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
 
     .exp-time {
       float: right;
+      font-size: var(--resume-text-sm, 13px);
       color: #999;
     }
 
@@ -116,9 +118,11 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
       .exp-desc-title {
         min-width: 80px;
         font-weight: bold;
+        font-size: var(--resume-text-base, 15px);
       }
       .exp-desc-content {
         flex: 1;
+        font-size: var(--resume-text-base, 15px);
 
         .exp-desc-item {
           display: flex;

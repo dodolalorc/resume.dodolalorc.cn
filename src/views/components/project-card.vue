@@ -65,10 +65,10 @@ const projects = defineModel<Project[]>('projects', {
   .project-header {
     display: flex;
     align-items: center;
-    margin: 10px 0;
+    margin: var(--resume-block-gap, 10px) 0;
 
     .project-title {
-      font-size: 24px;
+      font-size: var(--resume-text-xl, 24px);
       font-weight: bold;
       margin: 0;
     }
@@ -95,39 +95,41 @@ const projects = defineModel<Project[]>('projects', {
   }
 
   .project-item {
-    margin: 8px 0;
+    margin: var(--resume-section-gap, 8px) 0;
 
     .project-name {
-      font-size: 18px;
+      font-size: var(--resume-text-lg, 18px);
       font-weight: bold;
     }
 
     .project-link {
       margin-left: 10px;
-      font-size: 15px;
+      font-size: var(--resume-text-base, 15px);
       color: #666;
     }
 
     .project-role {
       margin-left: 10px;
+      font-size: var(--resume-text-base, 15px);
       color: #666;
     }
 
     .project-time {
       float: right;
+      font-size: var(--resume-text-sm, 13px);
       color: #999;
     }
 
     .project-row {
       display: flex;
       margin-top: 4px;
-      font-size: 15px;
+      font-size: var(--resume-text-base, 15px);
       width: 100%;
 
       .project-item-title {
         min-width: 90px;
         color: black;
-        font-size: 15px;
+        font-size: var(--resume-text-base, 15px);
         font-weight: bold;
       }
 

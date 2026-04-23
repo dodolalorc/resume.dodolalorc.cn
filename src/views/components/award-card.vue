@@ -39,10 +39,10 @@ const awards = defineModel<Award[]>('awards', {
   .award-header {
     display: flex;
     align-items: center;
-    margin: 10px 0;
+    margin: var(--resume-block-gap, 10px) 0;
 
     .award-title {
-      font-size: 24px;
+      font-size: var(--resume-text-xl, 24px);
       font-weight: bold;
       margin: 0;
     }
@@ -69,16 +69,17 @@ const awards = defineModel<Award[]>('awards', {
   }
 
   .award-item {
-    margin: 8px 0;
+    margin: var(--resume-section-gap, 8px) 0;
 
     .award-name {
-      font-size: 18px;
+      font-size: var(--resume-text-lg, 18px);
       font-weight: bold;
     }
 
     .award-level {
       margin-left: 10px;
       color: #666;
+      font-size: var(--resume-text-base, 15px);
       /* background: #f3f3f3; */
       padding: 2px 6px;
       border-radius: 4px;
@@ -86,6 +87,7 @@ const awards = defineModel<Award[]>('awards', {
 
     .award-time {
       float: right;
+      font-size: var(--resume-text-sm, 13px);
       color: #999;
     }
   }

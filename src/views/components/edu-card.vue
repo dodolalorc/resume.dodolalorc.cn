@@ -41,9 +41,9 @@ const edu = defineModel<EducationConfig[]>('education', {
   .edu-header {
     display: flex;
     align-items: center;
-    margin: 10px 0;
+    margin: var(--resume-block-gap, 10px) 0;
     .edu-title {
-      font-size: 24px;
+      font-size: var(--resume-text-xl, 24px);
       font-weight: bold;
       margin: 0;
     }
@@ -69,9 +69,9 @@ const edu = defineModel<EducationConfig[]>('education', {
   }
 
   .edu-item {
-    margin: 10px 0;
+    margin: var(--resume-block-gap, 10px) 0;
     .edu-school {
-      font-size: 18px;
+      font-size: var(--resume-text-lg, 18px);
       font-weight: bold;
     }
     .edu-time {
@@ -85,7 +85,7 @@ const edu = defineModel<EducationConfig[]>('education', {
       /* background: #f3f3f3; */
       border-radius: 12px;
       padding: 2px 10px;
-      font-size: 13px;
+      font-size: var(--resume-text-sm, 13px);
       line-height: 1.2;
       /* border: 1px solid #e0e0e0; */
     }
@@ -96,6 +96,7 @@ const edu = defineModel<EducationConfig[]>('education', {
     .edu-desc {
       margin-top: 8px;
       line-height: 1.6;
+      font-size: var(--resume-text-base, 15px);
       color: #333;
     }
   }

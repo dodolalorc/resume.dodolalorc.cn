@@ -1,4 +1,6 @@
 export type EditorSection = 'profile' | 'education' | 'experience' | 'projects' | 'awards'
+export type ResumeSize = 'xsmall' | 'small' | 'standard' | 'large'
+
 export interface avatarConfig {
   url: string // 照片链接
   rounded?: boolean // 是否圆形照片

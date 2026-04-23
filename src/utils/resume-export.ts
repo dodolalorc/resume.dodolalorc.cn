@@ -1,5 +1,6 @@
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+import type { ResumeSize } from '@/types/resume'
 
 export type PdfExportMode = 'screen' | 'print'
 
@@ -7,23 +8,27 @@ interface ExportPDFOptions {
   mode: PdfExportMode
   resumeSelector?: string
   fileBaseName?: string
+  size?: ResumeSize
 }
 
 interface ExportHTMLOptions {
   surfaceSelector?: string
   fileBaseName?: string
+  size?: ResumeSize
 }
 
 interface BuildExportHTMLOptions {
   mode?: PdfExportMode | 'html'
   surfaceSelector?: string
   fileBaseName?: string
+  size?: ResumeSize
 }
 
 interface ExportPrintPDFViaServerOptions {
   apiEndpoint?: string
   surfaceSelector?: string
   fileBaseName?: string
+  size?: ResumeSize
 }
 
 const getElement = (selector: string, errorText: string) => {
@@ -123,8 +128,11 @@ export const buildExportHTML = ({
   mode = 'html',
   surfaceSelector = '.resume-export-surface',
   fileBaseName = 'resume',
+  size = 'standard',
 }: BuildExportHTMLOptions = {}) => {
-  const element = getElement(surfaceSelector, '找不到简历容器')
+  const sourceElement = getElement(surfaceSelector, '找不到简历容器')
+  const element = sourceElement.cloneNode(true) as HTMLElement
+  element.setAttribute('data-export-size', size)
   const styleText = collectStyleText()
   const stylesheetLinks = collectStylesheetLinks()
   const bodyBg = getComputedStyle(document.body).backgroundColor || '#f3efe6'
@@ -229,11 +237,13 @@ export const exportResumePDF = async ({
   mode,
   resumeSelector = '.resume-shell',
   fileBaseName = 'resume',
+  size = 'standard',
 }: ExportPDFOptions) => {
   let cleanupSnapshot: (() => void) | null = null
 
   try {
     const source = getElement(resumeSelector, '找不到简历内容容器')
+    source.setAttribute('data-export-size', size)
     const snapshot = mode === 'print' ? createPrintSnapshotElement(source) : null
     const element = snapshot?.element ?? source
     cleanupSnapshot = snapshot?.cleanup ?? null
@@ -316,11 +326,13 @@ export const exportResumePDFPrintViaServer = async ({
   apiEndpoint = '/api/export/pdf',
   surfaceSelector = '.resume-export-surface',
   fileBaseName = 'resume',
+  size = 'standard',
 }: ExportPrintPDFViaServerOptions = {}) => {
   const { html, title } = buildExportHTML({
     mode: 'print',
     surfaceSelector,
     fileBaseName,
+    size,
   })
 
   const timeoutController = new AbortController()
@@ -338,6 +350,7 @@ export const exportResumePDFPrintViaServer = async ({
       body: JSON.stringify({
         html,
         fileName: `${title}_print.pdf`,
+        size,
       }),
       signal: timeoutController.signal,
     })
@@ -359,11 +372,13 @@ export const exportResumePDFPrintViaServer = async ({
 export const exportResumeHTML = ({
   surfaceSelector = '.resume-export-surface',
   fileBaseName = 'resume',
+  size = 'standard',
 }: ExportHTMLOptions) => {
   const { html, title } = buildExportHTML({
     mode: 'html',
     surfaceSelector,
     fileBaseName,
+    size,
   })
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
   downloadBlob(blob, `${title}.html`)

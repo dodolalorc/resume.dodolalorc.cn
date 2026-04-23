@@ -9,6 +9,7 @@ import type {
   Project,
   Award,
   EditorSection,
+  ResumeSize,
 } from '@/types/resume'
 import LogoIcon from '@/components/icon-logo.vue'
 import ResumeEditorDrawer from '@/views/modules/resume-editor/resume-editor-drawer.vue'
@@ -29,6 +30,7 @@ const awards = ref<Award[]>([]) // 奖项
 const exportingType = ref<'none' | 'pdf-screen' | 'pdf-print' | 'html'>('none') // 导出状态
 const showExportMenu = ref(false)
 const exportMenuRef = ref<HTMLElement | null>(null)
+const fontSizeMenuRef = ref<HTMLElement | null>(null)
 const isEditing = ref(false)
 const drawerOpen = ref(false)
 const activeSection = ref<EditorSection>('profile')
@@ -38,9 +40,34 @@ const importUrl = ref('')
 const importError = ref('')
 const importingFromUrl = ref(false)
 const importFileInputRef = ref<HTMLInputElement | null>(null)
+const fontSizeMenuOpen = ref(false)
+const resumeSize = ref<ResumeSize>('standard')
+
+const RESUME_SIZE_STORAGE_KEY = 'resume-font-size-v1'
+const RESUME_SIZE_PRESETS: Array<{
+  key: ResumeSize
+  label: string
+  shortLabel: string
+  scale: number
+  titleScale: number
+  avatarScale: number
+}> = [
+  { key: 'xsmall', label: '极小', shortLabel: '极小', scale: 0.88, titleScale: 0.84, avatarScale: 0.86 },
+  { key: 'small', label: '小', shortLabel: '小', scale: 0.94, titleScale: 0.92, avatarScale: 0.92 },
+  { key: 'standard', label: '标准', shortLabel: '默认', scale: 1, titleScale: 0.97, avatarScale: 0.97 },
+  { key: 'large', label: '加大', shortLabel: '加大', scale: 1.08, titleScale: 1.04, avatarScale: 1.04 },
+]
 
 const isExporting = computed(() => exportingType.value !== 'none')
 const modeText = computed(() => (isEditing.value ? '编辑模式' : '预览模式'))
+const currentSizePreset = computed(
+  () => RESUME_SIZE_PRESETS.find((item) => item.key === resumeSize.value) ?? RESUME_SIZE_PRESETS[2],
+)
+const resumeScaleStyle = computed(() => ({
+  '--resume-font-scale': String(currentSizePreset.value.scale),
+  '--resume-title-scale': String(currentSizePreset.value.titleScale),
+  '--resume-avatar-scale': String(currentSizePreset.value.avatarScale),
+}))
 
 const resumeData = computed<ResumeConfig>({
   get: () => ({
@@ -87,15 +114,34 @@ const toggleEditMode = () => {
 
 const toggleExportMenu = () => {
   if (isExporting.value) return
+  fontSizeMenuOpen.value = false
   showExportMenu.value = !showExportMenu.value
 }
 
+const toggleFontSizeMenu = () => {
+  fontSizeMenuOpen.value = !fontSizeMenuOpen.value
+  if (fontSizeMenuOpen.value) showExportMenu.value = false
+}
+
+const setResumeSize = (size: ResumeSize) => {
+  resumeSize.value = size
+  fontSizeMenuOpen.value = false
+  try {
+    localStorage.setItem(RESUME_SIZE_STORAGE_KEY, size)
+  } catch (error) {
+    console.warn('保存字体大小配置失败:', error)
+  }
+}
+
 const handleDocumentClick = (event: MouseEvent) => {
-  if (!showExportMenu.value) return
   const target = event.target as Node | null
   if (!target) return
-  if (exportMenuRef.value?.contains(target)) return
-  showExportMenu.value = false
+  if (showExportMenu.value && !exportMenuRef.value?.contains(target)) {
+    showExportMenu.value = false
+  }
+  if (fontSizeMenuOpen.value && !fontSizeMenuRef.value?.contains(target)) {
+    fontSizeMenuOpen.value = false
+  }
 }
 
 const exportResumeJSON = () => {
@@ -128,6 +174,7 @@ const startExport = async (mode: 'html' | 'pdf-screen' | 'pdf-print' | 'json') =
       exportResumeHTML({
         surfaceSelector: '.resume-export-surface',
         fileBaseName,
+        size: resumeSize.value,
       })
       return
     }
@@ -139,6 +186,7 @@ const startExport = async (mode: 'html' | 'pdf-screen' | 'pdf-print' | 'json') =
         await exportResumePDFPrintViaServer({
           surfaceSelector: '.resume-export-surface',
           fileBaseName,
+          size: resumeSize.value,
         })
       } catch (error) {
         console.warn('打印模式服务端导出失败，回退到本地截图导出:', error)
@@ -146,6 +194,7 @@ const startExport = async (mode: 'html' | 'pdf-screen' | 'pdf-print' | 'json') =
           mode: 'print',
           resumeSelector: '.resume-shell',
           fileBaseName,
+          size: resumeSize.value,
         })
       }
       return
@@ -155,6 +204,7 @@ const startExport = async (mode: 'html' | 'pdf-screen' | 'pdf-print' | 'json') =
       mode: 'screen',
       resumeSelector: '.resume-shell',
       fileBaseName,
+      size: resumeSize.value,
     })
   } catch (error) {
     console.error('导出失败:', error)
@@ -224,6 +274,15 @@ onMounted(() => {
   document.addEventListener('click', handleDocumentClick)
 
   try {
+    const cachedSize = localStorage.getItem(RESUME_SIZE_STORAGE_KEY) as ResumeSize | null
+    if (cachedSize && RESUME_SIZE_PRESETS.some((item) => item.key === cachedSize)) {
+      resumeSize.value = cachedSize
+    }
+  } catch (error) {
+    console.warn('读取字体大小配置失败:', error)
+  }
+
+  try {
     config.value = cvData as ResumeConfig
     applyResumeData(config.value)
   } catch (error) {
@@ -269,11 +328,46 @@ onBeforeUnmount(() => {
         <button class="export-btn" @click="toggleEditMode" :disabled="isExporting">
           <logo-icon name="edit" /> {{ isEditing ? '结束编辑' : '编辑' }}
         </button>
+
+        <div ref="fontSizeMenuRef" class="font-size-menu">
+          <button
+            class="export-btn icon-btn"
+            :disabled="isExporting"
+            @click="toggleFontSizeMenu"
+            :aria-expanded="fontSizeMenuOpen"
+          >
+            <logo-icon name="gear" />
+          </button>
+
+          <div v-if="fontSizeMenuOpen" class="font-size-panel">
+            <div class="font-size-panel-header">
+              <span class="font-size-panel-title">整体字体大小</span>
+              <span class="font-size-panel-value">{{ currentSizePreset.label }}</span>
+            </div>
+
+            <div class="font-size-track" role="radiogroup" aria-label="整体字体大小">
+              <button
+                v-for="(preset, index) in RESUME_SIZE_PRESETS"
+                :key="preset.key"
+                class="font-size-step"
+                :class="{ active: preset.key === resumeSize }"
+                :style="{ '--dot-size': `${12 + index * 4}px` }"
+                :aria-checked="preset.key === resumeSize"
+                :title="preset.label"
+                role="radio"
+                @click="setResumeSize(preset.key)"
+              >
+                <span class="font-size-step-dot"></span>
+                <span class="font-size-step-label">{{ preset.shortLabel }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="resume-export-surface">
-      <div class="resume-shell">
+    <div class="resume-export-surface" :data-export-size="resumeSize">
+      <div class="resume-shell" :style="resumeScaleStyle" :data-export-size="resumeSize">
         <!-- 个人基本信息 -->
         <profile-card
           v-model:profile="profile"
@@ -383,8 +477,104 @@ onBeforeUnmount(() => {
   gap: 8px;
 }
 
+.font-size-menu,
 .export-menu {
   position: relative;
+}
+
+.font-size-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  width: 320px;
+  padding: 14px 16px 18px;
+  background-color: #fffdf7;
+  border: 1px solid #d6d0c4;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 20;
+}
+
+.font-size-panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.font-size-panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5b5448;
+}
+
+.font-size-panel-value {
+  font-size: 13px;
+  color: #8a7d69;
+}
+
+.font-size-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: end;
+  gap: 12px;
+}
+
+.font-size-track::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 13px;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #dfd7ca 0%, #c7baa5 100%);
+}
+
+.font-size-step {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: #7b7468;
+}
+
+.font-size-step-dot {
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 50%;
+  border: 2px solid #b7ab95;
+  background: #fffdf7;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.font-size-step-label {
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.font-size-step:hover .font-size-step-dot,
+.font-size-step.active .font-size-step-dot {
+  border-color: #6f624d;
+  background: #6f624d;
+  box-shadow: 0 0 0 4px rgba(111, 98, 77, 0.12);
+  transform: translateY(-1px);
+}
+
+.font-size-step.active {
+  color: #2f2a24;
+  font-weight: 600;
 }
 
 .export-options {
@@ -436,6 +626,12 @@ onBeforeUnmount(() => {
   cursor: pointer;
 }
 
+.icon-btn {
+  justify-content: center;
+  min-width: 44px;
+  padding-inline: 12px;
+}
+
 .export-btn:hover:not(:disabled) {
   background-color: #f6f1e7;
 }
@@ -466,6 +662,18 @@ onBeforeUnmount(() => {
 }
 
 .resume-shell {
+  --resume-font-scale: 1;
+  --resume-title-scale: 0.97;
+  --resume-avatar-scale: 0.97;
+  --resume-text-sm: calc(13px * var(--resume-font-scale));
+  --resume-text-md: calc(14px * var(--resume-font-scale));
+  --resume-text-base: calc(15px * var(--resume-font-scale));
+  --resume-text-lg: calc(18px * var(--resume-font-scale));
+  --resume-text-xl: calc(24px * var(--resume-title-scale));
+  --resume-text-hero: calc(30px * var(--resume-title-scale));
+  --resume-text-hero-desktop: calc(36px * var(--resume-title-scale));
+  --resume-section-gap: calc(8px * var(--resume-font-scale));
+  --resume-block-gap: calc(10px * var(--resume-font-scale));
   width: 100%;
   max-width: none;
   height: fit-content;
@@ -476,7 +684,7 @@ onBeforeUnmount(() => {
   border: 0;
   border-radius: 0;
 
-  padding: 22px 28px;
+  padding: 20px 26px;
   margin: 0 auto;
 
   background-color: #fffdf7;
@@ -579,6 +787,12 @@ onBeforeUnmount(() => {
   .toolbar-actions {
     justify-content: flex-end;
     flex-wrap: wrap;
+  }
+
+  .font-size-panel {
+    left: 0;
+    right: auto;
+    width: min(320px, calc(100vw - 24px));
   }
 
   .resume-shell {

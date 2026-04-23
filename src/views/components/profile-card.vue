@@ -96,7 +96,9 @@ const intentions = computed(() => {
   ].filter((item) => item.value)
 })
 
-const avatarSize = computed(() => profile.value.avatar?.size || 140)
+const avatarCssSize = computed(
+  () => `calc(${profile.value.avatar?.size || 140}px * var(--resume-avatar-scale, 1))`,
+)
 
 const avatarUrl = computed(() => {
   const rawUrl = profile.value.avatar?.url?.trim()
@@ -174,13 +176,13 @@ const avatarUrl = computed(() => {
 
 <style scoped>
 .profile-card {
-  padding: 1.5rem 0;
+  padding: calc(24px * var(--resume-font-scale, 1)) 0;
 }
 
 .profile-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: calc(24px * var(--resume-font-scale, 1));
 }
 
 @media (min-width: 768px) {
@@ -194,11 +196,11 @@ const avatarUrl = computed(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: calc(16px * var(--resume-font-scale, 1));
 }
 
 .resume-label {
-  font-size: 0.75rem;
+  font-size: calc(12px * var(--resume-font-scale, 1));
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.2em;
@@ -223,14 +225,14 @@ const avatarUrl = computed(() => {
 }
 
 .profile-name {
-  font-size: 1.875rem;
+  font-size: var(--resume-text-hero, 30px);
   font-weight: 600;
   color: var(--color-text);
 }
 
 @media (min-width: 768px) {
   .profile-name {
-    font-size: 2.25rem;
+    font-size: var(--resume-text-hero-desktop, 36px);
   }
 }
 
@@ -250,7 +252,7 @@ const avatarUrl = computed(() => {
   align-items: center;
   line-height: 1.5;
   gap: 0.5rem;
-  font-size: 0.875rem;
+  font-size: var(--resume-text-md, 14px);
   color: #475569;
 }
 
@@ -263,8 +265,8 @@ const avatarUrl = computed(() => {
 }
 
 .icon-size {
-  height: 1rem;
-  width: 1rem;
+  height: calc(16px * var(--resume-font-scale, 1));
+  width: calc(16px * var(--resume-font-scale, 1));
 }
 
 .contact-label {
@@ -301,7 +303,7 @@ const avatarUrl = computed(() => {
   border-radius: 9999px;
   background-color: rgba(var(--color-secondary-rgb, 59, 130, 246), 0.1);
   padding: 0.25rem 0.75rem;
-  font-size: 0.75rem;
+  font-size: calc(12px * var(--resume-font-scale, 1));
   font-weight: 600;
   color: var(--color-secondary);
 }
@@ -316,8 +318,8 @@ const avatarUrl = computed(() => {
 }
 
 .avatar-wrapper {
-  width: v-bind(avatarSize + 'px');
-  height: v-bind(avatarSize + 'px');
+  width: v-bind(avatarCssSize);
+  height: v-bind(avatarCssSize);
   border-radius: 50%;
   overflow: hidden;
   background: #fff;
