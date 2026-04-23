@@ -1,7 +1,5 @@
 import chromium from '@sparticuz/chromium'
 import { chromium as playwrightChromium } from 'playwright-core'
-import type { ResumeSize } from '@/types/resume'
-
 const MAX_HTML_BYTES = 1_500_000
 const MAX_FILE_NAME_BYTES = 120
 const REQUEST_TIMEOUT_MS = 30_000
@@ -10,7 +8,6 @@ const FONT_LOAD_TIMEOUT_MS = 10_000
 interface ExportPdfBody {
   html: string
   fileName?: string
-  size?: ResumeSize
 }
 
 type VercelLikeRequest = {
