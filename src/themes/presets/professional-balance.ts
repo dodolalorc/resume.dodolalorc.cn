@@ -1,0 +1,51 @@
+import type { ResumeThemeConfig } from '@/themes/types'
+
+const theme: ResumeThemeConfig = {
+  key: 'professional-balance',
+  name: '稳重专业',
+  description: '顶部概览 + 双栏主体，强调学历、奖项与岗位经历的秩序感。',
+  category: '稳重专业',
+  audience: '校招研发岗 / 大厂投递 / 硕博技术岗位',
+  previewTags: ['双栏结构', '专业克制', '信息优先级清晰'],
+  order: 2,
+  palette: {
+    primary: '#0f3b66',
+    secondary: '#1f5f8b',
+    accent: '#2a7f62',
+    canvas: '#eaf0f5',
+    paper: '#ffffff',
+    text: '#12202f',
+    mutedText: '#415467',
+    subtleText: '#6f8091',
+    border: '#d9e2ea',
+    divider: '#d2dbe4',
+    badgeBackground: 'rgba(15, 59, 102, 0.08)',
+    badgeText: '#0f3b66',
+    toolbarBackground: 'rgba(255, 255, 255, 0.94)',
+    toolbarText: '#12202f',
+    buttonBackground: '#ffffff',
+    buttonText: '#12202f',
+    shadow: '0 24px 48px rgba(15, 59, 102, 0.12)',
+  },
+  layout: {
+    columns: 2,
+    sidebarWidth: '250px',
+    profileVariant: 'hero',
+    sectionTitleStyle: 'divider',
+    sectionOrder: ['profile', 'education', 'experience', 'projects', 'awards'],
+    sidebarSections: ['education', 'awards'],
+    paperPadding: '26px 30px',
+    shellGap: '18px',
+    columnGap: '22px',
+    blockGap: '14px',
+    sectionGap: '12px',
+    paperRadius: '24px',
+  },
+  defaults: {
+    resumeSize: 'standard',
+    backgroundColor: '#ffffff',
+    preserveExportBackground: true,
+  },
+}
+
+export default theme
