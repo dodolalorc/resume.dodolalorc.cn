@@ -96,9 +96,22 @@ const intentions = computed(() => {
   ].filter((item) => item.value)
 })
 
-const avatarCssSize = computed(
+const avatarCssWidth = computed(
   () => `calc(${profile.value.avatar?.size || 140}px * var(--resume-avatar-scale, 1))`,
 )
+
+const avatarCssHeight = computed(() => {
+  const size = profile.value.avatar?.size || 140
+  const scale = 'var(--resume-avatar-scale, 1)'
+  if (profile.value.avatar?.rounded) {
+    // 圆形：正方形
+    return `calc(${size}px * ${scale})`
+  }
+  // 矩形：1寸照片比例 25mm:35mm = 5:7
+  return `calc(${size}px * 7 / 5 * ${scale})`
+})
+
+const avatarBorderRadius = computed(() => (profile.value.avatar?.rounded ? '50%' : '16px'))
 
 const avatarUrl = computed(() => {
   const rawUrl = profile.value.avatar?.url?.trim()
@@ -160,12 +173,19 @@ const avatarUrl = computed(() => {
 
       <div class="avatar-container">
         <div class="avatar-ring">
-          <div class="avatar-wrapper">
+          <div
+            class="avatar-wrapper"
+            :style="{
+              borderRadius: avatarBorderRadius,
+              width: avatarCssWidth,
+              height: avatarCssHeight,
+            }"
+          >
             <img
               :src="avatarUrl"
               :alt="profile.name"
               class="avatar-image"
-              :style="{ borderRadius: profile.avatar?.rounded ? '50%' : '16px' }"
+              :style="{ borderRadius: avatarBorderRadius }"
             />
           </div>
         </div>
@@ -317,9 +337,6 @@ const avatarUrl = computed(() => {
 }
 
 .avatar-wrapper {
-  width: v-bind(avatarCssSize);
-  height: v-bind(avatarCssSize);
-  border-radius: 50%;
   overflow: hidden;
   background: #fff;
 }
