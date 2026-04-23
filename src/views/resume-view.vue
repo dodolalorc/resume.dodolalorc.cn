@@ -19,7 +19,7 @@ import expCard from './components/exp-card.vue'
 import projectCard from './components/project-card.vue'
 import awardCard from './components/award-card.vue'
 import cvData from '@/data/cv.json'
-import { exportResumeHTML, exportResumePDF, exportResumePDFPrintViaServer } from '@/utils/resume-export'
+import { exportResumeHTML, exportResumePDFViaServer } from '@/utils/resume-export'
 
 const config = ref<Partial<ResumeConfig>>({})
 const profile = ref<Profile>({})
@@ -27,7 +27,7 @@ const education = ref<EducationConfig[]>([])
 const experience = ref<ExperienceConfig[]>([])
 const projects = ref<Project[]>([]) // 项目经历
 const awards = ref<Award[]>([]) // 奖项
-const exportingType = ref<'none' | 'pdf-screen' | 'pdf-print' | 'html'>('none') // 导出状态
+const exportingType = ref<'none' | 'pdf' | 'html'>('none') // 导出状态
 const showExportMenu = ref(false)
 const exportMenuRef = ref<HTMLElement | null>(null)
 const fontSizeMenuRef = ref<HTMLElement | null>(null)
@@ -103,8 +103,7 @@ const resumeData = computed<ResumeConfig>({
 
 const exportingText = computed(() => {
   if (exportingType.value === 'html') return '导出HTML中...'
-  if (exportingType.value === 'pdf-screen') return '导出PDF(屏幕)中...'
-  if (exportingType.value === 'pdf-print') return '导出PDF(打印)中...'
+  if (exportingType.value === 'pdf') return '导出PDF中...'
   return '导出'
 })
 
@@ -189,7 +188,7 @@ const exportResumeJSON = () => {
   URL.revokeObjectURL(url)
 }
 
-const startExport = async (mode: 'html' | 'pdf-screen' | 'pdf-print' | 'json') => {
+const startExport = async (mode: 'html' | 'pdf' | 'json') => {
   if (isExporting.value) return
   showExportMenu.value = false
 
@@ -215,32 +214,8 @@ const startExport = async (mode: 'html' | 'pdf-screen' | 'pdf-print' | 'json') =
 
     exportingType.value = mode
 
-    if (mode === 'pdf-print') {
-      try {
-        await exportResumePDFPrintViaServer({
-          surfaceSelector: '.resume-export-surface',
-          fileBaseName,
-          size: resumeSize.value,
-          preserveBackground: preserveExportBackground.value,
-          backgroundColor: resumeBackground.value,
-        })
-      } catch (error) {
-        console.warn('打印模式服务端导出失败，回退到本地截图导出:', error)
-        await exportResumePDF({
-          mode: 'print',
-          resumeSelector: '.resume-export-surface',
-          fileBaseName,
-          size: resumeSize.value,
-          preserveBackground: preserveExportBackground.value,
-          backgroundColor: resumeBackground.value,
-        })
-      }
-      return
-    }
-
-    await exportResumePDF({
-      mode: 'screen',
-      resumeSelector: '.resume-export-surface',
+    await exportResumePDFViaServer({
+      surfaceSelector: '.resume-export-surface',
       fileBaseName,
       size: resumeSize.value,
       preserveBackground: preserveExportBackground.value,
@@ -370,12 +345,7 @@ onBeforeUnmount(() => {
           <div v-if="showExportMenu && !isExporting" class="export-options">
             <button class="export-option" @click="startExport('json')">导出 JSON</button>
             <button class="export-option" @click="startExport('html')">导出 HTML</button>
-            <button class="export-option" @click="startExport('pdf-screen')">
-              导出 PDF（屏幕）
-            </button>
-            <button class="export-option" @click="startExport('pdf-print')">
-              导出 PDF（打印）
-            </button>
+            <button class="export-option" @click="startExport('pdf')">导出 PDF</button>
           </div>
         </div>
 
