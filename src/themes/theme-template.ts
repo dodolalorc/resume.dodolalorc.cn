@@ -1,0 +1,51 @@
+import type { ResumeThemeConfig } from '@/themes/types'
+
+const theme: ResumeThemeConfig = {
+  key: 'minimal-template',
+  name: '极简约风',
+  description: '用于新建主题的默认模版，可按需调整布局、颜色和区块顺序。',
+  category: '极简约风',
+  audience: '程序员求职 / 校园招聘',
+  previewTags: ['模板', '可扩展', '极简'],
+  order: 999,
+  palette: {
+    primary: '#30343f',
+    secondary: '#4a5565',
+    accent: '#0f766e',
+    canvas: '#eef1f4',
+    paper: '#ffffff',
+    text: '#1c1f26',
+    mutedText: '#556070',
+    subtleText: '#7a8596',
+    border: '#dde3ea',
+    divider: '#e7ebf0',
+    badgeBackground: 'rgba(48, 52, 63, 0.08)',
+    badgeText: '#30343f',
+    toolbarBackground: 'rgba(255, 255, 255, 0.94)',
+    toolbarText: '#1c1f26',
+    buttonBackground: '#ffffff',
+    buttonText: '#1c1f26',
+    shadow: '0 24px 56px rgba(28, 31, 38, 0.08)',
+  },
+  layout: {
+    columns: 1,
+    sidebarWidth: '0px',
+    profileVariant: 'hero',
+    sectionTitleStyle: 'divider',
+    sectionOrder: ['profile', 'experience', 'projects', 'education', 'awards'],
+    sidebarSections: [],
+    paperPadding: '24px 28px',
+    shellGap: '12px',
+    columnGap: '0px',
+    blockGap: '14px',
+    sectionGap: '12px',
+    paperRadius: '20px',
+  },
+  defaults: {
+    resumeSize: 'standard',
+    backgroundColor: '#ffffff',
+    preserveExportBackground: true,
+  },
+}
+
+export default theme

@@ -1,0 +1,51 @@
+import type { ResumeThemeConfig } from '@/themes/types'
+
+const theme: ResumeThemeConfig = {
+  key: 'modern-clarity',
+  name: '现代简约',
+  description: '轻量圆角卡片和更清爽的留白，适合校招前端、全栈和产品工程方向。',
+  category: '现代简约',
+  audience: '应届开发岗 / 前端 / 全栈 / 互联网团队',
+  previewTags: ['现代卡片', '留白充足', '气质清爽'],
+  order: 3,
+  palette: {
+    primary: '#1d4ed8',
+    secondary: '#2563eb',
+    accent: '#0f766e',
+    canvas: '#eef4ff',
+    paper: '#fbfdff',
+    text: '#162033',
+    mutedText: '#475569',
+    subtleText: '#64748b',
+    border: '#dbe6f3',
+    divider: '#d9e2ef',
+    badgeBackground: 'rgba(37, 99, 235, 0.1)',
+    badgeText: '#1d4ed8',
+    toolbarBackground: 'rgba(251, 253, 255, 0.94)',
+    toolbarText: '#162033',
+    buttonBackground: '#fbfdff',
+    buttonText: '#162033',
+    shadow: '0 28px 60px rgba(29, 78, 216, 0.12)',
+  },
+  layout: {
+    columns: 1,
+    sidebarWidth: '0px',
+    profileVariant: 'hero',
+    sectionTitleStyle: 'capsule',
+    sectionOrder: ['profile', 'experience', 'projects', 'education', 'awards'],
+    sidebarSections: [],
+    paperPadding: '28px 30px',
+    shellGap: '14px',
+    columnGap: '0px',
+    blockGap: '16px',
+    sectionGap: '14px',
+    paperRadius: '28px',
+  },
+  defaults: {
+    resumeSize: 'standard',
+    backgroundColor: '#fbfdff',
+    preserveExportBackground: true,
+  },
+}
+
+export default theme

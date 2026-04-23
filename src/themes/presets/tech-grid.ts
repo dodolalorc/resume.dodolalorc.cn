@@ -1,0 +1,51 @@
+import type { ResumeThemeConfig } from '@/themes/types'
+
+const theme: ResumeThemeConfig = {
+  key: 'tech-grid',
+  name: '技术导向',
+  description: '左侧个人画像，右侧项目与经历主导，适合强调技术栈、项目深度和研究产出。',
+  category: '技术导向',
+  audience: '研发工程师 / 算法工程师 / 研究型硕博',
+  previewTags: ['侧栏画像', '项目优先', '技术表达强'],
+  order: 4,
+  palette: {
+    primary: '#0f172a',
+    secondary: '#1e293b',
+    accent: '#0ea5e9',
+    canvas: '#e2e8f0',
+    paper: '#f8fafc',
+    text: '#0f172a',
+    mutedText: '#334155',
+    subtleText: '#64748b',
+    border: '#cbd5e1',
+    divider: '#d8e1ea',
+    badgeBackground: 'rgba(14, 165, 233, 0.12)',
+    badgeText: '#0369a1',
+    toolbarBackground: 'rgba(248, 250, 252, 0.94)',
+    toolbarText: '#0f172a',
+    buttonBackground: '#f8fafc',
+    buttonText: '#0f172a',
+    shadow: '0 30px 70px rgba(15, 23, 42, 0.14)',
+  },
+  layout: {
+    columns: 2,
+    sidebarWidth: '280px',
+    profileVariant: 'sidebar',
+    sectionTitleStyle: 'minimal',
+    sectionOrder: ['profile', 'projects', 'experience', 'education', 'awards'],
+    sidebarSections: ['profile', 'education', 'awards'],
+    paperPadding: '28px 30px',
+    shellGap: '18px',
+    columnGap: '26px',
+    blockGap: '14px',
+    sectionGap: '12px',
+    paperRadius: '22px',
+  },
+  defaults: {
+    resumeSize: 'small',
+    backgroundColor: '#f8fafc',
+    preserveExportBackground: true,
+  },
+}
+
+export default theme

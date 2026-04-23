@@ -29,22 +29,34 @@
 
 ### 导出功能
 
-| 格式                | 说明                                                 |
-| ------------------- | ---------------------------------------------------- |
-| **PDF**             | 走服务端 Chromium 原生打印（A4 / `@page`），适合打印投递 |
-| **HTML**            | 导出为独立 HTML 文件，内联样式，可离线查看或直接发送 |
-| **JSON**            | 导出当前简历全部数据为 JSON，用于备份或迁移          |
+| 格式     | 说明                                                     |
+| -------- | -------------------------------------------------------- |
+| **PDF**  | 走服务端 Chromium 原生打印（A4 / `@page`），适合打印投递 |
+| **HTML** | 导出为独立 HTML 文件，内联样式，可离线查看或直接发送     |
+| **JSON** | 导出当前简历全部数据为 JSON，用于备份或迁移              |
 
 ### 主题系统
 
-内置 4 套精心调配的配色方案，实时切换，立即预览：
+内置 4 套可扩展的简历主题预设，实时切换，立即预览：
 
-| 主题         | 风格     | 主色      |
-| ------------ | -------- | --------- |
-| Calm Glacier | 冷静蓝灰 | `#2563eb` |
-| Sunset Bloom | 温暖橙红 | `#ea580c` |
-| Forest Mist  | 自然绿意 | `#16a34a` |
-| Mono Focus   | 极简黑白 | `#111827` |
+| 主题     | 风格     | 说明                              |
+| -------- | -------- | --------------------------------- |
+| 简约纸张 | 极简约风 | 白纸化单栏，校招/应届通用         |
+| 稳重专业 | 稳重专业 | 双栏秩序结构，强调学历与经历层次  |
+| 现代简约 | 现代简约 | 现代卡片 + 留白，清爽轻量         |
+| 技术导向 | 技术导向 | 侧栏画像 + 项目优先，突出技术表达 |
+
+每个主题都在 `src/themes/presets/` 下作为独立配置文件存在，结构一致，便于社区贡献。
+主题能力由 `src/themes/types.ts`（类型约束）和 `src/themes/index.ts`（自动注册/读取）统一管理。
+
+#### 新建主题（默认极简约风模板）
+
+```bash
+# 生成 src/themes/presets/my-theme.ts
+bun run theme:new -- My Theme
+```
+
+生成文件基于 `src/themes/theme-template.ts`，默认是“极简约风”模板，可按需修改布局、配色、区块顺序与默认导出配置。
 
 ### 数据持久化
 
@@ -122,6 +134,7 @@ bun lint          # ESLint + Biome 代码检查
 bun run format    # Prettier 格式化代码
 bun run type-check  # TypeScript 类型检查
 bun test:unit     # 运行 Vitest 单元测试
+bun run theme:new -- My Theme  # 通过极简约风模板新建主题文件
 ```
 
 ---
@@ -138,7 +151,12 @@ src/
 ├── i18n/                      # 国际化文案（zh-Hans / zh-Hant / en / ja）
 ├── router/                    # Vue Router 路由配置
 ├── stores/
-│   └── resume.ts              # Pinia 核心 Store（数据 + 主题 + 自动保存）
+│   └── resume.ts              # Pinia 核心 Store（数据 + 自动保存）
+├── themes/
+│   ├── index.ts               # 主题加载/注册与样式变量构建
+│   ├── types.ts               # 主题类型定义
+│   ├── theme-template.ts      # 新建主题模板（默认极简约风）
+│   └── presets/               # 主题预设目录（每个主题独立文件）
 ├── types/
 │   └── resume.ts              # 全局 TypeScript 类型定义
 ├── utils/
@@ -226,18 +244,18 @@ resume-view.vue（主视图）
 
 ## 技术栈
 
-| 类型     | 技术                      |
-| -------- | ------------------------- |
-| 框架     | Vue 3.5 + Composition API |
-| 语言     | TypeScript 5.8            |
-| 构建     | Vite 6                    |
-| 状态     | Pinia 3                   |
-| 路由     | Vue Router 4              |
-| 样式     | TailwindCSS 4             |
-| 国际化   | vue-i18n 11               |
+| 类型     | 技术                          |
+| -------- | ----------------------------- |
+| 框架     | Vue 3.5 + Composition API     |
+| 语言     | TypeScript 5.8                |
+| 构建     | Vite 6                        |
+| 状态     | Pinia 3                       |
+| 路由     | Vue Router 4                  |
+| 样式     | TailwindCSS 4                 |
+| 国际化   | vue-i18n 11                   |
 | PDF 导出 | Playwright/Chromium（服务端） |
-| 代码质量 | ESLint + Biome + Prettier |
-| 测试     | Vitest                    |
+| 代码质量 | ESLint + Biome + Prettier     |
+| 测试     | Vitest                        |
 
 ---
 
@@ -268,7 +286,7 @@ resume-view.vue（主视图）
 ### 适合新手的贡献方向
 
 - 🌍 **补全翻译** — `src/i18n/` 目录下的 `en.json`、`ja.json`、`zh-Hant.json` 中有部分字段尚未完整翻译
-- 🎨 **新增主题** — 在 `src/stores/resume.ts` 的主题配置中添加新配色方案
+- 🎨 **新增主题** — 使用 `bun run theme:new -- <主题名>` 在 `src/themes/presets/` 生成并完善主题文件
 - 🐛 **修复 Bug** — 查看 [Issues](https://github.com/dodolalorc/resume.dodolalorc.cn/issues) 中标记 `good first issue` 的任务
 - 📝 **改进文档** — 完善使用说明、补充代码注释
 

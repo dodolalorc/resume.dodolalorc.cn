@@ -1,0 +1,51 @@
+import type { ResumeThemeConfig } from '@/themes/types'
+
+const theme: ResumeThemeConfig = {
+  key: 'minimal-paper',
+  name: '简约纸张',
+  description: '白纸化单栏结构，适合校招、应届生和偏研究型经历的清晰展示。',
+  category: '极简约风',
+  audience: '校园招聘 / 应届本科 / 硕士 / 博士',
+  previewTags: ['单栏纸张', '稳妥通用', '信息密度均衡'],
+  order: 1,
+  palette: {
+    primary: '#6f624d',
+    secondary: '#8a7d69',
+    accent: '#b5965a',
+    canvas: '#f3ede2',
+    paper: '#fffdf7',
+    text: '#2f2a24',
+    mutedText: '#5b5448',
+    subtleText: '#8a7d69',
+    border: '#d6d0c4',
+    divider: '#e5ddd0',
+    badgeBackground: 'rgba(111, 98, 77, 0.08)',
+    badgeText: '#6f624d',
+    toolbarBackground: 'rgba(255, 253, 247, 0.94)',
+    toolbarText: '#2f2a24',
+    buttonBackground: '#fffdf7',
+    buttonText: '#2f2a24',
+    shadow: '0 18px 38px rgba(102, 88, 63, 0.08)',
+  },
+  layout: {
+    columns: 1,
+    sidebarWidth: '0px',
+    profileVariant: 'hero',
+    sectionTitleStyle: 'divider',
+    sectionOrder: ['profile', 'education', 'experience', 'projects', 'awards'],
+    sidebarSections: [],
+    paperPadding: '20px 26px',
+    shellGap: '0px',
+    columnGap: '0px',
+    blockGap: '10px',
+    sectionGap: '8px',
+    paperRadius: '0px',
+  },
+  defaults: {
+    resumeSize: 'standard',
+    backgroundColor: '#fffdf7',
+    preserveExportBackground: true,
+  },
+}
+
+export default theme

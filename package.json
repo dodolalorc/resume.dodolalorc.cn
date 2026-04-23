@@ -14,7 +14,8 @@
     "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
     "lint:eslint": "eslint . --fix",
     "lint": "run-s lint:*",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "theme:new": "bun run scripts/create-theme.mjs"
   },
   "dependencies": {
     "@sparticuz/chromium": "^138.0.2",
