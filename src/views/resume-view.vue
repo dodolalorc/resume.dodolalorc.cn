@@ -19,7 +19,7 @@ import ExpCard from './components/exp-card.vue'
 import ProjectCard from './components/project-card.vue'
 import AwardCard from './components/award-card.vue'
 import cvData from '@/data/cv.json'
-import { exportResumeHTML, exportResumePDFViaServer } from '@/utils/resume-export'
+import { exportResumeHTML, printResumePDF } from '@/utils/resume-export'
 import {
   buildThemeStyleVars,
   getResumeTheme,
@@ -267,7 +267,7 @@ const startExport = async (mode: 'html' | 'pdf' | 'json') => {
 
     exportingType.value = mode
 
-    await exportResumePDFViaServer({
+    await printResumePDF({
       surfaceSelector: '.resume-export-surface',
       fileBaseName,
       size: resumeSize.value,
