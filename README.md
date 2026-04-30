@@ -31,7 +31,7 @@
 
 | 格式     | 说明                                                     |
 | -------- | -------------------------------------------------------- |
-| **PDF**  | 走服务端 Chromium 原生打印（A4 / `@page`），适合打印投递 |
+| **PDF**  | 走浏览器原生打印预览（A4 / `@page`），可在系统对话框中保存为 PDF |
 | **HTML** | 导出为独立 HTML 文件，内联样式，可离线查看或直接发送     |
 | **JSON** | 导出当前简历全部数据为 JSON，用于备份或迁移              |
 
@@ -98,18 +98,15 @@ bun dev
 
 浏览器打开 `http://localhost:5173` 即可看到效果。
 
-### PDF 导出（Serverless）说明
+### PDF 导出说明
 
-- `PDF`：调用 `/api/export/pdf`，由 Playwright/Chromium 生成 A4 PDF（`printBackground: true` + `preferCSSPageSize: true`），分页遵循 `@page` / `break-inside`。
-- 当前仓库已包含 Vercel Function：`api/export/pdf.ts`（Node Runtime）。
+- `PDF`：前端生成隔离打印文档，等待样式、图片和字体加载完成后调用浏览器原生 `window.print()`。
+- 在打印对话框中选择“另存为 PDF”即可保存文件；分页遵循 `@page` / `break-inside`，不使用 canvas 截图方案。
 
 #### 本地开发运行方式
 
 ```bash
-# 方式 1（推荐）：同时跑前端 + /api
-npx vercel dev
-
-# 方式 2：仅跑 Vite（/api 不可用）
+# 启动 Vite
 bun dev
 ```
 
@@ -120,7 +117,7 @@ bun dev
   - `installCommand`: `bun install`
   - `buildCommand`: `bun run build`
   - `outputDirectory`: `dist`
-  - 路由：`/api/*` 保持走 Serverless Function，其他路径回退到 `index.html`（Vue Router history mode）。
+  - 路由：其他路径回退到 `index.html`（Vue Router history mode）。
 - 已在 `package.json` 声明 `packageManager: bun@1.3.5`（与 `.bun-version` 一致），避免平台误判包管理器导致的安装/构建不一致。
 - 若使用 **Cloudflare**，可作为可选方案单独实现（例如 Browser Rendering/其他服务端渲染方案）；本仓库当前未提供 Workers 版实现。
 
@@ -253,7 +250,7 @@ resume-view.vue（主视图）
 | 路由     | Vue Router 4                  |
 | 样式     | TailwindCSS 4                 |
 | 国际化   | vue-i18n 11                   |
-| PDF 导出 | Playwright/Chromium（服务端） |
+| PDF 导出 | 浏览器原生 `window.print()` |
 | 代码质量 | ESLint + Biome + Prettier     |
 | 测试     | Vitest                        |
 

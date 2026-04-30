@@ -8,6 +8,8 @@
   <style>
     :root {
       color-scheme: light;
+      --print-page-width: 210mm;
+      --print-page-height: 297mm;
     }
 
     * {
@@ -45,15 +47,103 @@
       box-sizing: border-box;
     }
 
+    html.print-fit-mode,
+    html.print-fit-mode body {
+      width: var(--print-page-width) !important;
+      min-width: var(--print-page-width) !important;
+      min-height: var(--print-page-height) !important;
+      overflow-x: hidden !important;
+      background: #ffffff !important;
+    }
+
+    html.print-fit-mode body {
+      display: block !important;
+      padding: 0 !important;
+    }
+
+    html.print-fit-mode .resume-export-surface {
+      position: relative !important;
+      width: var(--print-page-width) !important;
+      min-height: var(--print-page-height) !important;
+      max-width: none !important;
+      margin: 0 !important;
+    }
+
+    html.print-fit-mode .resume-shell {
+      width: var(--print-page-width) !important;
+      min-height: var(--print-page-height) !important;
+      max-width: none !important;
+      margin: 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
+    html.print-fit-mode .profile-container {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: stretch !important;
+      flex-wrap: nowrap !important;
+      gap: calc(16px * var(--resume-font-scale, 1)) !important;
+    }
+
+    html.print-fit-mode .profile-card {
+      padding: calc(14px * var(--resume-font-scale, 1)) 0 !important;
+    }
+
+    html.print-fit-mode .profile-content {
+      min-width: 0 !important;
+      flex: 1 1 auto !important;
+      gap: calc(10px * var(--resume-font-scale, 1)) !important;
+    }
+
+    html.print-fit-mode .contact-grid,
+    html.print-fit-mode .contact-item {
+      min-width: 0 !important;
+    }
+
+    html.print-fit-mode .contact-grid {
+      gap: 0.32rem !important;
+    }
+
+    html.print-fit-mode .contact-item {
+      line-height: 1.35 !important;
+    }
+
+    html.print-fit-mode .intentions-container {
+      gap: 0.32rem !important;
+    }
+
+    html.print-fit-mode .intention-badge {
+      padding: 0.12rem 0.45rem !important;
+    }
+
+    html.print-fit-mode .avatar-container {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex: 0 0 auto !important;
+      align-self: stretch !important;
+    }
+
+    html.print-fit-mode .avatar-wrapper {
+      max-width: calc(104px * var(--resume-avatar-scale, 1)) !important;
+      max-height: calc(104px * var(--resume-avatar-scale, 1)) !important;
+    }
+
     @page {
       size: A4 portrait;
-      margin: __PRINT_MARGIN__;
+      margin: 0;
     }
 
     @media print {
       html,
       body {
         background: #ffffff !important;
+        width: var(--print-page-width) !important;
+        min-width: var(--print-page-width) !important;
+        min-height: var(--print-page-height) !important;
+        overflow-x: hidden !important;
       }
 
       body {
@@ -62,16 +152,74 @@
       }
 
       .resume-export-surface {
+        position: relative !important;
         max-width: none !important;
-        width: auto !important;
+        width: var(--print-page-width) !important;
+        min-height: var(--print-page-height) !important;
         margin: 0 !important;
         background: __SURFACE_BACKGROUND__ !important;
       }
 
       .resume-shell {
         max-width: none !important;
-        width: auto !important;
+        width: var(--print-page-width) !important;
+        min-height: var(--print-page-height) !important;
         margin: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+
+      .profile-container {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: stretch !important;
+        flex-wrap: nowrap !important;
+        gap: calc(16px * var(--resume-font-scale, 1)) !important;
+      }
+
+      .profile-card {
+        padding: calc(14px * var(--resume-font-scale, 1)) 0 !important;
+      }
+
+      .profile-content {
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+        gap: calc(10px * var(--resume-font-scale, 1)) !important;
+      }
+
+      .contact-grid,
+      .contact-item {
+        min-width: 0 !important;
+      }
+
+      .contact-grid {
+        gap: 0.32rem !important;
+      }
+
+      .contact-item {
+        line-height: 1.35 !important;
+      }
+
+      .intentions-container {
+        gap: 0.32rem !important;
+      }
+
+      .intention-badge {
+        padding: 0.12rem 0.45rem !important;
+      }
+
+      .avatar-container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex: 0 0 auto !important;
+        align-self: stretch !important;
+      }
+
+      .avatar-wrapper {
+        max-width: calc(104px * var(--resume-avatar-scale, 1)) !important;
+        max-height: calc(104px * var(--resume-avatar-scale, 1)) !important;
       }
 
       .profile-card,
