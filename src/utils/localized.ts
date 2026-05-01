@@ -38,6 +38,22 @@ export const resolveLocalizedList = (
   locale: ResumeLocale,
 ) => (value ?? []).map((item) => resolveLocalizedText(item, locale)).filter(Boolean)
 
+const escapeHTML = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+
+export const renderInlineMarkdown = (
+  value: LocalizedText | null | undefined,
+  locale: ResumeLocale,
+) =>
+  escapeHTML(resolveLocalizedText(value, locale))
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>')
+
 export const splitTags = (value: string) =>
   value
     .split(/[,，、]/)

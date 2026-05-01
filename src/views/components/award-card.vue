@@ -107,6 +107,7 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
   .award-header {
     margin: var(--resume-section-gap, 7px) 0 4px;
     border-bottom: 1px solid #111;
+    justify-content: space-between;
   }
 
   .award-title {

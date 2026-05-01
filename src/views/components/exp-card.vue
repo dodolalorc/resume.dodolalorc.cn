@@ -49,6 +49,9 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
         <div class="exp-header">
           <h2 class="exp-title">校园经历</h2>
           <hr class="exp-divider" />
+          <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
+            <IconLogo name="edit" />
+          </button>
         </div>
         <div v-for="(item, index) in campus()" :key="`campus-${index}`" class="research-list-item">
           <strong v-if="resolveLocalizedText(item.title || item.jobTitle, props.locale)">
@@ -193,6 +196,7 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
   .exp-header {
     margin: 0 0 4px;
     border-bottom: 1px solid #111;
+    justify-content: space-between;
   }
 
   .exp-title {

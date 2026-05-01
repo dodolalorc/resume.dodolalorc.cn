@@ -1,31 +1,13 @@
 {
   "profile": {
-    "name": {
-      "zh": "林若辰",
-      "en": "Ruochen Lin"
-    },
+    "name": "王小明",
     "avatar": {
       "url": "avatar.png",
       "rounded": false,
-      "size": 86
+      "size": 150
     },
     "prepend": "both",
-    "school": {
-      "zh": "星海理工大学",
-      "en": "Xinghai University of Technology"
-    },
-    "major": {
-      "zh": "计算机科学与技术",
-      "en": "Computer Science and Technology"
-    },
-    "ranking": {
-      "zh": "专业排名 3/126",
-      "en": "Rank 3/126"
-    },
-    "gpa": "3.91/4.00",
-    "gender": "女",
-    "birthplace": "四川成都",
-    "email": "lin.ruochen@example.com",
+    "email": "wang.xm@example.com",
     "phone": "139****1122",
     "github": {
       "url": "https://github.com/dodolalorc",
@@ -37,185 +19,318 @@
     },
     "zhihu": "",
     "xiaohongshu": "",
-    "wechat": "research_lin",
-    "workExpYear": "",
+    "wechat": "lin_demo_2026",
+    "workExpYear": "2年",
     "jobIntention": {
-      "city": "北京/上海/南京",
-      "position": "计算机视觉/智能系统方向研究生",
-      "salary": ""
-    },
-    "researchInfo": [
-      {
-        "label": "科研方向",
-        "value": "计算机视觉、可信机器学习"
-      },
-      {
-        "label": "英语",
-        "value": "CET-6 568"
-      }
-    ]
+      "city": "成都/西安/南京/苏州",
+      "position": "前端开发工程师/跨端开发工程师",
+      "salary": "15k-20k"
+    }
   },
   "education": [
     {
-      "school": {
-        "zh": "星海理工大学",
-        "en": "Xinghai University of Technology"
-      },
-      "schoolTags": [
-        "双一流",
-        "省部共建"
-      ],
+      "school": "星海理工大学",
+      "schoolTags": ["双一流"],
       "degree": "本科",
-      "major": "计算机科学与技术",
-      "majorTags": [
-        "国家级一流本科专业"
-      ],
-      "gpa": "3.91/4.00",
-      "ranking": "3/126",
-      "languageCertificates": [
-        "CET-4 612",
-        "CET-6 568"
-      ],
-      "courses": [
-        {
-          "name": "数据结构",
-          "grade": "96"
-        },
-        {
-          "name": "算法设计与分析",
-          "grade": "95"
-        },
-        {
-          "name": "机器学习",
-          "grade": "94"
-        },
-        {
-          "name": "计算机视觉",
-          "grade": "93"
-        },
-        {
-          "name": "概率论与数理统计",
-          "grade": "92"
-        }
-      ],
-      "eduTime": [
-        "2022.09",
-        "2026.06"
-      ],
-      "eduDesc": "连续三年获得校级一等奖学金，主持校级大学生创新训练项目，参与学院本科生科研能力提升计划。"
+      "major": "软件工程",
+      "majorTags": ["国家级一流本科专业"],
+      "eduTime": ["2021.09", "2025.06"],
+      "eduDesc": "获校级技术创新奖学金、优秀项目实践奖。担任学院开源社团前端组长，组织技术分享与代码评审活动，参与多项校企合作项目。"
     }
   ],
   "experience": [
     {
-      "kind": "skills",
-      "title": "编程与工程工具",
+      "kind": "work",
+      "jobTitle": "前端开发实习生",
+      "company": "云栖像素科技有限公司",
+      "partment": "产品研发中心-应用平台部",
+      "jobTime": ["2024.07", "2025.03"],
       "jobDesc": [
-        "熟悉 Python、C++、TypeScript，能够完成数据处理、模型训练与实验结果分析；熟练使用 PyTorch、OpenCV、NumPy、Pandas。"
-      ]
-    },
-    {
-      "kind": "skills",
-      "title": "科研能力",
-      "jobDesc": [
-        "能够阅读英文论文并复现实验，熟悉消融实验、指标对比和论文图表整理；具备较好的文献综述和学术写作基础。"
-      ]
-    },
-    {
-      "kind": "campus",
-      "title": "学院开源社团 算法组负责人",
-      "jobTime": [
-        "2024.03",
-        "2025.06"
-      ],
-      "jobDesc": [
-        "组织 8 次论文分享和算法训练，带领低年级同学完成图像分类、目标检测等入门项目。"
-      ]
-    },
-    {
-      "kind": "campus",
-      "title": "本科生科研训练营 志愿助教",
-      "jobTime": [
-        "2023.09",
-        "2024.01"
-      ],
-      "jobDesc": [
-        "协助教师维护课程资料、批改实验报告，整理机器学习基础实验模板。"
+        "参与企业级中台系统模块开发，负责表单配置页与可视化看板页面实现，配合产品完成 10+ 需求迭代。",
+        "与后端协作制定接口字段约定，封装通用请求与错误处理逻辑，减少重复开发并提升联调效率。",
+        "优化首屏加载与长列表渲染性能，页面交互流畅度明显提升，线上问题单数量持续下降。"
       ]
     }
   ],
   "projects": [
     {
-      "name": "复杂光照条件下的校园道路目标检测研究",
-      "role": "核心成员",
-      "authorRank": "第二作者",
-      "venue": "CCF-C 类会议在投",
-      "status": "投稿中",
-      "projectTime": [
-        "2024.10",
-        "2025.08"
+      "name": "晴空课堂 - 在线学习平台",
+      "link": {
+        "url": "https://qk-classroom.example",
+        "label": "qk-classroom.example"
+      },
+      "role": "前端负责人",
+      "techStack": ["Vue3", "TypeScript", "Vite", "Pinia"],
+      "projectTime": ["2025.01", "2025.08"],
+      "projectDesc": "面向高校社团与培训机构的课程管理平台，提供课程发布、学习进度追踪、作业提交与数据统计功能。",
+      "projectAchievements": [
+        "完成从 0 到 1 的前端架构搭建并稳定上线，支持多角色权限与响应式布局。"
       ],
-      "projectDesc": "面向夜间、逆光和雨雾场景下的道路目标检测问题，构建小规模校园道路图像数据集，并基于 YOLO 系列模型进行结构改进与训练策略优化。",
       "mainWork": [
         {
-          "title": "数据与实验",
-          "desc": "负责 **2400+ 张图像标注与清洗**，设计亮度扰动和天气增强策略，完成多组消融实验。"
+          "title": "架构设计",
+          "desc": "制定目录规范、状态管理方案与公共组件标准，提升团队协作效率。"
         },
         {
-          "title": "模型优化",
-          "desc": "引入轻量注意力模块并调整损失权重，mAP@0.5 相比基线提升 3.8%。"
+          "title": "核心功能实现",
+          "desc": "实现课程排期、章节学习、作业提交等核心页面，并完善异常状态处理。"
         }
-      ],
-      "projectAchievements": [
-        "完成论文初稿、实验复现实验包和可视化结果整理。"
       ]
     },
     {
-      "name": "基于学习行为日志的课程风险预警分析",
-      "role": "项目负责人",
-      "authorRank": "第一作者",
-      "venue": "校级大创项目",
-      "status": "结题优秀",
-      "projectTime": [
-        "2023.11",
-        "2024.09"
+      "name": "星舟会务 - 活动报名与签到系统",
+      "link": {
+        "url": "https://xingzhou-events.example",
+        "label": "xingzhou-events.example"
+      },
+      "role": "前端主程",
+      "techStack": ["React", "TypeScript", "Ant Design", "Zustand", "Node.js"],
+      "projectTime": ["2024.05", "2024.12"],
+      "projectDesc": "为中小型活动组织方提供在线报名、票种配置、现场签到与数据导出能力，覆盖活动前中后全流程。",
+      "projectAchievements": [
+        "支持单场活动万人级报名数据管理，后台操作稳定，工作人员培训成本降低。",
+        "搭建统一表单引擎，减少重复配置工作量，提升新活动上线速度。"
       ],
-      "projectDesc": "利用在线学习平台日志数据分析学生学习节奏、作业提交和测验表现，构建课程风险预警模型。",
       "mainWork": [
         {
-          "title": "特征工程",
-          "desc": "设计访问频次、任务延迟、测验波动等特征，完成数据脱敏和异常值处理。"
+          "title": "业务开发",
+          "desc": "负责报名流程、订单查询与签到核销模块，实现跨页面状态同步。"
         },
         {
-          "title": "模型评估",
-          "desc": "对比逻辑回归、随机森林与 XGBoost，最终模型 F1-score 达到 0.86。"
+          "title": "工程优化",
+          "desc": "引入分包与懒加载策略，优化打包体积与首屏资源加载。"
         }
-      ],
+      ]
+    },
+    {
+      "name": "北辰问卷 - 企业调研数据平台",
+      "link": {
+        "url": "https://beichen-survey.example",
+        "label": "beichen-survey.example"
+      },
+      "role": "前端开发工程师",
+      "techStack": ["Nuxt", "TypeScript", "TailwindCSS", "ECharts"],
+      "projectTime": ["2023.10", "2024.04"],
+      "projectDesc": "用于市场调研团队构建问卷、收集样本并进行结果分析的可视化平台，支持多种题型与报表导出。",
       "projectAchievements": [
-        "获得校级大学生创新训练项目优秀结题。"
+        "上线后覆盖多个行业调研场景，问卷生成与发布效率显著提升。"
+      ],
+      "mainWork": [
+        {
+          "title": "交互实现",
+          "desc": "实现拖拽式问卷编辑器与题型配置面板，提升编辑体验与可用性。"
+        },
+        {
+          "title": "数据可视化",
+          "desc": "开发统计图表与筛选联动功能，支持多维度数据洞察。"
+        }
       ]
     }
   ],
   "awards": [
     {
-      "title": "国家励志奖学金",
-      "issuer": "教育部",
+      "title": "2025 云岚高校开发者挑战赛",
       "date": "2025-10",
-      "level": "国家级",
-      "category": "综合类"
+      "level": "全国二等奖"
     },
     {
-      "title": "星海理工大学一等奖学金",
-      "issuer": "星海理工大学",
-      "date": "2024-11",
-      "level": "校级",
-      "category": "学业类"
-    },
-    {
-      "title": "蓝桥杯程序设计竞赛",
-      "issuer": "工业和信息化部人才交流中心",
+      "title": "2024 星图杯前端工程实践赛",
       "date": "2024-06",
-      "level": "省级二等奖",
-      "category": "创新类"
+      "level": "省级一等奖"
+    },
+    {
+      "title": "2024 智绘城市数据可视化大赛",
+      "date": "2024-11",
+      "level": "全国优胜奖"
+    },
+    {
+      "title": "2023 青禾校园创新项目评选",
+      "date": "2023-12",
+      "level": "校级金奖"
+    },
+    {
+      "title": "2023 数智未来算法应用赛",
+      "date": "2023-09",
+      "level": "区域三等奖"
     }
-  ]
+  ],
+  "research": {
+    "profile": {
+      "name": {
+        "zh": "林若辰",
+        "en": "Ruochen Lin"
+      },
+      "avatar": {
+        "url": "avatar.png",
+        "rounded": false,
+        "size": 86
+      },
+      "prepend": "both",
+      "school": {
+        "zh": "星海理工大学",
+        "en": "Xinghai University of Technology"
+      },
+      "major": {
+        "zh": "计算机科学与技术",
+        "en": "Computer Science and Technology"
+      },
+      "ranking": {
+        "zh": "专业排名 3/126",
+        "en": "Rank 3/126"
+      },
+      "gpa": "3.91/4.00",
+      "birthplace": "四川成都",
+      "email": "lin.ruochen@example.com",
+      "phone": "139****1122",
+      "github": {
+        "url": "https://github.com/dodolalorc",
+        "label": "github.com/dodolalorc"
+      },
+      "blog": {
+        "url": "",
+        "label": ""
+      },
+      "wechat": "research_lin",
+      "researchInfo": [
+        {
+          "label": "科研方向",
+          "value": "计算机视觉、可信机器学习"
+        }
+      ],
+      "jobIntention": {
+        "city": "北京/上海/南京",
+        "position": "计算机视觉/智能系统方向研究生",
+        "salary": ""
+      }
+    },
+    "education": [
+      {
+        "school": {
+          "zh": "星海理工大学",
+          "en": "Xinghai University of Technology"
+        },
+        "schoolTags": ["双一流", "省部共建"],
+        "degree": "本科",
+        "major": "计算机科学与技术",
+        "majorTags": ["国家级一流本科专业"],
+        "gpa": "3.91/4.00",
+        "ranking": "3/126",
+        "languageCertificates": ["CET-4 612", "CET-6 568"],
+        "courses": [
+          { "name": "数据结构", "grade": "96" },
+          { "name": "算法设计与分析", "grade": "95" },
+          { "name": "机器学习", "grade": "94" },
+          { "name": "计算机视觉", "grade": "93" },
+          { "name": "概率论与数理统计", "grade": "92" }
+        ],
+        "eduTime": ["2022.09", "2026.06"],
+        "eduDesc": "连续三年获得校级一等奖学金，主持校级大学生创新训练项目，参与学院本科生科研能力提升计划。"
+      }
+    ],
+    "experience": [
+      {
+        "kind": "skills",
+        "title": "编程与工程工具",
+        "jobDesc": [
+          "熟悉 Python、C++、TypeScript，能够完成数据处理、模型训练与实验结果分析；熟练使用 PyTorch、OpenCV、NumPy、Pandas。"
+        ]
+      },
+      {
+        "kind": "skills",
+        "title": "科研能力",
+        "jobDesc": [
+          "能够阅读英文论文并复现实验，熟悉消融实验、指标对比和论文图表整理；具备较好的文献综述和学术写作基础。"
+        ]
+      },
+      {
+        "kind": "campus",
+        "title": "学院开源社团 算法组负责人",
+        "jobTime": ["2024.03", "2025.06"],
+        "jobDesc": [
+          "组织 8 次论文分享和算法训练，带领低年级同学完成图像分类、目标检测等入门项目。"
+        ]
+      },
+      {
+        "kind": "campus",
+        "title": "本科生科研训练营 志愿助教",
+        "jobTime": ["2023.09", "2024.01"],
+        "jobDesc": [
+          "协助教师维护课程资料、批改实验报告，整理机器学习基础实验模板。"
+        ]
+      }
+    ],
+    "projects": [
+      {
+        "name": "复杂光照条件下的校园道路目标检测研究",
+        "role": "核心成员",
+        "authorRank": "第二作者",
+        "venue": "CCF-C 类会议在投",
+        "status": "投稿中",
+        "projectTime": ["2024.10", "2025.08"],
+        "projectDesc": "面向夜间、逆光和雨雾场景下的道路目标检测问题，构建小规模校园道路图像数据集，并基于 YOLO 系列模型进行结构改进与训练策略优化。项目重点关注复杂光照导致的误检、漏检问题，通过数据增强、特征融合和损失函数调整提升模型在真实校园道路场景中的稳定性。",
+        "mainWork": [
+          {
+            "title": "数据集构建",
+            "desc": "负责 **2400+ 张图像标注与清洗**，按照行人、自行车、机动车、交通锥等类别建立标注规范，并对模糊、过曝、遮挡样本进行质量复核，保证训练集、验证集和测试集分布相对均衡。"
+          },
+          {
+            "title": "实验设计",
+            "desc": "设计亮度扰动、雨雾模拟、随机裁剪等增强策略，围绕不同光照强度、目标尺度和遮挡比例组织对比实验，记录 Precision、Recall、mAP@0.5 等核心指标并整理可视化结果。"
+          },
+          {
+            "title": "模型优化",
+            "desc": "引入轻量注意力模块并调整损失权重，针对小目标检测效果进行结构微调；最终模型在自建测试集上的 mAP@0.5 相比基线提升 3.8%，夜间场景召回率有明显改善。"
+          }
+        ],
+        "projectAchievements": [
+          "完成论文初稿、实验复现实验包和可视化结果整理。"
+        ]
+      },
+      {
+        "name": "基于学习行为日志的课程风险预警分析",
+        "role": "项目负责人",
+        "authorRank": "第一作者",
+        "venue": "校级大创项目",
+        "status": "结题优秀",
+        "projectTime": ["2023.11", "2024.09"],
+        "projectDesc": "利用在线学习平台日志数据分析学生学习节奏、作业提交和测验表现，构建课程风险预警模型，为教师提供早期干预参考。",
+        "mainWork": [
+          {
+            "title": "特征工程",
+            "desc": "设计访问频次、任务延迟、测验波动、资源停留时长等特征，完成数据脱敏、缺失值处理和异常值过滤，并建立可复用的数据处理脚本。"
+          },
+          {
+            "title": "模型评估",
+            "desc": "对比逻辑回归、随机森林与 XGBoost，使用交叉验证评估模型稳定性；最终模型 F1-score 达到 0.86，并形成课程周报式风险解释结果。"
+          }
+        ],
+        "projectAchievements": [
+          "获得校级大学生创新训练项目优秀结题。"
+        ]
+      }
+    ],
+    "awards": [
+      {
+        "title": "国家励志奖学金",
+        "issuer": "教育部",
+        "date": "2025-10",
+        "level": "国家级",
+        "category": "综合类"
+      },
+      {
+        "title": "星海理工大学一等奖学金",
+        "issuer": "星海理工大学",
+        "date": "2024-11",
+        "level": "校级",
+        "category": "学业类"
+      },
+      {
+        "title": "蓝桥杯程序设计竞赛",
+        "issuer": "工业和信息化部人才交流中心",
+        "date": "2024-06",
+        "level": "省级二等奖",
+        "category": "创新类"
+      }
+    ]
+  }
 }

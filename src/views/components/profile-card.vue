@@ -5,14 +5,17 @@ import IconLogo from '@/components/icon-logo.vue'
 import localAvatarUrl from '@/data/avatar.png'
 import { resolveLocalizedText } from '@/utils/localized'
 
-const props = withDefaults(defineProps<{
-  editable?: boolean
-  locale?: ResumeLocale
-  themeKey?: string
-}>(), {
-  locale: 'zh',
-  themeKey: '',
-})
+const props = withDefaults(
+  defineProps<{
+    editable?: boolean
+    locale?: ResumeLocale
+    themeKey?: string
+  }>(),
+  {
+    locale: 'zh',
+    themeKey: '',
+  },
+)
 
 const emit = defineEmits<{
   (e: 'edit'): void
@@ -104,12 +107,10 @@ const intentions = computed(() => {
 
 const isResearchTheme = computed(() => props.themeKey === 'research-scholar')
 const researchInfoItems = computed(() => {
+  const gpa = resolveLocalizedText(profile.value.gpa, props.locale)
   const builtIn = [
-    resolveLocalizedText(profile.value.school, props.locale),
-    resolveLocalizedText(profile.value.major, props.locale),
     resolveLocalizedText(profile.value.ranking, props.locale),
-    resolveLocalizedText(profile.value.gpa, props.locale),
-    resolveLocalizedText(profile.value.gender, props.locale),
+    gpa ? `GPA: ${gpa}` : '',
     resolveLocalizedText(profile.value.birthplace, props.locale),
     profile.value.email,
     profile.value.phone,
@@ -120,6 +121,7 @@ const researchInfoItems = computed(() => {
       const label = resolveLocalizedText(item.label, props.locale)
       const value = resolveLocalizedText(item.value, props.locale)
       if (!value) return ''
+      if (/^(英语|语言|language|english)$/i.test(label)) return ''
       return label ? `${label}: ${value}` : value
     })
     .filter(Boolean)
@@ -128,7 +130,10 @@ const researchInfoItems = computed(() => {
 })
 
 const researchSubtitle = computed(() =>
-  [resolveLocalizedText(profile.value.school, props.locale), resolveLocalizedText(profile.value.major, props.locale)]
+  [
+    resolveLocalizedText(profile.value.school, props.locale),
+    resolveLocalizedText(profile.value.major, props.locale),
+  ]
     .filter(Boolean)
     .join(' | '),
 )
@@ -173,14 +178,18 @@ const avatarUrl = computed(() => {
 <template>
   <section class="profile-card" :class="{ 'is-research': isResearchTheme }">
     <template v-if="isResearchTheme">
-      <button v-if="editable" class="section-edit-btn research-edit" @click="emit('edit')">
-        <IconLogo name="edit" />
-      </button>
       <div class="research-profile-text">
-        <h1 class="profile-name research-name">
-          {{ resolveLocalizedText(profile.name, props.locale) || '未填写姓名' }}
-        </h1>
-        <div v-if="researchSubtitle" class="research-subtitle">{{ researchSubtitle }}</div>
+        <div class="research-name-row">
+          <h1 class="profile-name research-name">
+            {{ resolveLocalizedText(profile.name, props.locale) || '未填写姓名' }}
+          </h1>
+          <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
+            <IconLogo name="edit" />
+          </button>
+        </div>
+        <div v-if="researchSubtitle" class="research-subtitle">
+          <strong>{{ researchSubtitle }}</strong>
+        </div>
         <div v-if="researchInfoItems.length" class="research-meta">
           <span v-for="item in researchInfoItems" :key="item">{{ item }}</span>
         </div>
@@ -190,62 +199,62 @@ const avatarUrl = computed(() => {
       </div>
     </template>
     <template v-else>
-    <div class="profile-container">
-      <div class="profile-content">
-        <div>
-          <div class="profile-title-row">
-            <p class="resume-label">Resume</p>
-            <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
-              <IconLogo name="edit" />
-            </button>
+      <div class="profile-container">
+        <div class="profile-content">
+          <div>
+            <div class="profile-title-row">
+              <p class="resume-label">Resume</p>
+              <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
+                <IconLogo name="edit" />
+              </button>
+            </div>
+            <h1 class="profile-name">
+              {{ resolveLocalizedText(profile.name, props.locale) || '未填写姓名' }}
+            </h1>
           </div>
-          <h1 class="profile-name">
-            {{ resolveLocalizedText(profile.name, props.locale) || '未填写姓名' }}
-          </h1>
-        </div>
 
-        <div class="contact-grid">
-          <div v-for="item in contactItems" :key="item.key" class="contact-item">
-            <span v-if="showIcon" class="contact-icon">
+          <div class="contact-grid">
+            <div v-for="item in contactItems" :key="item.key" class="contact-item">
+              <span v-if="showIcon" class="contact-icon">
+                <IconLogo :name="item.icon" class="icon-size" />
+              </span>
+              <span v-if="showText" class="contact-label">{{ $t(`profile.${item.key}`) }}</span>
+              <span class="separator">·</span>
+              <a v-if="item.href" :href="item.href" class="contact-link">
+                {{ item.value }}
+              </a>
+              <span v-else>{{ item.value }}</span>
+            </div>
+          </div>
+
+          <div v-if="intentions.length" class="intentions-container">
+            <div v-for="item in intentions" :key="item.label" class="intention-badge">
               <IconLogo :name="item.icon" class="icon-size" />
-            </span>
-            <span v-if="showText" class="contact-label">{{ $t(`profile.${item.key}`) }}</span>
-            <span class="separator">·</span>
-            <a v-if="item.href" :href="item.href" class="contact-link">
-              {{ item.value }}
-            </a>
-            <span v-else>{{ item.value }}</span>
+              <span>{{ $t(item.label) }} · {{ item.value }}</span>
+            </div>
           </div>
         </div>
 
-        <div v-if="intentions.length" class="intentions-container">
-          <div v-for="item in intentions" :key="item.label" class="intention-badge">
-            <IconLogo :name="item.icon" class="icon-size" />
-            <span>{{ $t(item.label) }} · {{ item.value }}</span>
+        <div class="avatar-container">
+          <div class="avatar-ring">
+            <div
+              class="avatar-wrapper"
+              :style="{
+                borderRadius: avatarBorderRadius,
+                width: avatarCssWidth,
+                height: avatarCssHeight,
+              }"
+            >
+              <img
+                :src="avatarUrl"
+                :alt="resolveLocalizedText(profile.name, props.locale)"
+                class="avatar-image"
+                :style="{ borderRadius: avatarBorderRadius }"
+              />
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="avatar-container">
-        <div class="avatar-ring">
-          <div
-            class="avatar-wrapper"
-            :style="{
-              borderRadius: avatarBorderRadius,
-              width: avatarCssWidth,
-              height: avatarCssHeight,
-            }"
-          >
-            <img
-              :src="avatarUrl"
-              :alt="resolveLocalizedText(profile.name, props.locale)"
-              class="avatar-image"
-              :style="{ borderRadius: avatarBorderRadius }"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
     </template>
   </section>
 </template>
@@ -311,10 +320,17 @@ const avatarUrl = computed(() => {
   border-radius: 0 !important;
 }
 
-.research-edit {
+.research-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
+}
+
+.research-name-row .section-edit-btn {
   position: absolute;
-  top: 0;
-  left: 0;
+  right: 0;
 }
 
 .profile-container {

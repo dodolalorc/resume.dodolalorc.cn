@@ -357,13 +357,18 @@ export const buildExportHTML = ({
   const sourceElement = getElement(surfaceSelector, '找不到简历容器')
   const element = sourceElement.cloneNode(true) as HTMLElement
   element.setAttribute('data-export-size', size)
-  const bodyBg = getComputedStyle(document.body).backgroundColor || '#f3efe6'
-  const exportBackground = preserveBackground ? bodyBg : backgroundColor || '#ffffff'
+  // 优先使用传入的 backgroundColor（用户在"简历背景色"中选择的颜色）；
+  // preserveBackground=false 时强制用白色导出
+  const surfaceBg =
+    backgroundColor ||
+    getComputedStyle(sourceElement).backgroundColor ||
+    '#ffffff'
+  const exportBackground = preserveBackground ? surfaceBg : '#ffffff'
   element.style.backgroundColor = exportBackground
   const styleText = collectStyleText()
   const stylesheetLinks = collectStylesheetLinks()
   const bodyFontFamily = getComputedStyle(document.body).fontFamily
-  const title = `${fileBaseName}_${todayString()}`
+  const title = mode === 'pdf' ? `${fileBaseName}-${todayString()}.pdf` : `${fileBaseName}_${todayString()}`
   const bodyDisplayForMode = mode === 'pdf' ? 'block' : 'flex'
   const bodyPaddingForMode = mode === 'pdf' ? '0' : '24px 16px'
 

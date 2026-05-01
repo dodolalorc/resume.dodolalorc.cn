@@ -30,6 +30,7 @@ import ImportIcon from '@/assets/icons/import.svg'
 import GearIcon from '@/assets/icons/gear.svg'
 import AddIcon from '@/assets/icons/add.svg'
 import DeleteIcon from '@/assets/icons/delete.svg'
+import GlobeIcon from '@/assets/icons/globe.svg'
 
 import { computed } from 'vue'
 
@@ -67,7 +68,8 @@ const iconMap: Record<string, typeof EmailIcon> = {
   'file-import': ImportIcon,
   gear: GearIcon,
   add: AddIcon,
-  delete: DeleteIcon
+  delete: DeleteIcon,
+  globe: GlobeIcon
 }
 
 // 使用计算属性来动态选择图标组件
