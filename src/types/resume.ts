@@ -115,4 +115,5 @@ export interface ResumeConfig {
   experience: Array<ExperienceConfig>
   projects?: Array<Project>
   awards?: Array<Award>
+  research?: ResumeConfig
 }

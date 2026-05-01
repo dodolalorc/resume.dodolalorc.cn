@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ViewLayout from '@/layout/view-layout.vue'
@@ -37,6 +37,13 @@ const education = ref<EducationConfig[]>([])
 const experience = ref<ExperienceConfig[]>([])
 const projects = ref<Project[]>([])
 const awards = ref<Award[]>([])
+const researchResume = ref<ResumeConfig>({
+  profile: {},
+  education: [],
+  experience: [],
+  projects: [],
+  awards: [],
+})
 const resumeLocale = ref<ResumeLocale>('zh')
 const { locale: appLocale } = useI18n()
 const exportingType = ref<'none' | 'pdf' | 'html'>('none')
@@ -110,20 +117,59 @@ const RESUME_BACKGROUND_OPTIONS = [
   { key: 'soft-green', label: '浅鼠尾草', value: '#eff3ee' },
 ] as const
 
-const sectionCounts = computed(() => ({
-  education: education.value.length,
-  experience: experience.value.length,
-  projects: projects.value.length,
-  awards: awards.value.length,
-}))
-
 const currentTheme = computed(() => getResumeTheme(selectedThemeKey.value))
+const isResearchTheme = computed(() => currentTheme.value.key === 'research-scholar')
+const activeProfile = computed({
+  get: () => (isResearchTheme.value ? researchResume.value.profile : profile.value),
+  set: (value: Profile) => {
+    if (isResearchTheme.value) researchResume.value.profile = value
+    else profile.value = value
+  },
+})
+const activeEducation = computed({
+  get: () => (isResearchTheme.value ? researchResume.value.education : education.value),
+  set: (value: EducationConfig[]) => {
+    if (isResearchTheme.value) researchResume.value.education = value
+    else education.value = value
+  },
+})
+const activeExperience = computed({
+  get: () => (isResearchTheme.value ? researchResume.value.experience : experience.value),
+  set: (value: ExperienceConfig[]) => {
+    if (isResearchTheme.value) researchResume.value.experience = value
+    else experience.value = value
+  },
+})
+const activeProjects = computed({
+  get: () => (isResearchTheme.value ? researchResume.value.projects || [] : projects.value),
+  set: (value: Project[]) => {
+    if (isResearchTheme.value) researchResume.value.projects = value
+    else projects.value = value
+  },
+})
+const activeAwards = computed({
+  get: () => (isResearchTheme.value ? researchResume.value.awards || [] : awards.value),
+  set: (value: Award[]) => {
+    if (isResearchTheme.value) researchResume.value.awards = value
+    else awards.value = value
+  },
+})
+const sectionCounts = computed(() => ({
+  education: activeEducation.value.length,
+  experience: activeExperience.value.length,
+  projects: activeProjects.value.length,
+  awards: activeAwards.value.length,
+}))
 const currentSizePreset = computed(
   () => RESUME_SIZE_PRESETS.find((item) => item.key === resumeSize.value) ?? RESUME_SIZE_PRESETS[2],
 )
 const isExporting = computed(() => exportingType.value !== 'none')
-const currentProfileName = computed(() => resolveLocalizedText(profile.value.name, resumeLocale.value))
-const languageText = computed(() => (resumeLocale.value === 'zh' ? '中文' : 'English'))
+const currentProfileName = computed(() =>
+  resolveLocalizedText(activeProfile.value.name, resumeLocale.value),
+)
+const languageText = computed(() =>
+  resumeLocale.value === 'zh' ? 'Switch to English' : '切换中文',
+)
 const modeText = computed(() => (isEditing.value ? '编辑模式' : '预览模式'))
 const exportingText = computed(() => {
   if (exportingType.value === 'html') return '导出HTML中...'
@@ -140,6 +186,16 @@ const themeSections = computed(() => {
     mainSections: mainSections.filter((section) => sectionHasData(section, sectionCounts.value)),
   }
 })
+const groupedThemes = computed(() => [
+  {
+    label: '求职向',
+    themes: resumeThemes.filter((theme) => theme.key !== 'research-scholar'),
+  },
+  {
+    label: '科研保研',
+    themes: resumeThemes.filter((theme) => theme.key === 'research-scholar'),
+  },
+])
 
 const resumeScaleStyle = computed(() =>
   buildThemeStyleVars(currentTheme.value, {
@@ -152,18 +208,18 @@ const resumeScaleStyle = computed(() =>
 
 const resumeData = computed<ResumeConfig>({
   get: () => ({
-    profile: profile.value,
-    education: education.value,
-    experience: experience.value,
-    projects: projects.value,
-    awards: awards.value,
+    profile: activeProfile.value,
+    education: activeEducation.value,
+    experience: activeExperience.value,
+    projects: activeProjects.value,
+    awards: activeAwards.value,
   }),
   set: (next) => {
-    profile.value = next.profile || {}
-    education.value = next.education || []
-    experience.value = next.experience || []
-    projects.value = next.projects || []
-    awards.value = next.awards || []
+    activeProfile.value = next.profile || {}
+    activeEducation.value = next.education || []
+    activeExperience.value = next.experience || []
+    activeProjects.value = next.projects || []
+    activeAwards.value = next.awards || []
   },
 })
 
@@ -173,6 +229,13 @@ const applyResumeData = (payload: Partial<ResumeConfig>) => {
   experience.value = payload.experience || []
   projects.value = payload.projects || []
   awards.value = payload.awards || []
+  researchResume.value = {
+    profile: payload.research?.profile || {},
+    education: payload.research?.education || [],
+    experience: payload.research?.experience || [],
+    projects: payload.research?.projects || [],
+    awards: payload.research?.awards || [],
+  }
 }
 
 const openSectionEditor = (section: EditorSection) => {
@@ -259,8 +322,7 @@ const startExport = async (mode: 'html' | 'pdf' | 'json') => {
   showExportMenu.value = false
 
   try {
-    const defaultFileBaseName = currentProfileName.value || 'resume'
-    let fileBaseName = defaultFileBaseName
+    const fileBaseName = currentProfileName.value || 'resume'
 
     if (mode === 'json') {
       exportResumeJSON()
@@ -280,10 +342,6 @@ const startExport = async (mode: 'html' | 'pdf' | 'json') => {
     }
 
     exportingType.value = mode
-
-    const inputFileName = window.prompt('请输入 PDF 文件名', defaultFileBaseName)
-    if (inputFileName === null) return
-    fileBaseName = inputFileName.trim() || defaultFileBaseName
 
     await printResumePDF({
       surfaceSelector: '.resume-export-surface',
@@ -471,16 +529,23 @@ onBeforeUnmount(() => {
       <div class="toolbar-meta">
         <div class="mode-tag">{{ modeText }}</div>
         <div class="theme-intro">
-          <span class="theme-name">{{ currentTheme.name }}</span>
+          <span class="theme-name-row">
+            <span class="theme-name">{{ currentTheme.name }}</span>
+            <button
+              class="language-icon-btn"
+              :disabled="isExporting"
+              :title="languageText"
+              :aria-label="languageText"
+              @click="toggleResumeLocale"
+            >
+              <LogoIcon name="globe" />
+            </button>
+          </span>
           <span class="theme-description">{{ currentTheme.description }}</span>
         </div>
       </div>
 
       <div class="toolbar-actions">
-        <button class="export-btn language-btn" :disabled="isExporting" @click="toggleResumeLocale">
-          {{ languageText }}
-        </button>
-
         <div ref="exportMenuRef" class="export-menu">
           <button class="export-btn" :disabled="isExporting" @click="toggleExportMenu">
             <LogoIcon v-if="!isExporting" name="file-export" />
@@ -496,11 +561,17 @@ onBeforeUnmount(() => {
         </div>
 
         <button class="export-btn" :disabled="isExporting" @click="importDialogOpen = true">
-          <LogoIcon name="link" /> 导入
+          <LogoIcon name="file-import" /> 导入
         </button>
 
-        <button class="export-btn" :disabled="isExporting" @click="toggleEditMode">
-          <LogoIcon name="edit" /> {{ isEditing ? '结束编辑' : '编辑' }}
+        <button
+          class="export-btn icon-btn"
+          :disabled="isExporting"
+          :title="isEditing ? '结束编辑' : '编辑'"
+          :aria-label="isEditing ? '结束编辑' : '编辑'"
+          @click="toggleEditMode"
+        >
+          <LogoIcon name="edit" />
         </button>
 
         <div ref="fontSizeMenuRef" class="font-size-menu">
@@ -537,22 +608,25 @@ onBeforeUnmount(() => {
                 role="radiogroup"
                 aria-label="简历主题"
               >
-                <button
-                  v-for="theme in resumeThemes"
-                  :key="theme.key"
-                  class="theme-pill"
-                  :class="{ active: theme.key === currentTheme.key }"
-                  :aria-checked="theme.key === currentTheme.key"
-                  role="radio"
-                  @click="setTheme(theme.key)"
-                >
-                  <span
-                    class="theme-pill-chip"
-                    :style="{ backgroundColor: theme.palette.primary }"
-                  ></span>
-                  <span class="theme-pill-name">{{ theme.name }}</span>
-                  <span class="theme-pill-category">{{ theme.category }}</span>
-                </button>
+                <template v-for="group in groupedThemes" :key="group.label">
+                  <div class="theme-group-label">{{ group.label }}</div>
+                  <button
+                    v-for="theme in group.themes"
+                    :key="theme.key"
+                    class="theme-pill"
+                    :class="{ active: theme.key === currentTheme.key }"
+                    :aria-checked="theme.key === currentTheme.key"
+                    role="radio"
+                    @click="setTheme(theme.key)"
+                  >
+                    <span
+                      class="theme-pill-chip"
+                      :style="{ backgroundColor: theme.palette.primary }"
+                    ></span>
+                    <span class="theme-pill-name">{{ theme.name }}</span>
+                    <span class="theme-pill-category">{{ theme.category }}</span>
+                  </button>
+                </template>
               </div>
             </div>
 
@@ -642,7 +716,7 @@ onBeforeUnmount(() => {
           <template v-for="section in themeSections.sidebarSections" :key="section">
             <ProfileCard
               v-if="section === 'profile'"
-              v-model:profile="profile"
+              v-model:profile="activeProfile"
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
@@ -650,7 +724,7 @@ onBeforeUnmount(() => {
             />
             <EduCard
               v-else-if="section === 'education'"
-              v-model:education="education"
+              v-model:education="activeEducation"
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
@@ -658,7 +732,7 @@ onBeforeUnmount(() => {
             />
             <ExpCard
               v-else-if="section === 'experience'"
-              v-model:experience="experience"
+              v-model:experience="activeExperience"
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
@@ -666,7 +740,7 @@ onBeforeUnmount(() => {
             />
             <ProjectCard
               v-else-if="section === 'projects'"
-              v-model:projects="projects"
+              v-model:projects="activeProjects"
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
@@ -674,7 +748,7 @@ onBeforeUnmount(() => {
             />
             <AwardCard
               v-else
-              v-model:awards="awards"
+              v-model:awards="activeAwards"
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
@@ -687,7 +761,7 @@ onBeforeUnmount(() => {
           <template v-for="section in themeSections.mainSections" :key="section">
             <ProfileCard
               v-if="section === 'profile'"
-              v-model:profile="profile"
+              v-model:profile="activeProfile"
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
@@ -695,7 +769,7 @@ onBeforeUnmount(() => {
             />
             <EduCard
               v-else-if="section === 'education'"
-              v-model:education="education"
+              v-model:education="activeEducation"
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
@@ -703,7 +777,7 @@ onBeforeUnmount(() => {
             />
             <ExpCard
               v-else-if="section === 'experience'"
-              v-model:experience="experience"
+              v-model:experience="activeExperience"
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
@@ -711,7 +785,7 @@ onBeforeUnmount(() => {
             />
             <ProjectCard
               v-else-if="section === 'projects'"
-              v-model:projects="projects"
+              v-model:projects="activeProjects"
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
@@ -719,7 +793,7 @@ onBeforeUnmount(() => {
             />
             <AwardCard
               v-else
-              v-model:awards="awards"
+              v-model:awards="activeAwards"
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
@@ -804,6 +878,7 @@ onBeforeUnmount(() => {
 .toolbar-meta {
   display: flex;
   flex-direction: column;
+  flex: 1 1 0;
   gap: 8px;
   min-width: 0;
 }
@@ -830,10 +905,47 @@ onBeforeUnmount(() => {
   color: var(--resume-theme-muted);
 }
 
+.theme-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.language-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--resume-theme-border);
+  border-radius: 50%;
+  background: var(--resume-theme-button-bg);
+  color: var(--resume-theme-muted);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.language-icon-btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 8%, white);
+}
+
+.language-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .toolbar-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex: 1 1 0;
   gap: 10px;
   flex-wrap: wrap;
 }
@@ -894,6 +1006,17 @@ onBeforeUnmount(() => {
 .theme-pill-category {
   font-size: 12px;
   color: var(--resume-theme-subtle);
+}
+
+.theme-group-label {
+  width: 100%;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--resume-theme-subtle);
+  padding-top: 8px;
+  margin-top: 4px;
 }
 
 .font-size-menu,

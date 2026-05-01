@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import type { Project, ResumeLocale } from '@/types/resume'
 import IconLogo from '@/components/icon-logo.vue'
-import { resolveLocalizedText } from '@/utils/localized'
+import { renderInlineMarkdown, resolveLocalizedText } from '@/utils/localized'
 
-const props = withDefaults(defineProps<{
-  editable?: boolean
-  locale?: ResumeLocale
-  themeKey?: string
-}>(), {
-  locale: 'zh',
-  themeKey: '',
-})
+const props = withDefaults(
+  defineProps<{
+    editable?: boolean
+    locale?: ResumeLocale
+    themeKey?: string
+  }>(),
+  {
+    locale: 'zh',
+    themeKey: '',
+  },
+)
 
 const emit = defineEmits<{
   (e: 'edit'): void
@@ -38,13 +41,21 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
       <span class="project-time">{{ item.projectTime?.join(' - ') }}</span>
       <span class="project-role">{{ resolveLocalizedText(item.role, props.locale) }}</span>
       <template v-if="isResearchTheme()">
-        <span v-if="resolveLocalizedText(item.authorRank, props.locale)" class="project-role">{{ resolveLocalizedText(item.authorRank, props.locale) }}</span>
-        <span v-if="resolveLocalizedText(item.venue, props.locale)" class="project-role">{{ resolveLocalizedText(item.venue, props.locale) }}</span>
-        <span v-if="resolveLocalizedText(item.status, props.locale)" class="project-role">{{ resolveLocalizedText(item.status, props.locale) }}</span>
+        <span v-if="resolveLocalizedText(item.authorRank, props.locale)" class="project-role">{{
+          resolveLocalizedText(item.authorRank, props.locale)
+        }}</span>
+        <span v-if="resolveLocalizedText(item.venue, props.locale)" class="project-role">{{
+          resolveLocalizedText(item.venue, props.locale)
+        }}</span>
+        <span v-if="resolveLocalizedText(item.status, props.locale)" class="project-role">{{
+          resolveLocalizedText(item.status, props.locale)
+        }}</span>
       </template>
-      <span v-if="item.link" class="project-link">
+      <span v-if="item.link?.url?.trim()" class="project-link">
         <span>链接：</span>
-        <a :href="item.link.url" target="_blank" rel="noopener noreferrer">{{ resolveLocalizedText(item.link.label, props.locale) }}</a>
+        <a :href="item.link.url" target="_blank" rel="noopener noreferrer">
+          {{ resolveLocalizedText(item.link.label, props.locale) || item.link.url }}
+        </a>
       </span>
 
       <div v-if="item.techStack && item.techStack.length" class="project-row">
@@ -53,20 +64,32 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
       </div>
       <div v-if="item.projectDesc" class="project-row">
         <span class="project-item-title">项目描述：</span>
-        <span class="project-content" v-html="resolveLocalizedText(item.projectDesc, props.locale)" />
+        <span
+          class="project-content"
+          v-html="renderInlineMarkdown(item.projectDesc, props.locale)"
+        />
       </div>
       <div v-if="item.mainWork && item.mainWork.length" class="project-row">
         <span class="project-item-title">主要工作：</span>
         <div class="project-content">
           <div v-for="(work, index) in item.mainWork" :key="index" class="project-main-work-item">
-            <span class="project-main-work-title" v-if="resolveLocalizedText(work.title, props.locale)">{{ resolveLocalizedText(work.title, props.locale) }}: </span>
-            <span v-html="resolveLocalizedText(work.desc, props.locale)"></span>
+            <span
+              class="project-main-work-title"
+              v-if="resolveLocalizedText(work.title, props.locale)"
+              >{{ resolveLocalizedText(work.title, props.locale) }}:
+            </span>
+            <span v-html="renderInlineMarkdown(work.desc, props.locale)"></span>
           </div>
         </div>
       </div>
       <div v-if="item.projectAchievements && item.projectAchievements.length" class="project-row">
         <span class="project-item-title">项目成就：</span>
-        <span class="project-content">{{ item.projectAchievements.map((achievement) => resolveLocalizedText(achievement, props.locale)).filter(Boolean).join(', ') }}</span>
+        <span class="project-content">{{
+          item.projectAchievements
+            .map((achievement) => resolveLocalizedText(achievement, props.locale))
+            .filter(Boolean)
+            .join(', ')
+        }}</span>
       </div>
     </div>
   </div>
@@ -167,6 +190,7 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
   .project-header {
     margin: var(--resume-section-gap, 7px) 0 4px;
     border-bottom: 1px solid #111;
+    justify-content: space-between;
   }
 
   .project-title {
