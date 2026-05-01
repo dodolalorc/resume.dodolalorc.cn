@@ -1,12 +1,35 @@
 <script setup lang="ts">
-import type { ExperienceConfig, ResumeConfig } from '@/types/resume'
+import type { ExperienceConfig, ResumeConfig, ResumeLocale } from '@/types/resume'
 import FormInput from '../../components/form-input.vue'
+import IconLogo from '@/components/icon-logo.vue'
+import { resolveLocalizedText, setLocalizedText } from '@/utils/localized'
+
+const props = defineProps<{
+  locale: ResumeLocale
+}>()
 
 const resume = defineModel<ResumeConfig>('resume', { required: true })
 
 const experienceList = () => (resume.value.experience ??= [])
 const ensureJobTime = (item: ExperienceConfig) => (item.jobTime ??= ['', ''])
 const ensureJobDesc = (item: ExperienceConfig) => (item.jobDesc ??= [''])
+const fieldText = (item: ExperienceConfig, key: keyof ExperienceConfig) =>
+  resolveLocalizedText(item[key] as never, props.locale)
+const updateFieldText = (item: ExperienceConfig, key: keyof ExperienceConfig, value: string) => {
+  setLocalizedText(item as unknown as Record<string, unknown>, key, props.locale, value)
+}
+const descText = (item: ExperienceConfig, index: number) =>
+  resolveLocalizedText(ensureJobDesc(item)[index], props.locale)
+const updateDesc = (item: ExperienceConfig, index: number, value: string) => {
+  const current = ensureJobDesc(item)[index]
+  if (props.locale === 'zh' && typeof current !== 'object') {
+    ensureJobDesc(item)[index] = value
+    return
+  }
+  const next = typeof current === 'object' ? { ...current } : { zh: current || '' }
+  next[props.locale] = value
+  ensureJobDesc(item)[index] = next
+}
 
 const addExperience = () => {
   experienceList().push({
@@ -35,19 +58,49 @@ const removeDesc = (item: ExperienceConfig, index: number) => {
   <div class="section-content">
     <div class="section-header">
       <h3 class="section-title">工作经历</h3>
-      <button class="paper-btn" @click="addExperience">新增</button>
+      <button class="action-btn add" @click="addExperience">
+        <IconLogo name="add" /> 新增
+      </button>
     </div>
 
     <div v-for="(item, idx) in experienceList()" :key="idx" class="card">
       <div class="card-header">
         <span>第 {{ idx + 1 }} 条</span>
-        <button class="paper-btn ghost" @click="removeExperience(idx)">删除</button>
+        <button class="action-btn delete" @click="removeExperience(idx)">
+          <IconLogo name="delete" /> 删除
+        </button>
       </div>
 
       <div class="form-grid">
-        <FormInput v-model="item.company" label="公司" />
-        <FormInput v-model="item.partment" label="部门" />
-        <FormInput v-model="item.jobTitle" label="职位" />
+        <FormInput
+          :model-value="fieldText(item, 'title')"
+          label="科研模块标题"
+          placeholder="如：编程与工程工具 / 学院开源社团"
+          @update:model-value="updateFieldText(item, 'title', $event)"
+        />
+        <label class="form-label">
+          <span>内容类型</span>
+          <select v-model="item.kind" class="form-select">
+            <option value="work">工作经历</option>
+            <option value="skills">掌握技能</option>
+            <option value="campus">校园经历</option>
+          </select>
+        </label>
+        <FormInput
+          :model-value="fieldText(item, 'company')"
+          label="公司"
+          @update:model-value="updateFieldText(item, 'company', $event)"
+        />
+        <FormInput
+          :model-value="fieldText(item, 'partment')"
+          label="部门"
+          @update:model-value="updateFieldText(item, 'partment', $event)"
+        />
+        <FormInput
+          :model-value="fieldText(item, 'jobTitle')"
+          label="职位"
+          @update:model-value="updateFieldText(item, 'jobTitle', $event)"
+        />
         <div class="time-grid">
           <FormInput v-model="ensureJobTime(item)[0]" label="开始时间" />
           <FormInput v-model="ensureJobTime(item)[1]" label="结束时间" />
@@ -55,16 +108,21 @@ const removeDesc = (item: ExperienceConfig, index: number) => {
         <div class="full-width">
           <div class="list-header">
             <span class="list-title">工作内容</span>
-            <button class="paper-btn ghost" @click="addDesc(item)">添加一条</button>
+            <button class="action-btn add compact" @click="addDesc(item)">
+              <IconLogo name="add" /> 添加一条
+            </button>
           </div>
           <div class="list-items">
-            <div v-for="(desc, dIdx) in ensureJobDesc(item)" :key="dIdx" class="list-item">
+            <div v-for="(_desc, dIdx) in ensureJobDesc(item)" :key="dIdx" class="list-item">
               <textarea
-                v-model="ensureJobDesc(item)[dIdx]"
+                :value="descText(item, dIdx)"
                 class="form-textarea"
                 rows="2"
+                @input="updateDesc(item, dIdx, ($event.target as HTMLTextAreaElement).value)"
               ></textarea>
-              <button class="paper-btn ghost" @click="removeDesc(item, dIdx)">删</button>
+              <button class="action-btn delete icon-only" @click="removeDesc(item, dIdx)">
+                <IconLogo name="delete" />
+              </button>
             </div>
           </div>
         </div>
@@ -108,6 +166,23 @@ const removeDesc = (item: ExperienceConfig, index: number) => {
 .form-grid {
   display: grid;
   gap: 12px;
+}
+
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #7a7060;
+}
+
+.form-select {
+  border: 1px solid #d6d0c4;
+  background: #fffdf7;
+  padding: 7px 8px;
+  font: inherit;
+  color: #2f2a24;
 }
 
 @media (min-width: 768px) {
@@ -155,30 +230,47 @@ const removeDesc = (item: ExperienceConfig, index: number) => {
   color: #2f2a24;
   line-height: 1.5;
   box-sizing: border-box;
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
 }
 
-.form-textarea:focus {
-  border-color: #9c8f7a;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(156, 143, 122, 0.2);
-}
-
-.form-textarea::placeholder {
-  color: #b0a898;
-}
-
-.paper-btn {
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   border: 1px solid #d6d0c4;
-  background: #fffdf7;
-  color: #2f2a24;
-  padding: 4px 10px;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.paper-btn.ghost {
-  background: #fff;
+.action-btn :deep(.icon-logo) {
+  width: 14px;
+  height: 14px;
+  padding: 0;
+}
+
+.action-btn.add {
+  border-color: #b8d8c0;
+  background: #eff8f1;
+  color: #25633b;
+}
+
+.action-btn.delete {
+  border-color: #efc4bd;
+  background: #fff1ef;
+  color: #a33a2b;
+}
+
+.action-btn.compact {
+  padding: 4px 10px;
+}
+
+.action-btn.icon-only {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  flex: 0 0 auto;
 }
 </style>

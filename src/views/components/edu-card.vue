@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import type { EducationConfig } from '@/types/resume'
+import type { EducationConfig, ResumeLocale } from '@/types/resume'
 import IconLogo from '@/components/icon-logo.vue'
+import { resolveLocalizedList, resolveLocalizedText } from '@/utils/localized'
 
-defineProps<{
+const props = withDefaults(defineProps<{
   editable?: boolean
-}>()
+  locale?: ResumeLocale
+  themeKey?: string
+}>(), {
+  locale: 'zh',
+  themeKey: '',
+})
 
 const emit = defineEmits<{
   (e: 'edit'): void
@@ -15,9 +21,21 @@ const edu = defineModel<EducationConfig[]>('education', {
   required: true,
   default: () => [],
 })
+
+const isResearchTheme = () => props.themeKey === 'research-scholar'
+const courseText = (item: EducationConfig) =>
+  (item.courses ?? [])
+    .map((course) => {
+      const name = resolveLocalizedText(course.name, props.locale)
+      const grade = resolveLocalizedText(course.grade, props.locale)
+      if (!name) return ''
+      return grade ? `${name}(${grade})` : name
+    })
+    .filter(Boolean)
+    .join('，')
 </script>
 <template>
-  <div class="edu-shell">
+  <div class="edu-shell" :class="{ 'is-research': isResearchTheme() }">
     <div class="edu-header">
       <h2 class="edu-title">教育经历</h2>
       <hr class="edu-divider" />
@@ -26,11 +44,33 @@ const edu = defineModel<EducationConfig[]>('education', {
       </button>
     </div>
     <div v-for="(item, index) in edu" :key="index" class="edu-item">
-      <span class="edu-school">{{ item.school }}</span>
+      <span class="edu-school">{{ resolveLocalizedText(item.school, props.locale) }}</span>
+      <span
+        v-for="tag in resolveLocalizedList(item.schoolTags, props.locale)"
+        :key="tag"
+        class="edu-tag"
+      >{{ tag }}</span>
       <span class="edu-time">{{ item.eduTime?.join(' - ') }}</span>
-      <span class="edu-degree">{{ item.degree }}</span>
-      <span class="edu-major">{{ item.major }}</span>
-      <div class="edu-desc" v-html="item.eduDesc"></div>
+      <span class="edu-degree">{{ resolveLocalizedText(item.degree, props.locale) }}</span>
+      <span class="edu-major">{{ resolveLocalizedText(item.major, props.locale) }}</span>
+      <span
+        v-for="tag in resolveLocalizedList(item.majorTags, props.locale)"
+        :key="tag"
+        class="edu-tag major-tag"
+      >{{ tag }}</span>
+      <div class="edu-desc" v-html="resolveLocalizedText(item.eduDesc, props.locale)"></div>
+      <template v-if="isResearchTheme()">
+        <div class="edu-research-meta">
+          <span v-if="resolveLocalizedText(item.gpa, props.locale)">GPA：{{ resolveLocalizedText(item.gpa, props.locale) }}</span>
+          <span v-if="resolveLocalizedText(item.ranking, props.locale)">排名：{{ resolveLocalizedText(item.ranking, props.locale) }}</span>
+          <span v-if="resolveLocalizedList(item.languageCertificates, props.locale).length">
+            语言证书：{{ resolveLocalizedList(item.languageCertificates, props.locale).join('，') }}
+          </span>
+        </div>
+        <div v-if="courseText(item)" class="edu-courses">
+          <strong>主修课程：</strong>{{ courseText(item) }}
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -74,6 +114,24 @@ const edu = defineModel<EducationConfig[]>('education', {
       font-size: var(--resume-text-lg, 18px);
       font-weight: bold;
     }
+    .edu-tag {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 1px 6px;
+      border: 1px solid color-mix(in srgb, var(--color-primary) 24%, transparent);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--color-primary) 8%, white);
+      color: var(--color-primary);
+      font-size: calc(11px * var(--resume-font-scale, 1));
+      font-weight: 600;
+      line-height: 1.35;
+      vertical-align: 0.08em;
+    }
+    .major-tag {
+      color: #666;
+      border-color: #d6d0c4;
+      background: #fffdf7;
+    }
     .edu-time {
       margin-left: 10px;
       color: #666;
@@ -105,6 +163,57 @@ const edu = defineModel<EducationConfig[]>('education', {
         font-size: inherit;
       }
     }
+  }
+}
+
+.edu-shell.is-research {
+  .edu-header {
+    margin: var(--resume-section-gap, 7px) 0 4px;
+    border-bottom: 1px solid #111;
+  }
+
+  .edu-title {
+    font-size: var(--resume-text-lg, 16px);
+  }
+
+  .edu-divider {
+    display: none;
+  }
+
+  .edu-item {
+    margin: 6px 0 0;
+  }
+
+  .edu-time {
+    float: right;
+  }
+
+  .edu-tag,
+  .major-tag {
+    border-color: #111;
+    background: #fff;
+    color: #111;
+    border-radius: 0;
+  }
+
+  .edu-research-meta,
+  .edu-courses {
+    margin-top: 4px;
+    font-size: var(--resume-text-base, 14px);
+    color: #222;
+    line-height: 1.55;
+  }
+
+  .edu-research-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 8px;
+  }
+
+  .edu-research-meta span:not(:last-child)::after {
+    content: '|';
+    margin-left: 8px;
+    color: #555;
   }
 }
 </style>

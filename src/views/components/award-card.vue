@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import type { Award } from '@/types/resume'
+import type { Award, ResumeLocale } from '@/types/resume'
 import IconLogo from '@/components/icon-logo.vue'
+import { resolveLocalizedText } from '@/utils/localized'
 
-defineProps<{
+const props = withDefaults(defineProps<{
   editable?: boolean
-}>()
+  locale?: ResumeLocale
+  themeKey?: string
+}>(), {
+  locale: 'zh',
+  themeKey: '',
+})
 
 const emit = defineEmits<{
   (e: 'edit'): void
@@ -15,9 +21,11 @@ const awards = defineModel<Award[]>('awards', {
   required: true,
   default: () => [],
 })
+
+const isResearchTheme = () => props.themeKey === 'research-scholar'
 </script>
 <template>
-  <div class="award-shell">
+  <div class="award-shell" :class="{ 'is-research': isResearchTheme() }">
     <div class="award-header">
       <h2 class="award-title">奖项</h2>
       <hr class="award-divider" />
@@ -26,8 +34,10 @@ const awards = defineModel<Award[]>('awards', {
       </button>
     </div>
     <div v-for="(item, index) in awards" :key="index" class="award-item">
-      <span class="award-name">{{ item.title }}</span>
-      <span class="award-level" v-if="item.level">{{ item.level }}</span>
+      <span class="award-name">{{ resolveLocalizedText(item.title, props.locale) }}</span>
+      <span class="award-level" v-if="resolveLocalizedText(item.issuer, props.locale)">{{ resolveLocalizedText(item.issuer, props.locale) }}</span>
+      <span class="award-level" v-if="resolveLocalizedText(item.level, props.locale)">{{ resolveLocalizedText(item.level, props.locale) }}</span>
+      <span class="award-level" v-if="resolveLocalizedText(item.category, props.locale)">{{ resolveLocalizedText(item.category, props.locale) }}</span>
       <span class="award-time" v-if="item.date">{{ item.date }}</span>
     </div>
   </div>
@@ -90,6 +100,30 @@ const awards = defineModel<Award[]>('awards', {
       font-size: var(--resume-text-sm, 13px);
       color: #999;
     }
+  }
+}
+
+.award-shell.is-research {
+  .award-header {
+    margin: var(--resume-section-gap, 7px) 0 4px;
+    border-bottom: 1px solid #111;
+  }
+
+  .award-title {
+    font-size: var(--resume-text-lg, 16px);
+  }
+
+  .award-divider {
+    display: none;
+  }
+
+  .award-item {
+    margin: 5px 0;
+    font-size: var(--resume-text-base, 14px);
+  }
+
+  .award-name {
+    font-size: var(--resume-text-base, 14px);
   }
 }
 </style>

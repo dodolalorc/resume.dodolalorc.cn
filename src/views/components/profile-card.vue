@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Profile } from '@/types/resume'
+import type { Profile, ResumeLocale } from '@/types/resume'
 import IconLogo from '@/components/icon-logo.vue'
 import localAvatarUrl from '@/data/avatar.png'
+import { resolveLocalizedText } from '@/utils/localized'
 
-defineProps<{
+const props = withDefaults(defineProps<{
   editable?: boolean
-}>()
+  locale?: ResumeLocale
+  themeKey?: string
+}>(), {
+  locale: 'zh',
+  themeKey: '',
+})
 
 const emit = defineEmits<{
   (e: 'edit'): void
@@ -53,13 +59,13 @@ const contactItems = computed(() => {
     {
       key: 'github',
       icon: 'github',
-      value: profile.value.github?.label,
+      value: resolveLocalizedText(profile.value.github?.label, props.locale),
       href: profile.value.github?.url,
     },
     {
       key: 'blog',
       icon: 'blog',
-      value: profile.value.blog?.label,
+      value: resolveLocalizedText(profile.value.blog?.label, props.locale),
       href: profile.value.blog?.url,
     },
     { key: 'zhihu', icon: 'zhihu', value: profile.value.zhihu, href: profile.value.zhihu },
@@ -81,20 +87,51 @@ const intentions = computed(() => {
     {
       label: 'profile.jobIntention.city',
       icon: 'location-dot',
-      value: profile.value.jobIntention.city,
+      value: resolveLocalizedText(profile.value.jobIntention.city, props.locale),
     },
     {
       label: 'profile.jobIntention.position',
       icon: 'briefcase',
-      value: profile.value.jobIntention.position,
+      value: resolveLocalizedText(profile.value.jobIntention.position, props.locale),
     },
     {
       label: 'profile.jobIntention.salary',
       icon: 'dollar-sign',
-      value: profile.value.jobIntention.salary,
+      value: resolveLocalizedText(profile.value.jobIntention.salary, props.locale),
     },
   ].filter((item) => item.value)
 })
+
+const isResearchTheme = computed(() => props.themeKey === 'research-scholar')
+const researchInfoItems = computed(() => {
+  const builtIn = [
+    resolveLocalizedText(profile.value.school, props.locale),
+    resolveLocalizedText(profile.value.major, props.locale),
+    resolveLocalizedText(profile.value.ranking, props.locale),
+    resolveLocalizedText(profile.value.gpa, props.locale),
+    resolveLocalizedText(profile.value.gender, props.locale),
+    resolveLocalizedText(profile.value.birthplace, props.locale),
+    profile.value.email,
+    profile.value.phone,
+  ].filter(Boolean)
+
+  const custom = (profile.value.researchInfo ?? [])
+    .map((item) => {
+      const label = resolveLocalizedText(item.label, props.locale)
+      const value = resolveLocalizedText(item.value, props.locale)
+      if (!value) return ''
+      return label ? `${label}: ${value}` : value
+    })
+    .filter(Boolean)
+
+  return [...builtIn, ...custom]
+})
+
+const researchSubtitle = computed(() =>
+  [resolveLocalizedText(profile.value.school, props.locale), resolveLocalizedText(profile.value.major, props.locale)]
+    .filter(Boolean)
+    .join(' | '),
+)
 
 const avatarCssWidth = computed(
   () => `calc(${profile.value.avatar?.size || 140}px * var(--resume-avatar-scale, 1))`,
@@ -111,7 +148,7 @@ const avatarCssHeight = computed(() => {
   return `calc(${size}px * 7 / 5 * ${scale})`
 })
 
-const avatarBorderRadius = computed(() => (profile.value.avatar?.rounded ? '50%' : '16px'))
+const avatarBorderRadius = computed(() => '0')
 
 const avatarUrl = computed(() => {
   const rawUrl = profile.value.avatar?.url?.trim()
@@ -134,7 +171,25 @@ const avatarUrl = computed(() => {
 </script>
 
 <template>
-  <section class="profile-card">
+  <section class="profile-card" :class="{ 'is-research': isResearchTheme }">
+    <template v-if="isResearchTheme">
+      <button v-if="editable" class="section-edit-btn research-edit" @click="emit('edit')">
+        <IconLogo name="edit" />
+      </button>
+      <div class="research-profile-text">
+        <h1 class="profile-name research-name">
+          {{ resolveLocalizedText(profile.name, props.locale) || '未填写姓名' }}
+        </h1>
+        <div v-if="researchSubtitle" class="research-subtitle">{{ researchSubtitle }}</div>
+        <div v-if="researchInfoItems.length" class="research-meta">
+          <span v-for="item in researchInfoItems" :key="item">{{ item }}</span>
+        </div>
+      </div>
+      <div v-if="avatarUrl" class="research-avatar">
+        <img :src="avatarUrl" :alt="resolveLocalizedText(profile.name, props.locale)" />
+      </div>
+    </template>
+    <template v-else>
     <div class="profile-container">
       <div class="profile-content">
         <div>
@@ -145,7 +200,7 @@ const avatarUrl = computed(() => {
             </button>
           </div>
           <h1 class="profile-name">
-            {{ profile.name || '未填写姓名' }}
+            {{ resolveLocalizedText(profile.name, props.locale) || '未填写姓名' }}
           </h1>
         </div>
 
@@ -183,7 +238,7 @@ const avatarUrl = computed(() => {
           >
             <img
               :src="avatarUrl"
-              :alt="profile.name"
+              :alt="resolveLocalizedText(profile.name, props.locale)"
               class="avatar-image"
               :style="{ borderRadius: avatarBorderRadius }"
             />
@@ -191,12 +246,75 @@ const avatarUrl = computed(() => {
         </div>
       </div>
     </div>
+    </template>
   </section>
 </template>
 
 <style scoped>
 .profile-card {
+  position: relative;
   padding: calc(24px * var(--resume-font-scale, 1)) 0;
+}
+
+.profile-card.is-research {
+  min-height: calc(96px * var(--resume-font-scale, 1));
+  padding: 0 110px 12px;
+  border-bottom: 2px solid #111;
+  text-align: center;
+}
+
+.research-profile-text {
+  min-width: 0;
+}
+
+.research-name {
+  margin: 0 0 6px;
+  font-size: calc(28px * var(--resume-title-scale, 1));
+  font-weight: 700;
+  color: #111;
+}
+
+.research-subtitle,
+.research-meta {
+  color: #222;
+  font-size: var(--resume-text-base, 14px);
+  line-height: 1.55;
+}
+
+.research-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 8px;
+}
+
+.research-meta span:not(:last-child)::after {
+  content: '|';
+  margin-left: 8px;
+  color: #555;
+}
+
+.research-avatar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: calc(78px * var(--resume-avatar-scale, 1));
+  height: calc(104px * var(--resume-avatar-scale, 1));
+  border: 1px solid #111;
+  background: #fff;
+}
+
+.research-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0 !important;
+}
+
+.research-edit {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .profile-container {

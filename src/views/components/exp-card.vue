@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import type { ExperienceConfig } from '@/types/resume'
+import type { ExperienceConfig, ResumeLocale } from '@/types/resume'
 import IconLogo from '@/components/icon-logo.vue'
+import { resolveLocalizedText } from '@/utils/localized'
 
-defineProps<{
+const props = withDefaults(defineProps<{
   editable?: boolean
-}>()
+  locale?: ResumeLocale
+  themeKey?: string
+}>(), {
+  locale: 'zh',
+  themeKey: '',
+})
 
 const emit = defineEmits<{
   (e: 'edit'): void
@@ -15,9 +21,44 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
   required: true,
   default: () => [],
 })
+
+const isResearchTheme = () => props.themeKey === 'research-scholar'
+const skills = () => experience.value.filter((item) => item.kind === 'skills')
+const campus = () => experience.value.filter((item) => item.kind === 'campus')
 </script>
 <template>
-  <div class="exp-shell">
+  <div class="exp-shell" :class="{ 'is-research': isResearchTheme() }">
+    <template v-if="isResearchTheme()">
+      <div v-if="skills().length" class="research-section">
+        <div class="exp-header">
+          <h2 class="exp-title">掌握技能</h2>
+          <hr class="exp-divider" />
+          <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
+            <IconLogo name="edit" />
+          </button>
+        </div>
+        <div v-for="(item, index) in skills()" :key="`skill-${index}`" class="research-list-item">
+          <strong v-if="resolveLocalizedText(item.title || item.jobTitle, props.locale)">
+            {{ resolveLocalizedText(item.title || item.jobTitle, props.locale) }}：
+          </strong>
+          <span>{{ (item.jobDesc ?? []).map((desc) => resolveLocalizedText(desc, props.locale)).filter(Boolean).join('；') }}</span>
+        </div>
+      </div>
+
+      <div v-if="campus().length" class="research-section">
+        <div class="exp-header">
+          <h2 class="exp-title">校园经历</h2>
+          <hr class="exp-divider" />
+        </div>
+        <div v-for="(item, index) in campus()" :key="`campus-${index}`" class="research-list-item">
+          <strong v-if="resolveLocalizedText(item.title || item.jobTitle, props.locale)">
+            {{ resolveLocalizedText(item.title || item.jobTitle, props.locale) }}：
+          </strong>
+          <span>{{ (item.jobDesc ?? []).map((desc) => resolveLocalizedText(desc, props.locale)).filter(Boolean).join('；') }}</span>
+        </div>
+      </div>
+    </template>
+    <template v-else>
     <div class="exp-header">
       <h2 class="exp-title">工作经历</h2>
       <hr class="exp-divider" />
@@ -26,9 +67,9 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
       </button>
     </div>
     <div v-for="(item, index) in experience" :key="index" class="exp-item">
-      <span class="exp-company">{{ item.company }}</span>
-      <span class="exp-partment">{{ item.partment }}</span>
-      <span class="exp-title">{{ item.jobTitle }}</span>
+      <span class="exp-company">{{ resolveLocalizedText(item.company, props.locale) }}</span>
+      <span class="exp-partment">{{ resolveLocalizedText(item.partment, props.locale) }}</span>
+      <span class="exp-title">{{ resolveLocalizedText(item.jobTitle, props.locale) }}</span>
       <span class="exp-time">{{ item.jobTime?.join(' - ') }}</span>
       <div class="exp-desc">
         <div class="exp-desc-title">主要工作：</div>
@@ -37,11 +78,12 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
             class="exp-desc-item"
             v-for="(desc, descIndex) in item.jobDesc"
             :key="descIndex"
-            v-html="desc"
+            v-html="resolveLocalizedText(desc, props.locale)"
           ></div>
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -140,6 +182,32 @@ const experience = defineModel<ExperienceConfig[]>('experience', {
         }
       }
     }
+  }
+}
+
+.exp-shell.is-research {
+  .research-section {
+    margin-top: var(--resume-section-gap, 7px);
+  }
+
+  .exp-header {
+    margin: 0 0 4px;
+    border-bottom: 1px solid #111;
+  }
+
+  .exp-title {
+    font-size: var(--resume-text-lg, 16px);
+  }
+
+  .exp-divider {
+    display: none;
+  }
+
+  .research-list-item {
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+    font-size: var(--resume-text-base, 14px);
+    line-height: 1.55;
   }
 }
 </style>

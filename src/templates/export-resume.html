@@ -67,6 +67,7 @@
       min-height: var(--print-page-height) !important;
       max-width: none !important;
       margin: 0 !important;
+      background: __SURFACE_BACKGROUND__ !important;
     }
 
     html.print-fit-mode .resume-shell {
@@ -77,6 +78,19 @@
       border: 0 !important;
       border-radius: 0 !important;
       box-shadow: none !important;
+      background: __SURFACE_BACKGROUND__ !important;
+    }
+
+    html.print-fit-mode .resume-page-number {
+      position: absolute;
+      right: 9mm;
+      transform: translateY(calc(-100% - 8mm));
+      z-index: 20;
+      color: color-mix(in srgb, var(--resume-theme-muted, #666666) 76%, transparent);
+      font-family: __BODY_FONT_FAMILY__;
+      font-size: 10px;
+      line-height: 1;
+      pointer-events: none;
     }
 
     html.print-fit-mode .profile-container {
@@ -168,6 +182,19 @@
         border: 0 !important;
         border-radius: 0 !important;
         box-shadow: none !important;
+        background: __SURFACE_BACKGROUND__ !important;
+      }
+
+      .resume-page-number {
+        position: absolute !important;
+        right: 9mm !important;
+        transform: translateY(calc(-100% - 8mm)) !important;
+        z-index: 20 !important;
+        color: color-mix(in srgb, var(--resume-theme-muted, #666666) 76%, transparent) !important;
+        font-family: __BODY_FONT_FAMILY__ !important;
+        font-size: 10px !important;
+        line-height: 1 !important;
+        pointer-events: none !important;
       }
 
       .profile-container {

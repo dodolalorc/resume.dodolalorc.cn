@@ -1,0 +1,51 @@
+import type { ResumeThemeConfig } from '@/themes/types'
+
+const theme: ResumeThemeConfig = {
+  key: 'research-scholar',
+  name: '科研保研',
+  description: '黑白学术版式，突出学习能力、课程成绩、科研项目与校园经历，适合保研、夏令营和科研申请。',
+  category: '科研学术',
+  audience: '保研 / 夏令营 / 科研助理 / 学术申请',
+  previewTags: ['黑白严谨', '学习能力', '科研导向'],
+  order: 0,
+  palette: {
+    primary: '#111111',
+    secondary: '#333333',
+    accent: '#000000',
+    canvas: '#ffffff',
+    paper: '#ffffff',
+    text: '#111111',
+    mutedText: '#444444',
+    subtleText: '#666666',
+    border: '#111111',
+    divider: '#111111',
+    badgeBackground: '#ffffff',
+    badgeText: '#111111',
+    toolbarBackground: 'rgba(255, 255, 255, 0.96)',
+    toolbarText: '#111111',
+    buttonBackground: '#ffffff',
+    buttonText: '#111111',
+    shadow: 'none',
+  },
+  layout: {
+    columns: 1,
+    sidebarWidth: '0px',
+    profileVariant: 'hero',
+    sectionTitleStyle: 'minimal',
+    sectionOrder: ['profile', 'education', 'experience', 'projects', 'awards'],
+    sidebarSections: [],
+    paperPadding: '18px 24px',
+    shellGap: '8px',
+    columnGap: '0px',
+    blockGap: '8px',
+    sectionGap: '7px',
+    paperRadius: '0px',
+  },
+  defaults: {
+    resumeSize: 'small',
+    backgroundColor: '#ffffff',
+    preserveExportBackground: true,
+  },
+}
+
+export default theme

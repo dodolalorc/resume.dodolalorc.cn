@@ -27,7 +27,9 @@ import HtmlFileIcon from '@/assets/icons/file-html.svg'
 import ExportIcon from '@/assets/icons/export.svg'
 import EditIcon from '@/assets/icons/edit.svg'
 import ImportIcon from '@/assets/icons/import.svg'
-import gearIcon from '@/assets/icons/gear.svg'
+import GearIcon from '@/assets/icons/gear.svg'
+import AddIcon from '@/assets/icons/add.svg'
+import DeleteIcon from '@/assets/icons/delete.svg'
 
 import { computed } from 'vue'
 
@@ -63,7 +65,9 @@ const iconMap: Record<string, typeof EmailIcon> = {
   'file-html': HtmlFileIcon,
   'file-export': ExportIcon,
   'file-import': ImportIcon,
-  gear: gearIcon
+  gear: GearIcon,
+  add: AddIcon,
+  delete: DeleteIcon
 }
 
 // 使用计算属性来动态选择图标组件

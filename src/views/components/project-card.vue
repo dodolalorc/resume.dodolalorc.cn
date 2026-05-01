@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import type { Project } from '@/types/resume'
+import type { Project, ResumeLocale } from '@/types/resume'
 import IconLogo from '@/components/icon-logo.vue'
+import { resolveLocalizedText } from '@/utils/localized'
 
-defineProps<{
+const props = withDefaults(defineProps<{
   editable?: boolean
-}>()
+  locale?: ResumeLocale
+  themeKey?: string
+}>(), {
+  locale: 'zh',
+  themeKey: '',
+})
 
 const emit = defineEmits<{
   (e: 'edit'): void
@@ -15,9 +21,11 @@ const projects = defineModel<Project[]>('projects', {
   required: true,
   default: () => [],
 })
+
+const isResearchTheme = () => props.themeKey === 'research-scholar'
 </script>
 <template>
-  <div class="project-shell">
+  <div class="project-shell" :class="{ 'is-research': isResearchTheme() }">
     <div class="project-header">
       <h2 class="project-title">项目经历</h2>
       <hr class="project-divider" />
@@ -26,12 +34,17 @@ const projects = defineModel<Project[]>('projects', {
       </button>
     </div>
     <div v-for="(item, index) in projects" :key="index" class="project-item">
-      <span class="project-name">{{ item.name }}</span>
+      <span class="project-name">{{ resolveLocalizedText(item.name, props.locale) }}</span>
       <span class="project-time">{{ item.projectTime?.join(' - ') }}</span>
-      <span class="project-role">{{ item.role }}</span>
+      <span class="project-role">{{ resolveLocalizedText(item.role, props.locale) }}</span>
+      <template v-if="isResearchTheme()">
+        <span v-if="resolveLocalizedText(item.authorRank, props.locale)" class="project-role">{{ resolveLocalizedText(item.authorRank, props.locale) }}</span>
+        <span v-if="resolveLocalizedText(item.venue, props.locale)" class="project-role">{{ resolveLocalizedText(item.venue, props.locale) }}</span>
+        <span v-if="resolveLocalizedText(item.status, props.locale)" class="project-role">{{ resolveLocalizedText(item.status, props.locale) }}</span>
+      </template>
       <span v-if="item.link" class="project-link">
         <span>链接：</span>
-        <a :href="item.link.url" target="_blank" rel="noopener noreferrer">{{ item.link.label }}</a>
+        <a :href="item.link.url" target="_blank" rel="noopener noreferrer">{{ resolveLocalizedText(item.link.label, props.locale) }}</a>
       </span>
 
       <div v-if="item.techStack && item.techStack.length" class="project-row">
@@ -40,20 +53,20 @@ const projects = defineModel<Project[]>('projects', {
       </div>
       <div v-if="item.projectDesc" class="project-row">
         <span class="project-item-title">项目描述：</span>
-        <span class="project-content" v-html="item.projectDesc" />
+        <span class="project-content" v-html="resolveLocalizedText(item.projectDesc, props.locale)" />
       </div>
       <div v-if="item.mainWork && item.mainWork.length" class="project-row">
         <span class="project-item-title">主要工作：</span>
         <div class="project-content">
           <div v-for="(work, index) in item.mainWork" :key="index" class="project-main-work-item">
-            <span class="project-main-work-title" v-if="work.title">{{ work.title }}: </span>
-            <span v-html="work.desc"></span>
+            <span class="project-main-work-title" v-if="resolveLocalizedText(work.title, props.locale)">{{ resolveLocalizedText(work.title, props.locale) }}: </span>
+            <span v-html="resolveLocalizedText(work.desc, props.locale)"></span>
           </div>
         </div>
       </div>
       <div v-if="item.projectAchievements && item.projectAchievements.length" class="project-row">
         <span class="project-item-title">项目成就：</span>
-        <span class="project-content">{{ item.projectAchievements.join(', ') }}</span>
+        <span class="project-content">{{ item.projectAchievements.map((achievement) => resolveLocalizedText(achievement, props.locale)).filter(Boolean).join(', ') }}</span>
       </div>
     </div>
   </div>
@@ -147,6 +160,42 @@ const projects = defineModel<Project[]>('projects', {
         }
       }
     }
+  }
+}
+
+.project-shell.is-research {
+  .project-header {
+    margin: var(--resume-section-gap, 7px) 0 4px;
+    border-bottom: 1px solid #111;
+  }
+
+  .project-title {
+    font-size: var(--resume-text-lg, 16px);
+  }
+
+  .project-divider {
+    display: none;
+  }
+
+  .project-item {
+    margin: 6px 0 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .project-name {
+    font-size: var(--resume-text-base, 14px);
+  }
+
+  .project-role,
+  .project-link,
+  .project-time {
+    color: #333;
+  }
+
+  .project-row {
+    margin-top: 5px;
+    line-height: 1.55;
   }
 }
 </style>

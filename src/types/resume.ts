@@ -1,80 +1,112 @@
 export type EditorSection = 'profile' | 'education' | 'experience' | 'projects' | 'awards'
 export type ResumeSize = 'xsmall' | 'small' | 'standard' | 'large'
+export type ResumeLocale = 'zh' | 'en'
+export type LocalizedText = string | {
+  zh?: string
+  en?: string
+}
 
 export interface avatarConfig {
-  url: string // 照片链接
-  rounded?: boolean // 是否圆形照片
-  size?: number // 照片大小(px)
+  url: string
+  rounded?: boolean
+  size?: number
 }
 
 export interface jobIntention {
-  position?: string // 意向职位
-  city?: string // 意向城市
-  salary?: string // 期望薪资
+  position?: LocalizedText
+  city?: LocalizedText
+  salary?: LocalizedText
 }
 
-export type prependType = 'icon' | 'text' | 'both' | 'none' // 基本信息的前置内容
+export type prependType = 'icon' | 'text' | 'both' | 'none'
 
 export interface LinkField {
-  url: string // 实际跳转链接
-  label: string // 显示文字
+  url: string
+  label: LocalizedText
 }
 
 export interface Profile {
-  name?: string // 姓名
-  avatar?: avatarConfig // 照片
-  prepend?: prependType // 基本信息的前置内容
-  email?: string // 邮箱
-  phone?: string // 电话
-  github?: LinkField // GitHub 链接
-  blog?: LinkField // 个人博客链接
-  zhihu?: string // 知乎链接
-  xiaohongshu?: string // 小红书链接
-  wechat?: string // 微信链接
-  workExpYear?: string // 工作经验年限
+  name?: LocalizedText
+  avatar?: avatarConfig
+  prepend?: prependType
+  email?: string
+  phone?: string
+  school?: LocalizedText
+  major?: LocalizedText
+  ranking?: LocalizedText
+  gpa?: LocalizedText
+  gender?: LocalizedText
+  birthplace?: LocalizedText
+  researchInfo?: Array<{
+    label?: LocalizedText
+    value?: LocalizedText
+  }>
+  github?: LinkField
+  blog?: LinkField
+  zhihu?: string
+  xiaohongshu?: string
+  wechat?: string
+  workExpYear?: LocalizedText
   jobIntention?: jobIntention
 }
 
 export interface ExperienceConfig {
-  jobTitle?: string // 职位名称
-  company?: string // 公司
-  partment?: string // 部门
-  jobTime?: string[] // 工作时间
-  jobDesc?: string[] // 工作描述(支持 markdown)
+  kind?: 'work' | 'skills' | 'campus'
+  title?: LocalizedText
+  jobTitle?: LocalizedText
+  company?: LocalizedText
+  partment?: LocalizedText
+  jobTime?: string[]
+  jobDesc?: LocalizedText[]
+}
+
+export interface CourseConfig {
+  name: LocalizedText
+  grade?: LocalizedText
 }
 
 export interface EducationConfig {
-  school?: string // 学校
-  degree?: string // 学位
-  major?: string // 专业
-  eduTime?: string[] // 就读时间
-  eduDesc?: string // 在校描述(支持 markdown)
+  school?: LocalizedText
+  degree?: LocalizedText
+  major?: LocalizedText
+  schoolTags?: LocalizedText[]
+  majorTags?: LocalizedText[]
+  gpa?: LocalizedText
+  ranking?: LocalizedText
+  languageCertificates?: LocalizedText[]
+  courses?: CourseConfig[]
+  eduTime?: string[]
+  eduDesc?: LocalizedText
 }
 
 export interface ProjectLink {
-  url: string // 实际跳转链接
-  label: string // 显示文字
+  url: string
+  label: LocalizedText
 }
 
 export interface Project {
-  name: string // 项目名称
-  link?: ProjectLink // 项目链接
-  role?: string // 在项目中的角色
-  techStack?: string[] // 技术栈
-  projectTime?: string[] // 项目时间
-  projectDesc?: string // 项目描述(支持 markdown)
-  projectAchievements?: string[] // 项目成果
-  // 主要工作内容
+  name: LocalizedText
+  link?: ProjectLink
+  role?: LocalizedText
+  authorRank?: LocalizedText
+  venue?: LocalizedText
+  status?: LocalizedText
+  techStack?: string[]
+  projectTime?: string[]
+  projectDesc?: LocalizedText
+  projectAchievements?: LocalizedText[]
   mainWork?: Array<{
-    title: string // 工作内容标题
-    desc: string // 工作内容描述(支持 markdown)
+    title: LocalizedText
+    desc: LocalizedText
   }>
 }
 
 export interface Award {
-  title: string // 奖项名称
-  level?: string // 奖项等级
-  date?: string // 获奖时间
+  title: LocalizedText
+  level?: LocalizedText
+  issuer?: LocalizedText
+  category?: LocalizedText
+  date?: string
 }
 
 export interface ResumeConfig {
@@ -82,5 +114,5 @@ export interface ResumeConfig {
   education: Array<EducationConfig>
   experience: Array<ExperienceConfig>
   projects?: Array<Project>
-  awards?: Array<Award> // 奖项
+  awards?: Array<Award>
 }

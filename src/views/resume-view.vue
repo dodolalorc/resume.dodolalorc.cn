@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ViewLayout from '@/layout/view-layout.vue'
 import type {
   ResumeConfig,
@@ -10,6 +11,7 @@ import type {
   Award,
   EditorSection,
   ResumeSize,
+  ResumeLocale,
 } from '@/types/resume'
 import LogoIcon from '@/components/icon-logo.vue'
 import ResumeEditorDrawer from '@/views/modules/resume-editor/resume-editor-drawer.vue'
@@ -20,6 +22,7 @@ import ProjectCard from './components/project-card.vue'
 import AwardCard from './components/award-card.vue'
 import cvData from '@/data/cv.json'
 import { exportResumeHTML, printResumePDF } from '@/utils/resume-export'
+import { resolveLocalizedText } from '@/utils/localized'
 import {
   buildThemeStyleVars,
   getResumeTheme,
@@ -34,6 +37,8 @@ const education = ref<EducationConfig[]>([])
 const experience = ref<ExperienceConfig[]>([])
 const projects = ref<Project[]>([])
 const awards = ref<Award[]>([])
+const resumeLocale = ref<ResumeLocale>('zh')
+const { locale: appLocale } = useI18n()
 const exportingType = ref<'none' | 'pdf' | 'html'>('none')
 const showExportMenu = ref(false)
 const exportMenuRef = ref<HTMLElement | null>(null)
@@ -57,6 +62,7 @@ const RESUME_THEME_STORAGE_KEY = 'resume-theme-preset-v1'
 const RESUME_SIZE_STORAGE_KEY = 'resume-font-size-v1'
 const RESUME_BACKGROUND_STORAGE_KEY = 'resume-background-v1'
 const RESUME_PRESERVE_BG_STORAGE_KEY = 'resume-preserve-bg-v1'
+const RESUME_LOCALE_STORAGE_KEY = 'resume-locale-v1'
 
 const RESUME_SIZE_PRESETS: Array<{
   key: ResumeSize
@@ -116,6 +122,8 @@ const currentSizePreset = computed(
   () => RESUME_SIZE_PRESETS.find((item) => item.key === resumeSize.value) ?? RESUME_SIZE_PRESETS[2],
 )
 const isExporting = computed(() => exportingType.value !== 'none')
+const currentProfileName = computed(() => resolveLocalizedText(profile.value.name, resumeLocale.value))
+const languageText = computed(() => (resumeLocale.value === 'zh' ? '中文' : 'English'))
 const modeText = computed(() => (isEditing.value ? '编辑模式' : '预览模式'))
 const exportingText = computed(() => {
   if (exportingType.value === 'html') return '导出HTML中...'
@@ -217,6 +225,11 @@ const togglePreserveExportBackground = () => {
   preserveExportBackground.value = !preserveExportBackground.value
 }
 
+const toggleResumeLocale = () => {
+  resumeLocale.value = resumeLocale.value === 'zh' ? 'en' : 'zh'
+  appLocale.value = resumeLocale.value === 'zh' ? 'zhHans' : 'en'
+}
+
 const handleDocumentClick = (event: MouseEvent) => {
   const target = event.target as Node | null
   if (!target) return
@@ -229,7 +242,7 @@ const handleDocumentClick = (event: MouseEvent) => {
 }
 
 const exportResumeJSON = () => {
-  const fileBaseName = profile.value.name || 'resume'
+  const fileBaseName = currentProfileName.value || 'resume'
   const blob = new Blob([JSON.stringify(resumeData.value, null, 2)], {
     type: 'application/json;charset=utf-8',
   })
@@ -246,7 +259,8 @@ const startExport = async (mode: 'html' | 'pdf' | 'json') => {
   showExportMenu.value = false
 
   try {
-    const fileBaseName = profile.value.name || 'resume'
+    const defaultFileBaseName = currentProfileName.value || 'resume'
+    let fileBaseName = defaultFileBaseName
 
     if (mode === 'json') {
       exportResumeJSON()
@@ -266,6 +280,10 @@ const startExport = async (mode: 'html' | 'pdf' | 'json') => {
     }
 
     exportingType.value = mode
+
+    const inputFileName = window.prompt('请输入 PDF 文件名', defaultFileBaseName)
+    if (inputFileName === null) return
+    fileBaseName = inputFileName.trim() || defaultFileBaseName
 
     await printResumePDF({
       surfaceSelector: '.resume-export-surface',
@@ -371,6 +389,15 @@ watch(preserveExportBackground, (value) => {
   }
 })
 
+watch(resumeLocale, (value) => {
+  appLocale.value = value === 'zh' ? 'zhHans' : 'en'
+  try {
+    localStorage.setItem(RESUME_LOCALE_STORAGE_KEY, value)
+  } catch (error) {
+    console.warn('保存语言配置失败:', error)
+  }
+})
+
 onMounted(() => {
   document.addEventListener('click', handleDocumentClick)
 
@@ -416,6 +443,16 @@ onMounted(() => {
   }
 
   try {
+    const cachedLocale = localStorage.getItem(RESUME_LOCALE_STORAGE_KEY) as ResumeLocale | null
+    if (cachedLocale === 'zh' || cachedLocale === 'en') {
+      resumeLocale.value = cachedLocale
+      appLocale.value = cachedLocale === 'zh' ? 'zhHans' : 'en'
+    }
+  } catch (error) {
+    console.warn('读取语言配置失败:', error)
+  }
+
+  try {
     config.value = cvData as ResumeConfig
     applyResumeData(config.value)
   } catch (error) {
@@ -440,6 +477,10 @@ onBeforeUnmount(() => {
       </div>
 
       <div class="toolbar-actions">
+        <button class="export-btn language-btn" :disabled="isExporting" @click="toggleResumeLocale">
+          {{ languageText }}
+        </button>
+
         <div ref="exportMenuRef" class="export-menu">
           <button class="export-btn" :disabled="isExporting" @click="toggleExportMenu">
             <LogoIcon v-if="!isExporting" name="file-export" />
@@ -603,30 +644,40 @@ onBeforeUnmount(() => {
               v-if="section === 'profile'"
               v-model:profile="profile"
               :editable="isEditing"
+              :locale="resumeLocale"
+              :theme-key="currentTheme.key"
               @edit="openSectionEditor('profile')"
             />
             <EduCard
               v-else-if="section === 'education'"
               v-model:education="education"
               :editable="isEditing"
+              :locale="resumeLocale"
+              :theme-key="currentTheme.key"
               @edit="openSectionEditor('education')"
             />
             <ExpCard
               v-else-if="section === 'experience'"
               v-model:experience="experience"
               :editable="isEditing"
+              :locale="resumeLocale"
+              :theme-key="currentTheme.key"
               @edit="openSectionEditor('experience')"
             />
             <ProjectCard
               v-else-if="section === 'projects'"
               v-model:projects="projects"
               :editable="isEditing"
+              :locale="resumeLocale"
+              :theme-key="currentTheme.key"
               @edit="openSectionEditor('projects')"
             />
             <AwardCard
               v-else
               v-model:awards="awards"
               :editable="isEditing"
+              :locale="resumeLocale"
+              :theme-key="currentTheme.key"
               @edit="openSectionEditor('awards')"
             />
           </template>
@@ -638,30 +689,40 @@ onBeforeUnmount(() => {
               v-if="section === 'profile'"
               v-model:profile="profile"
               :editable="isEditing"
+              :locale="resumeLocale"
+              :theme-key="currentTheme.key"
               @edit="openSectionEditor('profile')"
             />
             <EduCard
               v-else-if="section === 'education'"
               v-model:education="education"
               :editable="isEditing"
+              :locale="resumeLocale"
+              :theme-key="currentTheme.key"
               @edit="openSectionEditor('education')"
             />
             <ExpCard
               v-else-if="section === 'experience'"
               v-model:experience="experience"
               :editable="isEditing"
+              :locale="resumeLocale"
+              :theme-key="currentTheme.key"
               @edit="openSectionEditor('experience')"
             />
             <ProjectCard
               v-else-if="section === 'projects'"
               v-model:projects="projects"
               :editable="isEditing"
+              :locale="resumeLocale"
+              :theme-key="currentTheme.key"
               @edit="openSectionEditor('projects')"
             />
             <AwardCard
               v-else
               v-model:awards="awards"
               :editable="isEditing"
+              :locale="resumeLocale"
+              :theme-key="currentTheme.key"
               @edit="openSectionEditor('awards')"
             />
           </template>
@@ -673,6 +734,7 @@ onBeforeUnmount(() => {
       v-model:open="drawerOpen"
       v-model:section="activeSection"
       v-model:resume="resumeData"
+      :locale="resumeLocale"
     />
 
     <Transition name="fade">

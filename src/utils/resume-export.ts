@@ -39,6 +39,8 @@ const PRINT_FIT_SCALE_PRECISION = 1000
 const PRINT_FIT_ITERATIONS = 4
 const MIN_PRINT_LAYOUT_SCALE = 0.76
 const PRINT_BASE_LAYOUT_SCALE = 0.92
+const PRINT_PAGE_HEIGHT_CSS = '297mm'
+const PRINT_PAGE_WIDTH_CSS = '210mm'
 
 const PRINT_SCALE_VARIABLES = [
   '--resume-font-scale',
@@ -203,13 +205,32 @@ const normalizeFitScale = (scale: number) => {
 const normalizeLayoutScale = (scale: number) =>
   Math.max(MIN_PRINT_LAYOUT_SCALE, normalizeFitScale(scale))
 
+const measurePrintLength = (printDocument: Document, length: string) => {
+  const probe = printDocument.createElement('div')
+  probe.style.position = 'absolute'
+  probe.style.visibility = 'hidden'
+  probe.style.pointerEvents = 'none'
+  probe.style.width = length
+  probe.style.height = length
+  printDocument.body.appendChild(probe)
+  const size = probe.getBoundingClientRect().width
+  probe.remove()
+  return size
+}
+
+const getPrintPageSize = (printDocument: Document) => ({
+  width: measurePrintLength(printDocument, PRINT_PAGE_WIDTH_CSS),
+  height: measurePrintLength(printDocument, PRINT_PAGE_HEIGHT_CSS),
+})
+
 const getPrintFitScale = (printDocument: Document) => {
   const surface = printDocument.querySelector('.resume-export-surface') as HTMLElement | null
   const shell = printDocument.querySelector('.resume-shell') as HTMLElement | null
   if (!surface || !shell) return 1
 
-  const pageWidth = surface.clientWidth
-  const pageHeight = surface.clientHeight
+  const pageSize = getPrintPageSize(printDocument)
+  const pageWidth = pageSize.width || surface.clientWidth
+  const pageHeight = pageSize.height || surface.clientHeight
   const contentWidth = Math.max(shell.scrollWidth, shell.offsetWidth)
   const contentHeight = Math.max(shell.scrollHeight, shell.offsetHeight)
 
@@ -278,6 +299,42 @@ const applyCompactPrintFit = async (printWindow: Window) => {
       applyLayoutScale(shell, normalizeLayoutScale(nextScale))
       await nextFrame(printWindow)
     }
+  }
+
+  await nextFrame(printWindow)
+}
+
+const applyPrintPagination = async (printWindow: Window) => {
+  const printDocument = printWindow.document
+  const surface = printDocument.querySelector('.resume-export-surface') as HTMLElement | null
+  const shell = printDocument.querySelector('.resume-shell') as HTMLElement | null
+  if (!surface || !shell) return
+
+  for (const footer of Array.from(surface.querySelectorAll('.resume-page-number'))) {
+    footer.remove()
+  }
+
+  const pageHeight = getPrintPageSize(printDocument).height || surface.clientHeight
+  if (!pageHeight) return
+
+  const contentHeight = Math.max(shell.scrollHeight, shell.offsetHeight, surface.scrollHeight)
+  const totalPages = Math.max(1, Math.ceil((contentHeight - 1) / pageHeight))
+  const totalHeight = totalPages * pageHeight
+
+  surface.style.minHeight = `${totalHeight}px`
+  shell.style.minHeight = `${totalHeight}px`
+
+  if (totalPages <= 1) {
+    await nextFrame(printWindow)
+    return
+  }
+
+  for (let page = 1; page <= totalPages; page += 1) {
+    const footer = printDocument.createElement('div')
+    footer.className = 'resume-page-number'
+    footer.textContent = `${page}/${totalPages}`
+    footer.style.top = `${page * pageHeight}px`
+    surface.appendChild(footer)
   }
 
   await nextFrame(printWindow)
@@ -358,6 +415,7 @@ export const printResumePDF = async ({
 
     await waitForPrintDocumentReady(printWindow)
     await applyCompactPrintFit(printWindow)
+    await applyPrintPagination(printWindow)
     printWindow.document.title = title
     removePrintFrameAfterDialog(printFrame, printWindow)
     printWindow.focus()
