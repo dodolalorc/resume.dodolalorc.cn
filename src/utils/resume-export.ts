@@ -346,6 +346,13 @@ const applyTemplate = (template: string, replacements: Record<string, string>) =
   }, template)
 }
 
+const removeEditorArtifactsForExport = (element: HTMLElement) => {
+  // 导出时只保留简历内容，移除编辑态入口按钮（如铅笔图标）。
+  for (const button of Array.from(element.querySelectorAll('.section-edit-btn'))) {
+    button.remove()
+  }
+}
+
 export const buildExportHTML = ({
   mode = 'html',
   surfaceSelector = '.resume-export-surface',
@@ -356,6 +363,7 @@ export const buildExportHTML = ({
 }: BuildExportHTMLOptions = {}) => {
   const sourceElement = getElement(surfaceSelector, '找不到简历容器')
   const element = sourceElement.cloneNode(true) as HTMLElement
+  removeEditorArtifactsForExport(element)
   element.setAttribute('data-export-size', size)
   // 优先使用传入的 backgroundColor（用户在"简历背景色"中选择的颜色）；
   // preserveBackground=false 时强制用白色导出
