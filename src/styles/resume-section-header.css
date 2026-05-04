@@ -44,3 +44,20 @@
   margin-left: -2px;
   align-self: flex-end;
 }
+
+/* Minimal section title style (e.g. research-scholar theme) */
+.resume-section-title.is-minimal {
+  font-size: var(--resume-text-lg, 16px);
+  letter-spacing: 0.05em;
+}
+
+.resume-section-header.is-minimal {
+  margin-top: var(--resume-section-gap, 7px);
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--color-primary, #111);
+  justify-content: space-between;
+}
+
+.resume-section-header.is-minimal .resume-section-divider {
+  display: none;
+}
