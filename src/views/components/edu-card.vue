@@ -41,9 +41,20 @@ const courseText = (item: EducationConfig) =>
 </script>
 <template>
   <div class="edu-shell" :class="{ 'is-research': isResearchTheme() }">
-    <div class="edu-header">
-      <h2 class="edu-title" :class="{ 'with-background': enableTitleBackground }">教育经历</h2>
-      <hr class="edu-divider" />
+    <div
+      class="edu-header resume-section-header"
+      :class="{ 'has-title-background': enableTitleBackground }"
+    >
+      <h2
+        class="edu-title resume-section-title"
+        :class="{ 'with-background': enableTitleBackground }"
+      >
+        教育经历
+      </h2>
+      <hr
+        class="edu-divider resume-section-divider"
+        :class="{ 'with-background': enableTitleBackground }"
+      />
       <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
         <IconLogo name="edit" />
       </button>
@@ -90,36 +101,6 @@ const courseText = (item: EducationConfig) =>
 .edu-shell {
   width: 100%;
   .edu-header {
-    display: flex;
-    align-items: flex-end;
-    margin: var(--resume-block-gap, 10px) 0;
-    .edu-title {
-      font-size: var(--resume-text-xl, 24px);
-      font-weight: bold;
-      margin: 0;
-      padding: 0;
-      letter-spacing: 0.15em;
-
-      &.with-background {
-        display: inline-block;
-        background-color: var(--color-primary);
-        color: white;
-        padding: 4px 20px 4px 10px;
-        line-height: 1.2;
-        clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 100%, 0 100%);
-        font-weight: 600;
-      }
-    }
-    .edu-divider {
-      flex: 1;
-      height: 2px;
-      background-color: var(--color-primary);
-      margin-left: -2px;
-      border: 0;
-      align-self: flex-end;
-      margin-bottom: 0;
-    }
-
     .section-edit-btn {
       border: 0;
       background: transparent;

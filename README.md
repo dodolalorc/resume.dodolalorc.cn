@@ -2,12 +2,21 @@
 
 一个基于 Vue 3 + TypeScript 构建的在线简历填写与生成工具。无需注册，打开即用，支持可视化编辑、主题切换、多语言内容、JSON 导入导出，以及浏览器原生 PDF 打印导出。
 
-![求职主题页面截图](./public/images/cv4work.png)
-![科研保研主题页面截图](./public/images/cv4research.png)
-![编辑抽屉截图](./public/images/edit-drawer.png)
-
 > 在线体验：[resume.dodolalorc.cn](https://resume.dodolalorc.cn)  
 > 项目仓库：[github.com/dodolalorc/resume.dodolalorc.cn](https://github.com/dodolalorc/resume.dodolalorc.cn)
+
+|                    简约纸张                    |                       稳重专业                        |                    现代简约                     |
+| :--------------------------------------------: | :---------------------------------------------------: | :---------------------------------------------: |
+| ![简约纸张](./public/images/minimal-paper.png) | ![稳重专业](./public/images/professional-balance.png) | ![现代简约](./public/images/modern-clarity.png) |
+
+|                  技术导向                  |                     科研保研                      |                     标题背景色                      |
+| :----------------------------------------: | :-----------------------------------------------: | :-------------------------------------------------: |
+| ![技术导向](./public/images/tech-grid.png) | ![科研保研](./public/images/research-scholar.png) | ![标题背景色](./public/images/cv-with-title-bg.png) |
+
+|                   编辑抽屉                   |                   设置面板                    |                  PDF 导出                   |
+| :------------------------------------------: | :-------------------------------------------: | :-----------------------------------------: |
+| ![编辑抽屉](./public/images/edit-drawer.png) | ![设置面板](./public/images/more-setting.png) | ![PDF 导出](./public/images/export2pdf.png) |
+
 
 ## 功能概览
 
