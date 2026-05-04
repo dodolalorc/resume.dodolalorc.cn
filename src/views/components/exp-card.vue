@@ -3,16 +3,19 @@ import type { ExperienceConfig, ResumeLocale } from '@/types/resume'
 import IconLogo from '@/components/icon-logo.vue'
 import { resolveLocalizedText } from '@/utils/localized'
 
-const props = withDefaults(defineProps<{
-  editable?: boolean
-  locale?: ResumeLocale
-  themeKey?: string
-  enableTitleBackground?: boolean
-}>(), {
-  locale: 'zh',
-  themeKey: '',
-  enableTitleBackground: false,
-})
+const props = withDefaults(
+  defineProps<{
+    editable?: boolean
+    locale?: ResumeLocale
+    themeKey?: string
+    enableTitleBackground?: boolean
+  }>(),
+  {
+    locale: 'zh',
+    themeKey: '',
+    enableTitleBackground: false,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'edit'): void
@@ -43,7 +46,12 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
           <strong v-if="resolveLocalizedText(item.title || item.jobTitle, props.locale)">
             {{ resolveLocalizedText(item.title || item.jobTitle, props.locale) }}：
           </strong>
-          <span>{{ (item.jobDesc ?? []).map((desc) => resolveLocalizedText(desc, props.locale)).filter(Boolean).join('；') }}</span>
+          <span>{{
+            (item.jobDesc ?? [])
+              .map((desc) => resolveLocalizedText(desc, props.locale))
+              .filter(Boolean)
+              .join('；')
+          }}</span>
         </div>
       </div>
 
@@ -59,35 +67,40 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
           <strong v-if="resolveLocalizedText(item.title || item.jobTitle, props.locale)">
             {{ resolveLocalizedText(item.title || item.jobTitle, props.locale) }}：
           </strong>
-          <span>{{ (item.jobDesc ?? []).map((desc) => resolveLocalizedText(desc, props.locale)).filter(Boolean).join('；') }}</span>
+          <span>{{
+            (item.jobDesc ?? [])
+              .map((desc) => resolveLocalizedText(desc, props.locale))
+              .filter(Boolean)
+              .join('；')
+          }}</span>
         </div>
       </div>
     </template>
     <template v-else>
-    <div class="exp-header">
-      <h2 class="exp-title" :class="{ 'with-background': enableTitleBackground }">工作经历</h2>
-      <hr class="exp-divider" />
-      <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
-        <IconLogo name="edit" />
-      </button>
-    </div>
-    <div v-for="(item, index) in experience" :key="index" class="exp-item">
-      <span class="exp-company">{{ resolveLocalizedText(item.company, props.locale) }}</span>
-      <span class="exp-partment">{{ resolveLocalizedText(item.partment, props.locale) }}</span>
-      <span class="exp-title">{{ resolveLocalizedText(item.jobTitle, props.locale) }}</span>
-      <span class="exp-time">{{ item.jobTime?.join(' - ') }}</span>
-      <div class="exp-desc">
-        <div class="exp-desc-title">主要工作：</div>
-        <div class="exp-desc-content">
-          <div
-            class="exp-desc-item"
-            v-for="(desc, descIndex) in item.jobDesc"
-            :key="descIndex"
-            v-html="resolveLocalizedText(desc, props.locale)"
-          ></div>
+      <div class="exp-header">
+        <h2 class="exp-title" :class="{ 'with-background': enableTitleBackground }">工作经历</h2>
+        <hr class="exp-divider" />
+        <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
+          <IconLogo name="edit" />
+        </button>
+      </div>
+      <div v-for="(item, index) in experience" :key="index" class="exp-item">
+        <span class="exp-company">{{ resolveLocalizedText(item.company, props.locale) }}</span>
+        <span class="exp-partment">{{ resolveLocalizedText(item.partment, props.locale) }}</span>
+        <span class="exp-title">{{ resolveLocalizedText(item.jobTitle, props.locale) }}</span>
+        <span class="exp-time">{{ item.jobTime?.join(' - ') }}</span>
+        <div class="exp-desc">
+          <div class="exp-desc-title">主要工作：</div>
+          <div class="exp-desc-content">
+            <div
+              class="exp-desc-item"
+              v-for="(desc, descIndex) in item.jobDesc"
+              :key="descIndex"
+              v-html="resolveLocalizedText(desc, props.locale)"
+            ></div>
+          </div>
         </div>
       </div>
-    </div>
     </template>
   </div>
 </template>
@@ -107,7 +120,7 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
       margin: 0;
       padding: 0;
       letter-spacing: 0.15em;
-      
+
       &.with-background {
         display: inline-block;
         background-color: var(--color-primary);

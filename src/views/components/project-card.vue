@@ -111,7 +111,7 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
       margin: 0;
       padding: 0;
       letter-spacing: 0.15em;
-      
+
       &.with-background {
         display: inline-block;
         background-color: var(--color-primary);

@@ -3,16 +3,19 @@ import type { Award, ResumeLocale } from '@/types/resume'
 import IconLogo from '@/components/icon-logo.vue'
 import { resolveLocalizedText } from '@/utils/localized'
 
-const props = withDefaults(defineProps<{
-  editable?: boolean
-  locale?: ResumeLocale
-  themeKey?: string
-  enableTitleBackground?: boolean
-}>(), {
-  locale: 'zh',
-  themeKey: '',
-  enableTitleBackground: false,
-})
+const props = withDefaults(
+  defineProps<{
+    editable?: boolean
+    locale?: ResumeLocale
+    themeKey?: string
+    enableTitleBackground?: boolean
+  }>(),
+  {
+    locale: 'zh',
+    themeKey: '',
+    enableTitleBackground: false,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'edit'): void
@@ -37,9 +40,15 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
     </div>
     <div v-for="(item, index) in awards" :key="index" class="award-item">
       <span class="award-name">{{ resolveLocalizedText(item.title, props.locale) }}</span>
-      <span class="award-level" v-if="resolveLocalizedText(item.issuer, props.locale)">{{ resolveLocalizedText(item.issuer, props.locale) }}</span>
-      <span class="award-level" v-if="resolveLocalizedText(item.level, props.locale)">{{ resolveLocalizedText(item.level, props.locale) }}</span>
-      <span class="award-level" v-if="resolveLocalizedText(item.category, props.locale)">{{ resolveLocalizedText(item.category, props.locale) }}</span>
+      <span class="award-level" v-if="resolveLocalizedText(item.issuer, props.locale)">{{
+        resolveLocalizedText(item.issuer, props.locale)
+      }}</span>
+      <span class="award-level" v-if="resolveLocalizedText(item.level, props.locale)">{{
+        resolveLocalizedText(item.level, props.locale)
+      }}</span>
+      <span class="award-level" v-if="resolveLocalizedText(item.category, props.locale)">{{
+        resolveLocalizedText(item.category, props.locale)
+      }}</span>
       <span class="award-time" v-if="item.date">{{ item.date }}</span>
     </div>
   </div>
@@ -59,7 +68,7 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
       margin: 0;
       padding: 0;
       letter-spacing: 0.15em;
-      
+
       &.with-background {
         display: inline-block;
         background-color: var(--color-primary);
