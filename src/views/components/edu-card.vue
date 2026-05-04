@@ -91,7 +91,7 @@ const courseText = (item: EducationConfig) =>
   width: 100%;
   .edu-header {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     margin: var(--resume-block-gap, 10px) 0;
     .edu-title {
       font-size: var(--resume-text-xl, 24px);
@@ -104,8 +104,9 @@ const courseText = (item: EducationConfig) =>
         display: inline-block;
         background-color: var(--color-primary);
         color: white;
-        padding: 4px 16px 4px 8px;
-        border-radius: 0 12px 12px 0;
+        padding: 4px 20px 4px 10px;
+        line-height: 1.2;
+        clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 100%, 0 100%);
         font-weight: 600;
       }
     }
@@ -113,10 +114,10 @@ const courseText = (item: EducationConfig) =>
       flex: 1;
       height: 2px;
       background-color: var(--color-primary);
-      margin-left: 0;
+      margin-left: -2px;
       border: 0;
       align-self: flex-end;
-      margin-bottom: 0.4em;
+      margin-bottom: 0;
     }
 
     .section-edit-btn {
