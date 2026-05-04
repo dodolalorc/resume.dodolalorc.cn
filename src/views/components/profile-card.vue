@@ -191,7 +191,14 @@ const avatarUrl = computed(() => {
           <strong>{{ researchSubtitle }}</strong>
         </div>
         <div v-if="researchInfoItems.length" class="research-meta">
-          <span v-for="item in researchInfoItems" :key="item">{{ item }}</span>
+          <span
+            v-for="(item, index) in researchInfoItems"
+            :key="`${index}-${item}`"
+            class="research-meta-item"
+          >
+            <span v-if="index > 0" class="research-meta-separator" aria-hidden="true">|</span>
+            <span class="research-meta-text">{{ item }}</span>
+          </span>
         </div>
       </div>
       <div v-if="avatarUrl" class="research-avatar">
@@ -266,6 +273,7 @@ const avatarUrl = computed(() => {
 }
 
 .profile-card.is-research {
+  --research-avatar-reserved-width: calc(92px * var(--resume-avatar-scale, 1));
   min-height: calc(96px * var(--resume-font-scale, 1));
   padding: 0 110px 12px;
   border-bottom: 2px solid #111;
@@ -274,6 +282,8 @@ const avatarUrl = computed(() => {
 
 .research-profile-text {
   min-width: 0;
+  max-width: calc(100% - var(--research-avatar-reserved-width));
+  margin: 0 auto;
 }
 
 .research-name {
@@ -294,13 +304,22 @@ const avatarUrl = computed(() => {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0 8px;
+  width: 100%;
 }
 
-.research-meta span:not(:last-child)::after {
-  content: '|';
-  margin-left: 8px;
+.research-meta-item {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.research-meta-separator {
+  margin: 0 8px;
   color: #555;
+}
+
+.research-meta-text {
+  white-space: nowrap;
 }
 
 .research-avatar {
