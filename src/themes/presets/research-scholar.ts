@@ -32,7 +32,7 @@ const theme: ResumeThemeConfig = {
     sidebarWidth: '0px',
     profileVariant: 'hero',
     sectionTitleStyle: 'minimal',
-    sectionOrder: ['profile', 'education', 'experience', 'projects', 'awards'],
+    sectionOrder: ['profile', 'education', 'skills', 'campus', 'projects', 'awards'],
     sidebarSections: [],
     paperPadding: '18px 24px',
     shellGap: '8px',
