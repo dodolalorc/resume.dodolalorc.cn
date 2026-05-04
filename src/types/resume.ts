@@ -1,4 +1,4 @@
-export type EditorSection = 'profile' | 'education' | 'experience' | 'projects' | 'awards'
+export type EditorSection = 'profile' | 'education' | 'experience' | 'skills' | 'campus' | 'projects' | 'awards'
 export type ResumeSize = 'xsmall' | 'small' | 'standard' | 'large'
 export type ResumeLocale = 'zh' | 'en'
 export type LocalizedText = string | {
@@ -51,11 +51,20 @@ export interface Profile {
 }
 
 export interface ExperienceConfig {
-  kind?: 'work' | 'skills' | 'campus'
-  title?: LocalizedText
   jobTitle?: LocalizedText
   company?: LocalizedText
   partment?: LocalizedText
+  jobTime?: string[]
+  jobDesc?: LocalizedText[]
+}
+
+export interface SkillItem {
+  title?: LocalizedText
+  jobDesc?: LocalizedText[]
+}
+
+export interface CampusItem {
+  title?: LocalizedText
   jobTime?: string[]
   jobDesc?: LocalizedText[]
 }
@@ -113,6 +122,8 @@ export interface ResumeConfig {
   profile: Profile
   education: Array<EducationConfig>
   experience: Array<ExperienceConfig>
+  skills?: Array<SkillItem>
+  campus?: Array<CampusItem>
   projects?: Array<Project>
   awards?: Array<Award>
   research?: ResumeConfig
