@@ -29,6 +29,8 @@
   "section": {
     "education": "学歴",
     "experience": "職務経験",
+    "skills": "スキル",
+    "campus": "キャンパス経験",
     "projects": "プロジェクト",
     "awards": "受賞"
   }

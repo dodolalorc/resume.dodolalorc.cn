@@ -29,6 +29,8 @@
   "section": {
     "education": "教育經歷",
     "experience": "工作經歷",
+    "skills": "掌握技能",
+    "campus": "校園經歷",
     "projects": "項目經歷",
     "awards": "獎項"
   }
