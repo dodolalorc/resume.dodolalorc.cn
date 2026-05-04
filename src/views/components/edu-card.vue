@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { EducationConfig, ResumeLocale } from '@/types/resume'
-import IconLogo from '@/components/icon-logo.vue'
+import type { ResumeThemeSectionTitleStyle } from '@/themes/types'
+import SectionHeaderBar from '@/views/components/common/section-header-bar.vue'
 import { resolveLocalizedList, resolveLocalizedText } from '@/utils/localized'
 
 const props = withDefaults(
@@ -8,11 +9,13 @@ const props = withDefaults(
     editable?: boolean
     locale?: ResumeLocale
     themeKey?: string
+    titleStyle?: ResumeThemeSectionTitleStyle
     enableTitleBackground?: boolean
   }>(),
   {
     locale: 'zh',
     themeKey: '',
+    titleStyle: 'divider',
     enableTitleBackground: false,
   },
 )
@@ -41,24 +44,13 @@ const courseText = (item: EducationConfig) =>
 </script>
 <template>
   <div class="edu-shell" :class="{ 'is-research': isResearchTheme() }">
-    <div
-      class="edu-header resume-section-header"
-      :class="{ 'has-title-background': enableTitleBackground }"
-    >
-      <h2
-        class="edu-title resume-section-title"
-        :class="{ 'with-background': enableTitleBackground }"
-      >
-        教育经历
-      </h2>
-      <hr
-        class="edu-divider resume-section-divider"
-        :class="{ 'with-background': enableTitleBackground }"
-      />
-      <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
-        <IconLogo name="edit" />
-      </button>
-    </div>
+    <SectionHeaderBar
+      title="教育经历"
+      :editable="editable"
+      :enable-title-background="enableTitleBackground"
+      :title-style="titleStyle"
+      @edit="emit('edit')"
+    />
     <div v-for="(item, index) in edu" :key="index" class="edu-item">
       <span class="edu-school">{{ resolveLocalizedText(item.school, props.locale) }}</span>
       <span
@@ -100,20 +92,6 @@ const courseText = (item: EducationConfig) =>
 <style scoped>
 .edu-shell {
   width: 100%;
-  .edu-header {
-    .section-edit-btn {
-      border: 0;
-      background: transparent;
-      cursor: pointer;
-      color: #666;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      margin-left: 10px;
-    }
-  }
-
   .edu-item {
     margin: var(--resume-block-gap, 10px) 0;
     .edu-school {
@@ -173,20 +151,6 @@ const courseText = (item: EducationConfig) =>
 }
 
 .edu-shell.is-research {
-  .edu-header {
-    margin: var(--resume-section-gap, 7px) 0 4px;
-    border-bottom: 1px solid #111;
-    justify-content: space-between;
-  }
-
-  .edu-title {
-    font-size: var(--resume-text-lg, 16px);
-  }
-
-  .edu-divider {
-    display: none;
-  }
-
   .edu-item {
     margin: 6px 0 0;
   }

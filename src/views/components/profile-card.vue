@@ -138,12 +138,19 @@ const researchSubtitle = computed(() =>
     .join(' | '),
 )
 
+const PROFILE_AVATAR_SCALE_FACTOR = 0.82
+
+const resolvedAvatarSize = computed(() => {
+  const rawSize = profile.value.avatar?.size || 140
+  return Math.round(rawSize * PROFILE_AVATAR_SCALE_FACTOR)
+})
+
 const avatarCssWidth = computed(
-  () => `calc(${profile.value.avatar?.size || 140}px * var(--resume-avatar-scale, 1))`,
+  () => `calc(${resolvedAvatarSize.value}px * var(--resume-avatar-scale, 1))`,
 )
 
 const avatarCssHeight = computed(() => {
-  const size = profile.value.avatar?.size || 140
+  const size = resolvedAvatarSize.value
   const scale = 'var(--resume-avatar-scale, 1)'
   if (profile.value.avatar?.rounded) {
     // 圆形：正方形

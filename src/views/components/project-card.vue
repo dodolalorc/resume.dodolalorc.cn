@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Project, ResumeLocale } from '@/types/resume'
-import IconLogo from '@/components/icon-logo.vue'
+import type { ResumeThemeSectionTitleStyle } from '@/themes/types'
+import SectionHeaderBar from '@/views/components/common/section-header-bar.vue'
 import { renderInlineMarkdown, resolveLocalizedText } from '@/utils/localized'
 
 const props = withDefaults(
@@ -8,11 +9,13 @@ const props = withDefaults(
     editable?: boolean
     locale?: ResumeLocale
     themeKey?: string
+    titleStyle?: ResumeThemeSectionTitleStyle
     enableTitleBackground?: boolean
   }>(),
   {
     locale: 'zh',
     themeKey: '',
+    titleStyle: 'divider',
     enableTitleBackground: false,
   },
 )
@@ -31,24 +34,13 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
 </script>
 <template>
   <div class="project-shell" :class="{ 'is-research': isResearchTheme() }">
-    <div
-      class="project-header resume-section-header"
-      :class="{ 'has-title-background': enableTitleBackground }"
-    >
-      <h2
-        class="project-title resume-section-title"
-        :class="{ 'with-background': enableTitleBackground }"
-      >
-        项目经历
-      </h2>
-      <hr
-        class="project-divider resume-section-divider"
-        :class="{ 'with-background': enableTitleBackground }"
-      />
-      <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
-        <IconLogo name="edit" />
-      </button>
-    </div>
+    <SectionHeaderBar
+      title="项目经历"
+      :editable="editable"
+      :enable-title-background="enableTitleBackground"
+      :title-style="titleStyle"
+      @edit="emit('edit')"
+    />
     <div v-for="(item, index) in projects" :key="index" class="project-item">
       <span class="project-name">{{ resolveLocalizedText(item.name, props.locale) }}</span>
       <span class="project-time">{{ item.projectTime?.join(' - ') }}</span>
@@ -111,20 +103,6 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
 .project-shell {
   width: 100%;
 
-  .project-header {
-    .section-edit-btn {
-      border: 0;
-      background: transparent;
-      cursor: pointer;
-      color: #666;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      margin-left: 10px;
-    }
-  }
-
   .project-item {
     margin: var(--resume-section-gap, 8px) 0;
 
@@ -182,20 +160,6 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
 }
 
 .project-shell.is-research {
-  .project-header {
-    margin: var(--resume-section-gap, 7px) 0 4px;
-    border-bottom: 1px solid #111;
-    justify-content: space-between;
-  }
-
-  .project-title {
-    font-size: var(--resume-text-lg, 16px);
-  }
-
-  .project-divider {
-    display: none;
-  }
-
   .project-item {
     margin: 6px 0 0;
     padding-bottom: 6px;
