@@ -7,6 +7,8 @@ import type {
   Profile,
   EducationConfig,
   ExperienceConfig,
+  SkillItem,
+  CampusItem,
   Project,
   Award,
   EditorSection,
@@ -18,18 +20,32 @@ import ResumeEditorDrawer from '@/views/modules/resume-editor/resume-editor-draw
 import ProfileCard from './components/profile-card.vue'
 import EduCard from './components/edu-card.vue'
 import ExpCard from './components/exp-card.vue'
+import SkillCard from './components/skill-card.vue'
+import CampusCard from './components/campus-card.vue'
 import ProjectCard from './components/project-card.vue'
 import AwardCard from './components/award-card.vue'
+import ColorPickerPanel from './components/color-picker-panel.vue'
 import cvData from '@/data/cv.json'
 import { exportResumeHTML, printResumePDF } from '@/utils/resume-export'
 import { resolveLocalizedText } from '@/utils/localized'
-import {
-  buildThemeStyleVars,
-  getResumeTheme,
-  resolveThemeSections,
-  resumeThemes,
-  sectionHasData,
-} from '@/themes'
+import { buildThemeStyleVars, getResumeTheme, resumeThemes, sectionHasData } from '@/themes'
+import type { ResumeThemeSectionKey } from '@/themes/types'
+
+type ReorderableSectionKey = Exclude<ResumeThemeSectionKey, 'profile'>
+type ThemeColorSchemeKey =
+  | 'theme-default'
+  | 'business-blue'
+  | 'business-green'
+  | 'business-slate'
+  | 'business-amber'
+
+interface ThemeColorScheme {
+  key: ThemeColorSchemeKey
+  label: string
+  primary: string
+  secondary: string
+  accent: string
+}
 
 const config = ref<Partial<ResumeConfig>>({})
 const profile = ref<Profile>({})
@@ -41,11 +57,13 @@ const researchResume = ref<ResumeConfig>({
   profile: {},
   education: [],
   experience: [],
+  skills: [],
+  campus: [],
   projects: [],
   awards: [],
 })
 const resumeLocale = ref<ResumeLocale>('zh')
-const { locale: appLocale } = useI18n()
+const { locale: appLocale, t } = useI18n()
 const exportingType = ref<'none' | 'pdf' | 'html'>('none')
 const showExportMenu = ref(false)
 const exportMenuRef = ref<HTMLElement | null>(null)
@@ -61,6 +79,7 @@ const importingFromUrl = ref(false)
 const importFileInputRef = ref<HTMLInputElement | null>(null)
 const fontSizeMenuOpen = ref(false)
 const selectedThemeKey = ref('')
+const selectedColorSchemeKey = ref<ThemeColorSchemeKey>('theme-default')
 const resumeSize = ref<ResumeSize>('standard')
 const preserveExportBackground = ref(true)
 const resumeBackground = ref('#fffdf7')
@@ -72,6 +91,8 @@ const RESUME_BACKGROUND_STORAGE_KEY = 'resume-background-v1'
 const RESUME_PRESERVE_BG_STORAGE_KEY = 'resume-preserve-bg-v1'
 const RESUME_LOCALE_STORAGE_KEY = 'resume-locale-v1'
 const ENABLE_TITLE_BACKGROUND_STORAGE_KEY = 'enable-title-background-v1'
+const THEME_SECTION_ORDER_STORAGE_KEY = 'resume-theme-section-order-v1'
+const THEME_COLOR_SCHEME_STORAGE_KEY = 'resume-theme-color-scheme-v1'
 
 const RESUME_SIZE_PRESETS: Array<{
   key: ResumeSize
@@ -111,13 +132,48 @@ const RESUME_SIZE_PRESETS: Array<{
 const RESUME_BACKGROUND_OPTIONS = [
   { key: 'white', label: '纯白', value: '#ffffff' },
   { key: 'gray-white', label: '灰白', value: '#f5f5f4' },
-  { key: 'mist', label: '雾灰白', value: '#f2f4f5' },
   { key: 'blue-white', label: '浅蓝白', value: '#f3f7fb' },
   { key: 'beige', label: '米白', value: '#f7f2e8' },
-  { key: 'linen', label: '亚麻白', value: '#f6f1eb' },
-  { key: 'warm-sand', label: '暖沙白', value: '#f3ede2' },
   { key: 'soft-green', label: '浅鼠尾草', value: '#eff3ee' },
 ] as const
+
+const THEME_COLOR_SCHEMES: ThemeColorScheme[] = [
+  {
+    key: 'theme-default',
+    label: '跟随主题',
+    primary: '',
+    secondary: '',
+    accent: '',
+  },
+  {
+    key: 'business-blue',
+    label: '商务蓝',
+    primary: '#1d4ed8',
+    secondary: '#2563eb',
+    accent: '#0f766e',
+  },
+  {
+    key: 'business-green',
+    label: '商务绿',
+    primary: '#166534',
+    secondary: '#15803d',
+    accent: '#0f766e',
+  },
+  {
+    key: 'business-slate',
+    label: '黑灰',
+    primary: '#1f2937',
+    secondary: '#374151',
+    accent: '#52525b',
+  },
+  {
+    key: 'business-amber',
+    label: '棕黄',
+    primary: '#92400e',
+    secondary: '#b45309',
+    accent: '#78350f',
+  },
+]
 
 const currentTheme = computed(() => getResumeTheme(selectedThemeKey.value))
 const isResearchTheme = computed(() => currentTheme.value.key === 'research-scholar')
@@ -142,6 +198,18 @@ const activeExperience = computed({
     else experience.value = value
   },
 })
+const activeSkills = computed({
+  get: () => (isResearchTheme.value ? researchResume.value.skills || [] : []),
+  set: (value: SkillItem[]) => {
+    if (isResearchTheme.value) researchResume.value.skills = value
+  },
+})
+const activeCampus = computed({
+  get: () => (isResearchTheme.value ? researchResume.value.campus || [] : []),
+  set: (value: CampusItem[]) => {
+    if (isResearchTheme.value) researchResume.value.campus = value
+  },
+})
 const activeProjects = computed({
   get: () => (isResearchTheme.value ? researchResume.value.projects || [] : projects.value),
   set: (value: Project[]) => {
@@ -159,9 +227,140 @@ const activeAwards = computed({
 const sectionCounts = computed(() => ({
   education: activeEducation.value.length,
   experience: activeExperience.value.length,
+  skills: activeSkills.value.length,
+  campus: activeCampus.value.length,
   projects: activeProjects.value.length,
   awards: activeAwards.value.length,
 }))
+const themeSectionOrderMap = ref<Record<string, ReorderableSectionKey[]>>({})
+const draggedSectionKey = ref<ReorderableSectionKey | null>(null)
+const draggedSectionIndex = ref<number | null>(null)
+
+const getThemeBaseSectionOrder = (themeKey: string): ReorderableSectionKey[] => {
+  return getResumeTheme(themeKey).layout.sectionOrder.filter(
+    (section): section is ReorderableSectionKey => section !== 'profile',
+  )
+}
+
+const normalizeThemeSectionOrder = (
+  themeKey: string,
+  customOrder: unknown,
+): ReorderableSectionKey[] => {
+  const baseOrder = getThemeBaseSectionOrder(themeKey)
+  if (!Array.isArray(customOrder)) return baseOrder
+
+  const allowSet = new Set(baseOrder)
+  const normalizedOrder: ReorderableSectionKey[] = []
+
+  for (const section of customOrder) {
+    if (typeof section !== 'string') continue
+    if (!allowSet.has(section as ReorderableSectionKey)) continue
+    const nextSection = section as ReorderableSectionKey
+    if (!normalizedOrder.includes(nextSection)) {
+      normalizedOrder.push(nextSection)
+    }
+  }
+
+  for (const section of baseOrder) {
+    if (!normalizedOrder.includes(section)) {
+      normalizedOrder.push(section)
+    }
+  }
+
+  return normalizedOrder
+}
+
+const ensureThemeSectionOrder = (themeKey: string) => {
+  const normalizedOrder = normalizeThemeSectionOrder(themeKey, themeSectionOrderMap.value[themeKey])
+  themeSectionOrderMap.value = {
+    ...themeSectionOrderMap.value,
+    [themeKey]: normalizedOrder,
+  }
+}
+
+const updateCurrentThemeSectionOrder = (nextOrder: ReorderableSectionKey[]) => {
+  const themeKey = currentTheme.value.key
+  themeSectionOrderMap.value = {
+    ...themeSectionOrderMap.value,
+    [themeKey]: normalizeThemeSectionOrder(themeKey, nextOrder),
+  }
+}
+
+const moveCurrentThemeSection = (fromIndex: number, toIndex: number) => {
+  const currentOrder = normalizeThemeSectionOrder(
+    currentTheme.value.key,
+    themeSectionOrderMap.value[currentTheme.value.key],
+  )
+  if (fromIndex === toIndex) return
+  if (
+    fromIndex < 0 ||
+    toIndex < 0 ||
+    fromIndex >= currentOrder.length ||
+    toIndex >= currentOrder.length
+  ) {
+    return
+  }
+
+  const nextOrder = [...currentOrder]
+  const [movedSection] = nextOrder.splice(fromIndex, 1)
+  nextOrder.splice(toIndex, 0, movedSection)
+  updateCurrentThemeSectionOrder(nextOrder)
+}
+
+const onSectionDragStart = (sectionKey: ReorderableSectionKey, index: number, event: DragEvent) => {
+  draggedSectionKey.value = sectionKey
+  draggedSectionIndex.value = index
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.dropEffect = 'move'
+  }
+}
+
+const onSectionDragOver = (index: number, event: DragEvent) => {
+  if (draggedSectionIndex.value === null) return
+  event.preventDefault()
+  if (draggedSectionIndex.value === index) return
+  moveCurrentThemeSection(draggedSectionIndex.value, index)
+  draggedSectionIndex.value = index
+}
+
+const onSectionDrop = (event: DragEvent) => {
+  event.preventDefault()
+  draggedSectionKey.value = null
+  draggedSectionIndex.value = null
+}
+
+const onSectionDragEnd = () => {
+  draggedSectionKey.value = null
+  draggedSectionIndex.value = null
+}
+
+const effectiveThemeSectionOrder = computed<ResumeThemeSectionKey[]>(() => {
+  const baseOrder = currentTheme.value.layout.sectionOrder
+  const reorderedSections = normalizeThemeSectionOrder(
+    currentTheme.value.key,
+    themeSectionOrderMap.value[currentTheme.value.key],
+  )
+
+  let reorderIndex = 0
+  return baseOrder.map((section) => {
+    if (section === 'profile') return section
+    const mappedSection = reorderedSections[reorderIndex]
+    reorderIndex += 1
+    return mappedSection ?? section
+  })
+})
+
+const orderableSections = computed(() =>
+  normalizeThemeSectionOrder(
+    currentTheme.value.key,
+    themeSectionOrderMap.value[currentTheme.value.key],
+  ).map((sectionKey) => ({
+    key: sectionKey,
+    label: t(`section.${sectionKey}`),
+    count: sectionCounts.value[sectionKey],
+  })),
+)
 const currentSizePreset = computed(
   () => RESUME_SIZE_PRESETS.find((item) => item.key === resumeSize.value) ?? RESUME_SIZE_PRESETS[2],
 )
@@ -180,7 +379,13 @@ const exportingText = computed(() => {
 })
 
 const themeSections = computed(() => {
-  const { sidebarSections, mainSections } = resolveThemeSections(currentTheme.value)
+  const sidebarSet = new Set(currentTheme.value.layout.sidebarSections)
+  const sidebarSections = effectiveThemeSectionOrder.value.filter((section) =>
+    sidebarSet.has(section),
+  )
+  const mainSections = effectiveThemeSectionOrder.value.filter(
+    (section) => !sidebarSet.has(section),
+  )
   return {
     sidebarSections: sidebarSections.filter((section) =>
       sectionHasData(section, sectionCounts.value),
@@ -199,20 +404,44 @@ const groupedThemes = computed(() => [
   },
 ])
 
-const resumeScaleStyle = computed(() =>
-  buildThemeStyleVars(currentTheme.value, {
+const currentColorScheme = computed(
+  () =>
+    THEME_COLOR_SCHEMES.find((item) => item.key === selectedColorSchemeKey.value) ||
+    THEME_COLOR_SCHEMES[0],
+)
+
+const currentBackgroundLabel = computed(() => {
+  const preset = RESUME_BACKGROUND_OPTIONS.find((item) => item.value === resumeBackground.value)
+  return preset?.label || '自定义颜色'
+})
+
+const resumeScaleStyle = computed(() => {
+  const baseStyle = buildThemeStyleVars(currentTheme.value, {
     backgroundColor: resumeBackground.value,
     fontScale: currentSizePreset.value.scale,
     titleScale: currentSizePreset.value.titleScale,
     avatarScale: currentSizePreset.value.avatarScale,
-  }),
-)
+  })
+
+  if (currentColorScheme.value.key === 'theme-default') {
+    return baseStyle
+  }
+
+  return {
+    ...baseStyle,
+    '--color-primary': currentColorScheme.value.primary,
+    '--color-secondary': currentColorScheme.value.secondary,
+    '--color-accent': currentColorScheme.value.accent,
+  }
+})
 
 const resumeData = computed<ResumeConfig>({
   get: () => ({
     profile: activeProfile.value,
     education: activeEducation.value,
     experience: activeExperience.value,
+    skills: activeSkills.value,
+    campus: activeCampus.value,
     projects: activeProjects.value,
     awards: activeAwards.value,
   }),
@@ -235,6 +464,8 @@ const applyResumeData = (payload: Partial<ResumeConfig>) => {
     profile: payload.research?.profile || {},
     education: payload.research?.education || [],
     experience: payload.research?.experience || [],
+    skills: payload.research?.skills || [],
+    campus: payload.research?.campus || [],
     projects: payload.research?.projects || [],
     awards: payload.research?.awards || [],
   }
@@ -276,14 +507,16 @@ const setTheme = (key: string) => {
   if (previousTheme.key !== nextTheme.key) {
     applyThemeDefaults()
   }
+
+  ensureThemeSectionOrder(nextTheme.key)
 }
 
 const setResumeSize = (size: ResumeSize) => {
   resumeSize.value = size
 }
 
-const setResumeBackground = (color: string) => {
-  resumeBackground.value = color
+const setThemeColorScheme = (key: ThemeColorSchemeKey) => {
+  selectedColorSchemeKey.value = key
 }
 
 const togglePreserveExportBackground = () => {
@@ -457,6 +690,26 @@ watch(enableTitleBackground, (value) => {
   }
 })
 
+watch(selectedColorSchemeKey, (value) => {
+  try {
+    localStorage.setItem(THEME_COLOR_SCHEME_STORAGE_KEY, value)
+  } catch (error) {
+    console.warn('保存主题色配置失败:', error)
+  }
+})
+
+watch(
+  themeSectionOrderMap,
+  (value) => {
+    try {
+      localStorage.setItem(THEME_SECTION_ORDER_STORAGE_KEY, JSON.stringify(value))
+    } catch (error) {
+      console.warn('保存模块顺序配置失败:', error)
+    }
+  },
+  { deep: true },
+)
+
 watch(resumeLocale, (value) => {
   appLocale.value = value === 'zh' ? 'zhHans' : 'en'
   try {
@@ -517,6 +770,41 @@ onMounted(() => {
     }
   } catch (error) {
     console.warn('读取标题背景配置失败:', error)
+  }
+
+  try {
+    const cachedThemeSectionOrder = localStorage.getItem(THEME_SECTION_ORDER_STORAGE_KEY)
+    if (cachedThemeSectionOrder) {
+      const parsed = JSON.parse(cachedThemeSectionOrder) as Record<string, unknown>
+      if (parsed && typeof parsed === 'object') {
+        const normalizedOrderMap: Record<string, ReorderableSectionKey[]> = {}
+        for (const theme of resumeThemes) {
+          normalizedOrderMap[theme.key] = normalizeThemeSectionOrder(theme.key, parsed[theme.key])
+        }
+        themeSectionOrderMap.value = normalizedOrderMap
+      }
+    }
+  } catch (error) {
+    console.warn('读取模块顺序配置失败:', error)
+  }
+
+  if (Object.keys(themeSectionOrderMap.value).length === 0) {
+    const fallbackOrderMap: Record<string, ReorderableSectionKey[]> = {}
+    for (const theme of resumeThemes) {
+      fallbackOrderMap[theme.key] = getThemeBaseSectionOrder(theme.key)
+    }
+    themeSectionOrderMap.value = fallbackOrderMap
+  }
+
+  ensureThemeSectionOrder(selectedThemeKey.value)
+
+  try {
+    const cachedColorScheme = localStorage.getItem(THEME_COLOR_SCHEME_STORAGE_KEY)
+    if (cachedColorScheme && THEME_COLOR_SCHEMES.some((item) => item.key === cachedColorScheme)) {
+      selectedColorSchemeKey.value = cachedColorScheme as ThemeColorSchemeKey
+    }
+  } catch (error) {
+    console.warn('读取主题色配置失败:', error)
   }
 
   try {
@@ -616,109 +904,175 @@ onBeforeUnmount(() => {
               </div>
             </div>
 
-            <div class="panel-section">
-              <div class="font-size-panel-header compact">
-                <span class="font-size-panel-title">主题风格</span>
-                <span class="font-size-panel-value">{{ currentTheme.name }}</span>
+            <div class="font-size-panel-grid">
+              <div class="panel-section">
+                <div class="font-size-panel-header compact">
+                  <span class="font-size-panel-title">主题风格</span>
+                  <span class="font-size-panel-value">{{ currentTheme.name }}</span>
+                </div>
+
+                <div
+                  class="theme-switcher settings-theme-switcher"
+                  role="radiogroup"
+                  aria-label="简历主题"
+                >
+                  <template v-for="group in groupedThemes" :key="group.label">
+                    <div class="theme-group-label">{{ group.label }}</div>
+                    <button
+                      v-for="theme in group.themes"
+                      :key="theme.key"
+                      class="theme-pill"
+                      :class="{ active: theme.key === currentTheme.key }"
+                      :aria-checked="theme.key === currentTheme.key"
+                      role="radio"
+                      @click="setTheme(theme.key)"
+                    >
+                      <span
+                        class="theme-pill-chip"
+                        :style="{ backgroundColor: theme.palette.primary }"
+                      ></span>
+                      <span class="theme-pill-name">{{ theme.name }}</span>
+                      <span class="theme-pill-category">{{ theme.category }}</span>
+                    </button>
+                  </template>
+                </div>
               </div>
 
-              <div
-                class="theme-switcher settings-theme-switcher"
-                role="radiogroup"
-                aria-label="简历主题"
-              >
-                <template v-for="group in groupedThemes" :key="group.label">
-                  <div class="theme-group-label">{{ group.label }}</div>
+              <div class="panel-section">
+                <div class="font-size-panel-header compact">
+                  <span class="font-size-panel-title">模块排列顺序</span>
+                  <span class="font-size-panel-value">拖拽调整</span>
+                </div>
+
+                <div class="section-order-list" role="list" aria-label="模块排列顺序">
+                  <div
+                    v-for="(section, index) in orderableSections"
+                    :key="section.key"
+                    class="section-order-item"
+                    :class="{ dragging: draggedSectionKey === section.key }"
+                    role="listitem"
+                    draggable="true"
+                    @dragstart="onSectionDragStart(section.key, index, $event)"
+                    @dragover="onSectionDragOver(index, $event)"
+                    @drop="onSectionDrop($event)"
+                    @dragend="onSectionDragEnd"
+                  >
+                    <span class="section-order-handle" aria-hidden="true">::</span>
+                    <span class="section-order-name">{{ section.label }}</span>
+                    <span class="section-order-count">{{ section.count }}</span>
+                  </div>
+                </div>
+
+                <p class="section-order-tip">拖拽模块名称可调整顺序，个人信息固定不参与排序。</p>
+              </div>
+
+              <div class="panel-section">
+                <div class="font-size-panel-header compact">
+                  <span class="font-size-panel-title">主题色配置模块</span>
+                  <span class="font-size-panel-value">{{ currentColorScheme.label }}</span>
+                </div>
+
+                <div class="theme-color-schemes" role="radiogroup" aria-label="主题色配置">
                   <button
-                    v-for="theme in group.themes"
-                    :key="theme.key"
-                    class="theme-pill"
-                    :class="{ active: theme.key === currentTheme.key }"
-                    :aria-checked="theme.key === currentTheme.key"
+                    v-for="scheme in THEME_COLOR_SCHEMES"
+                    :key="scheme.key"
+                    class="theme-color-chip"
+                    :class="{ active: scheme.key === selectedColorSchemeKey }"
+                    :aria-checked="scheme.key === selectedColorSchemeKey"
                     role="radio"
-                    @click="setTheme(theme.key)"
+                    @click="setThemeColorScheme(scheme.key)"
                   >
                     <span
-                      class="theme-pill-chip"
-                      :style="{ backgroundColor: theme.palette.primary }"
-                    ></span>
-                    <span class="theme-pill-name">{{ theme.name }}</span>
-                    <span class="theme-pill-category">{{ theme.category }}</span>
+                      v-if="scheme.key === 'theme-default'"
+                      class="theme-color-default-badge"
+                      aria-hidden="true"
+                      >A</span
+                    >
+                    <span v-else class="theme-color-dots" aria-hidden="true">
+                      <span
+                        class="theme-color-dot"
+                        :style="{ backgroundColor: scheme.primary }"
+                      ></span>
+                      <span
+                        class="theme-color-dot"
+                        :style="{ backgroundColor: scheme.secondary }"
+                      ></span>
+                      <span
+                        class="theme-color-dot"
+                        :style="{ backgroundColor: scheme.accent }"
+                      ></span>
+                    </span>
+                    <span class="theme-color-name">{{ scheme.label }}</span>
                   </button>
-                </template>
-              </div>
-            </div>
-
-            <div class="panel-section">
-              <div class="font-size-panel-header">
-                <span class="font-size-panel-title">整体字体大小</span>
-                <span class="font-size-panel-value">{{ currentSizePreset.label }}</span>
+                </div>
               </div>
 
-              <div class="font-size-track" role="radiogroup" aria-label="整体字体大小">
-                <button
-                  v-for="(preset, index) in RESUME_SIZE_PRESETS"
-                  :key="preset.key"
-                  class="font-size-step"
-                  :class="{ active: preset.key === resumeSize }"
-                  :style="{ '--dot-size': `${12 + index * 4}px` }"
-                  :aria-checked="preset.key === resumeSize"
-                  :title="preset.label"
-                  role="radio"
-                  @click="setResumeSize(preset.key)"
-                >
-                  <span class="font-size-step-axis">
-                    <span class="font-size-step-dot"></span>
-                  </span>
-                  <span class="font-size-step-label">{{ preset.shortLabel }}</span>
-                </button>
-              </div>
-            </div>
+              <div class="panel-section">
+                <div class="font-size-panel-header compact">
+                  <span class="font-size-panel-title">简历背景色</span>
+                  <span class="font-size-panel-value">{{ currentBackgroundLabel }}</span>
+                </div>
 
-            <div class="panel-section">
-              <label class="toggle-row">
-                <input
-                  :checked="preserveExportBackground"
-                  type="checkbox"
-                  @change="togglePreserveExportBackground"
+                <ColorPickerPanel
+                  v-model="resumeBackground"
+                  :presets="RESUME_BACKGROUND_OPTIONS"
+                  custom-label="自定义颜色"
                 />
-                <span>导出时保留当前背景色</span>
-              </label>
-            </div>
-
-            <div class="panel-section">
-              <label class="toggle-row">
-                <input v-model="enableTitleBackground" type="checkbox" />
-                <span>填充标题背景色</span>
-              </label>
-            </div>
-
-            <div class="panel-section">
-              <div class="font-size-panel-header compact">
-                <span class="font-size-panel-title">简历背景色</span>
-                <span class="font-size-panel-value">
-                  {{
-                    RESUME_BACKGROUND_OPTIONS.find((item) => item.value === resumeBackground)
-                      ?.label || '自定义'
-                  }}
-                </span>
               </div>
 
-              <div class="background-swatches">
-                <button
-                  v-for="option in RESUME_BACKGROUND_OPTIONS"
-                  :key="option.key"
-                  class="background-swatch"
-                  :class="{ active: option.value === resumeBackground }"
-                  :title="option.label"
-                  @click="setResumeBackground(option.value)"
-                >
-                  <span
-                    class="background-swatch-chip"
-                    :style="{ backgroundColor: option.value }"
-                  ></span>
-                  <span class="background-swatch-label">{{ option.label }}</span>
-                </button>
+              <div class="panel-section">
+                <div class="font-size-panel-header">
+                  <span class="font-size-panel-title">整体字体大小</span>
+                  <span class="font-size-panel-value">{{ currentSizePreset.label }}</span>
+                </div>
+
+                <div class="font-size-track" role="radiogroup" aria-label="整体字体大小">
+                  <button
+                    v-for="(preset, index) in RESUME_SIZE_PRESETS"
+                    :key="preset.key"
+                    class="font-size-step"
+                    :class="{ active: preset.key === resumeSize }"
+                    :style="{ '--dot-size': `${12 + index * 4}px` }"
+                    :aria-checked="preset.key === resumeSize"
+                    :title="preset.label"
+                    role="radio"
+                    @click="setResumeSize(preset.key)"
+                  >
+                    <span class="font-size-step-axis">
+                      <span class="font-size-step-dot"></span>
+                    </span>
+                    <span class="font-size-step-label">{{ preset.shortLabel }}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="panel-section panel-section-wide">
+                <div class="font-size-panel-header compact">
+                  <span class="font-size-panel-title">开关卡片区</span>
+                  <span class="font-size-panel-value">显示与导出</span>
+                </div>
+
+                <div class="toggle-card-grid">
+                  <label class="toggle-card">
+                    <span class="toggle-card-main">
+                      <span class="toggle-card-title">导出背景</span>
+                      <span class="toggle-card-desc">导出时保留当前背景色</span>
+                    </span>
+                    <input
+                      :checked="preserveExportBackground"
+                      type="checkbox"
+                      @change="togglePreserveExportBackground"
+                    />
+                  </label>
+
+                  <label class="toggle-card">
+                    <span class="toggle-card-main">
+                      <span class="toggle-card-title">标题背景</span>
+                      <span class="toggle-card-desc">填充标题背景色</span>
+                    </span>
+                    <input v-model="enableTitleBackground" type="checkbox" />
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -754,15 +1108,34 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :title-style="currentTheme.layout.sectionTitleStyle"
               :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('education')"
+            />
+            <SkillCard
+              v-else-if="section === 'skills'"
+              v-model:skills="activeSkills"
+              :editable="isEditing"
+              :locale="resumeLocale"
+              :title-style="currentTheme.layout.sectionTitleStyle"
+              :enable-title-background="enableTitleBackground"
+              @edit="openSectionEditor('skills')"
+            />
+            <CampusCard
+              v-else-if="section === 'campus'"
+              v-model:campus="activeCampus"
+              :editable="isEditing"
+              :locale="resumeLocale"
+              :title-style="currentTheme.layout.sectionTitleStyle"
+              :enable-title-background="enableTitleBackground"
+              @edit="openSectionEditor('campus')"
             />
             <ExpCard
               v-else-if="section === 'experience'"
               v-model:experience="activeExperience"
               :editable="isEditing"
               :locale="resumeLocale"
-              :theme-key="currentTheme.key"
+              :title-style="currentTheme.layout.sectionTitleStyle"
               :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('experience')"
             />
@@ -772,6 +1145,7 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :title-style="currentTheme.layout.sectionTitleStyle"
               :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('projects')"
             />
@@ -781,6 +1155,7 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :title-style="currentTheme.layout.sectionTitleStyle"
               :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('awards')"
             />
@@ -803,15 +1178,34 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :title-style="currentTheme.layout.sectionTitleStyle"
               :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('education')"
+            />
+            <SkillCard
+              v-else-if="section === 'skills'"
+              v-model:skills="activeSkills"
+              :editable="isEditing"
+              :locale="resumeLocale"
+              :title-style="currentTheme.layout.sectionTitleStyle"
+              :enable-title-background="enableTitleBackground"
+              @edit="openSectionEditor('skills')"
+            />
+            <CampusCard
+              v-else-if="section === 'campus'"
+              v-model:campus="activeCampus"
+              :editable="isEditing"
+              :locale="resumeLocale"
+              :title-style="currentTheme.layout.sectionTitleStyle"
+              :enable-title-background="enableTitleBackground"
+              @edit="openSectionEditor('campus')"
             />
             <ExpCard
               v-else-if="section === 'experience'"
               v-model:experience="activeExperience"
               :editable="isEditing"
               :locale="resumeLocale"
-              :theme-key="currentTheme.key"
+              :title-style="currentTheme.layout.sectionTitleStyle"
               :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('experience')"
             />
@@ -821,6 +1215,7 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :title-style="currentTheme.layout.sectionTitleStyle"
               :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('projects')"
             />
@@ -830,6 +1225,7 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :title-style="currentTheme.layout.sectionTitleStyle"
               :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('awards')"
             />
@@ -1061,8 +1457,9 @@ onBeforeUnmount(() => {
 .font-size-panel {
   position: absolute;
   right: 0;
+  transform: translateX(min(50%, calc((100vw - min(794px, calc(100vw - 24px))) / 2 - 12px)));
   top: calc(100% + 8px);
-  width: 360px;
+  width: min(720px, calc(100vw - 24px));
   padding: 16px 18px 18px;
   background-color: var(--resume-theme-paper);
   border: 1px solid var(--resume-theme-border);
@@ -1075,6 +1472,12 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.font-size-panel-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px 16px;
 }
 
 .theme-panel-title {
@@ -1205,9 +1608,191 @@ onBeforeUnmount(() => {
 }
 
 .panel-section {
-  margin-top: 18px;
-  padding-top: 14px;
+  margin-top: 0;
+  padding-top: 12px;
   border-top: 1px solid var(--resume-theme-divider);
+  min-width: 0;
+}
+
+.panel-section-wide {
+  grid-column: 1 / -1;
+}
+
+.section-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-order-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--resume-theme-border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--resume-theme-paper) 92%, white);
+  padding: 9px 10px;
+  cursor: grab;
+  user-select: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.section-order-item:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+.section-order-item:active {
+  cursor: grabbing;
+}
+
+.section-order-item.dragging {
+  opacity: 0.72;
+  border-color: var(--color-primary);
+  transform: scale(0.99);
+}
+
+.section-order-handle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--resume-theme-subtle);
+}
+
+.section-order-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--resume-theme-text);
+}
+
+.section-order-count {
+  font-size: 12px;
+  color: var(--resume-theme-subtle);
+}
+
+.section-order-tip {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--resume-theme-subtle);
+}
+
+.theme-color-schemes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.theme-color-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid var(--resume-theme-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--resume-theme-paper) 94%, white);
+  color: var(--resume-theme-text);
+  padding: 8px 10px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.theme-color-chip:hover,
+.theme-color-chip.active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 10%, transparent);
+  transform: translateY(-1px);
+}
+
+.theme-color-dots {
+  display: inline-flex;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.theme-color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.theme-color-default-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--resume-theme-subtle);
+  border: 1px solid var(--resume-theme-border);
+}
+
+.theme-color-name {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.toggle-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.toggle-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--resume-theme-border);
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--resume-theme-paper) 92%, white);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.toggle-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 10%, transparent);
+  transform: translateY(-1px);
+}
+
+.toggle-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.toggle-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--resume-theme-text);
+}
+
+.toggle-card-desc {
+  font-size: 12px;
+  color: var(--resume-theme-subtle);
+}
+
+.toggle-card input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  flex: 0 0 auto;
 }
 
 .toggle-row {
@@ -1223,48 +1808,6 @@ onBeforeUnmount(() => {
   width: 16px;
   height: 16px;
   accent-color: var(--color-primary);
-}
-
-.background-swatches {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.background-swatch {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  border: 1px solid var(--resume-theme-border);
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--resume-theme-paper) 90%, white);
-  padding: 8px 10px;
-  cursor: pointer;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
-}
-
-.background-swatch:hover,
-.background-swatch.active {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 10%, transparent);
-  transform: translateY(-1px);
-}
-
-.background-swatch-chip {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  flex: 0 0 auto;
-}
-
-.background-swatch-label {
-  font-size: 12px;
-  color: var(--resume-theme-text);
 }
 
 .export-options {
@@ -1512,7 +2055,21 @@ onBeforeUnmount(() => {
   .font-size-panel {
     left: 0;
     right: auto;
-    width: min(360px, calc(100vw - 24px));
+    transform: none;
+    width: min(560px, calc(100vw - 24px));
+  }
+
+  .font-size-panel-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .theme-color-schemes {
+    grid-template-columns: 1fr;
+  }
+
+  .toggle-card-grid {
+    grid-template-columns: 1fr;
   }
 
   .resume-shell,
@@ -1532,8 +2089,9 @@ onBeforeUnmount(() => {
     justify-content: flex-start;
   }
 
-  .background-swatches {
-    grid-template-columns: 1fr;
+  .font-size-panel {
+    width: min(420px, calc(100vw - 24px));
+    transform: none;
   }
 
   .import-url-row {
