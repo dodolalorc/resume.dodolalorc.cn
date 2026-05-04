@@ -35,9 +35,20 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
   <div class="exp-shell" :class="{ 'is-research': isResearchTheme() }">
     <template v-if="isResearchTheme()">
       <div v-if="skills().length" class="research-section">
-        <div class="exp-header">
-          <h2 class="exp-title" :class="{ 'with-background': enableTitleBackground }">掌握技能</h2>
-          <hr class="exp-divider" />
+        <div
+          class="exp-header resume-section-header"
+          :class="{ 'has-title-background': enableTitleBackground }"
+        >
+          <h2
+            class="exp-title resume-section-title"
+            :class="{ 'with-background': enableTitleBackground }"
+          >
+            掌握技能
+          </h2>
+          <hr
+            class="exp-divider resume-section-divider"
+            :class="{ 'with-background': enableTitleBackground }"
+          />
           <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
             <IconLogo name="edit" />
           </button>
@@ -56,9 +67,20 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
       </div>
 
       <div v-if="campus().length" class="research-section">
-        <div class="exp-header">
-          <h2 class="exp-title" :class="{ 'with-background': enableTitleBackground }">校园经历</h2>
-          <hr class="exp-divider" />
+        <div
+          class="exp-header resume-section-header"
+          :class="{ 'has-title-background': enableTitleBackground }"
+        >
+          <h2
+            class="exp-title resume-section-title"
+            :class="{ 'with-background': enableTitleBackground }"
+          >
+            校园经历
+          </h2>
+          <hr
+            class="exp-divider resume-section-divider"
+            :class="{ 'with-background': enableTitleBackground }"
+          />
           <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
             <IconLogo name="edit" />
           </button>
@@ -77,9 +99,20 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
       </div>
     </template>
     <template v-else>
-      <div class="exp-header">
-        <h2 class="exp-title" :class="{ 'with-background': enableTitleBackground }">工作经历</h2>
-        <hr class="exp-divider" />
+      <div
+        class="exp-header resume-section-header"
+        :class="{ 'has-title-background': enableTitleBackground }"
+      >
+        <h2
+          class="exp-title resume-section-title"
+          :class="{ 'with-background': enableTitleBackground }"
+        >
+          工作经历
+        </h2>
+        <hr
+          class="exp-divider resume-section-divider"
+          :class="{ 'with-background': enableTitleBackground }"
+        />
         <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
           <IconLogo name="edit" />
         </button>
@@ -110,38 +143,6 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
   width: 100%;
 
   .exp-header {
-    display: flex;
-    align-items: flex-end;
-    margin: var(--resume-block-gap, 10px) 0;
-
-    .exp-title {
-      font-size: var(--resume-text-xl, 24px);
-      font-weight: bold;
-      margin: 0;
-      padding: 0;
-      letter-spacing: 0.15em;
-
-      &.with-background {
-        display: inline-block;
-        background-color: var(--color-primary);
-        color: white;
-        padding: 4px 20px 4px 10px;
-        line-height: 1.2;
-        clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 100%, 0 100%);
-        font-weight: 600;
-      }
-    }
-
-    .exp-divider {
-      flex: 1;
-      height: 2px;
-      background-color: var(--color-primary);
-      margin-left: -2px;
-      border: 0;
-      align-self: flex-end;
-      margin-bottom: 0;
-    }
-
     .section-edit-btn {
       border: 0;
       background: transparent;

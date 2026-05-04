@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './base.css';
+@import '../styles/resume-section-header.css';
 
 :root {
   --paper-bg: #f3efe6;

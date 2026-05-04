@@ -1,0 +1,46 @@
+.resume-section-header {
+  display: flex;
+  align-items: center;
+  margin: var(--resume-block-gap, 10px) 0;
+}
+
+.resume-section-title {
+  font-size: var(--resume-text-xl, 24px);
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+  letter-spacing: 0.15em;
+}
+
+.resume-section-title.with-background {
+  display: inline-block;
+  background-color: var(--color-primary);
+  color: white;
+  padding: 4px 20px 4px 10px;
+  line-height: 1.2;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 100%, 0 100%);
+  font-weight: 600;
+}
+
+.resume-section-divider {
+  flex: 1;
+  height: 1px;
+  background-color: color-mix(in srgb, var(--color-primary) 45%, white);
+  margin-left: 8px;
+  border: 0;
+  margin-bottom: 0;
+}
+
+.resume-section-divider.with-background {
+  height: 2px;
+  background-color: var(--color-primary);
+}
+
+.resume-section-header.has-title-background {
+  align-items: flex-end;
+}
+
+.resume-section-header.has-title-background .resume-section-divider {
+  margin-left: -2px;
+  align-self: flex-end;
+}
