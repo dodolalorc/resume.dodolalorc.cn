@@ -58,9 +58,7 @@ const removeDesc = (item: ExperienceConfig, index: number) => {
   <div class="section-content">
     <div class="section-header">
       <h3 class="section-title">工作经历</h3>
-      <button class="action-btn add" @click="addExperience">
-        <IconLogo name="add" /> 新增
-      </button>
+      <button class="action-btn add" @click="addExperience"><IconLogo name="add" /> 新增</button>
     </div>
 
     <div v-for="(item, idx) in experienceList()" :key="idx" class="card">
@@ -72,20 +70,6 @@ const removeDesc = (item: ExperienceConfig, index: number) => {
       </div>
 
       <div class="form-grid">
-        <FormInput
-          :model-value="fieldText(item, 'title')"
-          label="科研模块标题"
-          placeholder="如：编程与工程工具 / 学院开源社团"
-          @update:model-value="updateFieldText(item, 'title', $event)"
-        />
-        <label class="form-label">
-          <span>内容类型</span>
-          <select v-model="item.kind" class="form-select">
-            <option value="work">工作经历</option>
-            <option value="skills">掌握技能</option>
-            <option value="campus">校园经历</option>
-          </select>
-        </label>
         <FormInput
           :model-value="fieldText(item, 'company')"
           label="公司"

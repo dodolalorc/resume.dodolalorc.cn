@@ -19,6 +19,8 @@ const sectionLabels: Record<EditorSection, string> = {
   profile: '基本信息',
   education: '教育经历',
   experience: '工作经历',
+  skills: '掌握技能',
+  campus: '校园经历',
   projects: '项目经历',
   awards: '奖项',
 }
@@ -85,7 +87,11 @@ watch(
             v-model:resume="resume"
             :locale="locale"
           />
-          <SectionAwards v-else-if="section === 'awards'" v-model:resume="resume" :locale="locale" />
+          <SectionAwards
+            v-else-if="section === 'awards'"
+            v-model:resume="resume"
+            :locale="locale"
+          />
         </div>
       </div>
     </div>
