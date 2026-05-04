@@ -64,12 +64,14 @@ const selectedThemeKey = ref('')
 const resumeSize = ref<ResumeSize>('standard')
 const preserveExportBackground = ref(true)
 const resumeBackground = ref('#fffdf7')
+const enableTitleBackground = ref(false)
 
 const RESUME_THEME_STORAGE_KEY = 'resume-theme-preset-v1'
 const RESUME_SIZE_STORAGE_KEY = 'resume-font-size-v1'
 const RESUME_BACKGROUND_STORAGE_KEY = 'resume-background-v1'
 const RESUME_PRESERVE_BG_STORAGE_KEY = 'resume-preserve-bg-v1'
 const RESUME_LOCALE_STORAGE_KEY = 'resume-locale-v1'
+const ENABLE_TITLE_BACKGROUND_STORAGE_KEY = 'enable-title-background-v1'
 
 const RESUME_SIZE_PRESETS: Array<{
   key: ResumeSize
@@ -447,6 +449,14 @@ watch(preserveExportBackground, (value) => {
   }
 })
 
+watch(enableTitleBackground, (value) => {
+  try {
+    localStorage.setItem(ENABLE_TITLE_BACKGROUND_STORAGE_KEY, JSON.stringify(value))
+  } catch (error) {
+    console.warn('保存标题背景配置失败:', error)
+  }
+})
+
 watch(resumeLocale, (value) => {
   appLocale.value = value === 'zh' ? 'zhHans' : 'en'
   try {
@@ -498,6 +508,15 @@ onMounted(() => {
     }
   } catch (error) {
     console.warn('读取导出背景配置失败:', error)
+  }
+
+  try {
+    const cachedTitleBackground = localStorage.getItem(ENABLE_TITLE_BACKGROUND_STORAGE_KEY)
+    if (cachedTitleBackground !== null) {
+      enableTitleBackground.value = JSON.parse(cachedTitleBackground)
+    }
+  } catch (error) {
+    console.warn('读取标题背景配置失败:', error)
   }
 
   try {
@@ -668,6 +687,16 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="panel-section">
+              <label class="toggle-row">
+                <input
+                  v-model="enableTitleBackground"
+                  type="checkbox"
+                />
+                <span>填充标题背景色</span>
+              </label>
+            </div>
+
+            <div class="panel-section">
               <div class="font-size-panel-header compact">
                 <span class="font-size-panel-title">简历背景色</span>
                 <span class="font-size-panel-value">
@@ -728,6 +757,7 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('education')"
             />
             <ExpCard
@@ -736,6 +766,7 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('experience')"
             />
             <ProjectCard
@@ -744,6 +775,7 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('projects')"
             />
             <AwardCard
@@ -752,6 +784,7 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('awards')"
             />
           </template>
@@ -773,6 +806,7 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('education')"
             />
             <ExpCard
@@ -781,6 +815,7 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('experience')"
             />
             <ProjectCard
@@ -789,6 +824,7 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('projects')"
             />
             <AwardCard
@@ -797,6 +833,7 @@ onBeforeUnmount(() => {
               :editable="isEditing"
               :locale="resumeLocale"
               :theme-key="currentTheme.key"
+              :enable-title-background="enableTitleBackground"
               @edit="openSectionEditor('awards')"
             />
           </template>

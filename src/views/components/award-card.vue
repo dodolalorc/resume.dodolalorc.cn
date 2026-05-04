@@ -7,9 +7,11 @@ const props = withDefaults(defineProps<{
   editable?: boolean
   locale?: ResumeLocale
   themeKey?: string
+  enableTitleBackground?: boolean
 }>(), {
   locale: 'zh',
   themeKey: '',
+  enableTitleBackground: false,
 })
 
 const emit = defineEmits<{
@@ -27,7 +29,7 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
 <template>
   <div class="award-shell" :class="{ 'is-research': isResearchTheme() }">
     <div class="award-header">
-      <h2 class="award-title">奖项</h2>
+      <h2 class="award-title" :class="{ 'with-background': enableTitleBackground }">奖项</h2>
       <hr class="award-divider" />
       <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
         <IconLogo name="edit" />
@@ -55,6 +57,14 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
       font-size: var(--resume-text-xl, 24px);
       font-weight: bold;
       margin: 0;
+      padding: 0;
+      
+      &.with-background {
+        display: inline-block;
+        background-color: color-mix(in srgb, var(--color-primary) 12%, white);
+        padding: 2px 8px;
+        border-radius: 3px;
+      }
     }
 
     .award-divider {
@@ -63,6 +73,8 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
       background-color: #eee;
       margin-left: 20px;
       border: 0;
+      align-self: flex-end;
+      margin-bottom: 0.35em;
     }
 
     .section-edit-btn {
