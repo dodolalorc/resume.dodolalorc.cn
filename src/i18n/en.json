@@ -29,6 +29,8 @@
   "section": {
     "education": "Education",
     "experience": "Experience",
+    "skills": "Skills",
+    "campus": "Campus Experience",
     "projects": "Projects",
     "awards": "Awards"
   }
