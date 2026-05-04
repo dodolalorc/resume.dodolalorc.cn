@@ -3,16 +3,19 @@ import type { EducationConfig, ResumeLocale } from '@/types/resume'
 import IconLogo from '@/components/icon-logo.vue'
 import { resolveLocalizedList, resolveLocalizedText } from '@/utils/localized'
 
-const props = withDefaults(defineProps<{
-  editable?: boolean
-  locale?: ResumeLocale
-  themeKey?: string
-  enableTitleBackground?: boolean
-}>(), {
-  locale: 'zh',
-  themeKey: '',
-  enableTitleBackground: false,
-})
+const props = withDefaults(
+  defineProps<{
+    editable?: boolean
+    locale?: ResumeLocale
+    themeKey?: string
+    enableTitleBackground?: boolean
+  }>(),
+  {
+    locale: 'zh',
+    themeKey: '',
+    enableTitleBackground: false,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'edit'): void
@@ -51,7 +54,8 @@ const courseText = (item: EducationConfig) =>
         v-for="tag in resolveLocalizedList(item.schoolTags, props.locale)"
         :key="tag"
         class="edu-tag"
-      >{{ tag }}</span>
+        >{{ tag }}</span
+      >
       <span class="edu-time">{{ item.eduTime?.join(' - ') }}</span>
       <span class="edu-degree">{{ resolveLocalizedText(item.degree, props.locale) }}</span>
       <span class="edu-major">{{ resolveLocalizedText(item.major, props.locale) }}</span>
@@ -59,12 +63,17 @@ const courseText = (item: EducationConfig) =>
         v-for="tag in resolveLocalizedList(item.majorTags, props.locale)"
         :key="tag"
         class="edu-tag major-tag"
-      >{{ tag }}</span>
+        >{{ tag }}</span
+      >
       <div class="edu-desc" v-html="resolveLocalizedText(item.eduDesc, props.locale)"></div>
       <template v-if="isResearchTheme()">
         <div class="edu-research-meta">
-          <span v-if="resolveLocalizedText(item.gpa, props.locale)">GPA：{{ resolveLocalizedText(item.gpa, props.locale) }}</span>
-          <span v-if="resolveLocalizedText(item.ranking, props.locale)">排名：{{ resolveLocalizedText(item.ranking, props.locale) }}</span>
+          <span v-if="resolveLocalizedText(item.gpa, props.locale)"
+            >GPA：{{ resolveLocalizedText(item.gpa, props.locale) }}</span
+          >
+          <span v-if="resolveLocalizedText(item.ranking, props.locale)"
+            >排名：{{ resolveLocalizedText(item.ranking, props.locale) }}</span
+          >
           <span v-if="resolveLocalizedList(item.languageCertificates, props.locale).length">
             语言证书：{{ resolveLocalizedList(item.languageCertificates, props.locale).join('，') }}
           </span>
@@ -90,7 +99,7 @@ const courseText = (item: EducationConfig) =>
       margin: 0;
       padding: 0;
       letter-spacing: 0.15em;
-      
+
       &.with-background {
         display: inline-block;
         background-color: var(--color-primary);

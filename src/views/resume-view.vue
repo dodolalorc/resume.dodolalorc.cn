@@ -688,10 +688,7 @@ onBeforeUnmount(() => {
 
             <div class="panel-section">
               <label class="toggle-row">
-                <input
-                  v-model="enableTitleBackground"
-                  type="checkbox"
-                />
+                <input v-model="enableTitleBackground" type="checkbox" />
                 <span>填充标题背景色</span>
               </label>
             </div>
