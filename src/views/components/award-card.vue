@@ -58,23 +58,26 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
       font-weight: bold;
       margin: 0;
       padding: 0;
+      letter-spacing: 0.15em;
       
       &.with-background {
         display: inline-block;
-        background-color: color-mix(in srgb, var(--color-primary) 12%, white);
-        padding: 2px 8px;
-        border-radius: 3px;
+        background-color: var(--color-primary);
+        color: white;
+        padding: 4px 16px 4px 8px;
+        border-radius: 0 12px 12px 0;
+        font-weight: 600;
       }
     }
 
     .award-divider {
       flex: 1;
-      height: 1px;
-      background-color: #eee;
-      margin-left: 20px;
+      height: 2px;
+      background-color: var(--color-primary);
+      margin-left: 0;
       border: 0;
       align-self: flex-end;
-      margin-bottom: 0.35em;
+      margin-bottom: 0.4em;
     }
 
     .section-edit-btn {
