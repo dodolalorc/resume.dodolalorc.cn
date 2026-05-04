@@ -7,9 +7,11 @@ const props = withDefaults(defineProps<{
   editable?: boolean
   locale?: ResumeLocale
   themeKey?: string
+  enableTitleBackground?: boolean
 }>(), {
   locale: 'zh',
   themeKey: '',
+  enableTitleBackground: false,
 })
 
 const emit = defineEmits<{
@@ -31,7 +33,7 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
     <template v-if="isResearchTheme()">
       <div v-if="skills().length" class="research-section">
         <div class="exp-header">
-          <h2 class="exp-title">掌握技能</h2>
+          <h2 class="exp-title" :class="{ 'with-background': enableTitleBackground }">掌握技能</h2>
           <hr class="exp-divider" />
           <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
             <IconLogo name="edit" />
@@ -47,7 +49,7 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
 
       <div v-if="campus().length" class="research-section">
         <div class="exp-header">
-          <h2 class="exp-title">校园经历</h2>
+          <h2 class="exp-title" :class="{ 'with-background': enableTitleBackground }">校园经历</h2>
           <hr class="exp-divider" />
           <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
             <IconLogo name="edit" />
@@ -63,7 +65,7 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
     </template>
     <template v-else>
     <div class="exp-header">
-      <h2 class="exp-title">工作经历</h2>
+      <h2 class="exp-title" :class="{ 'with-background': enableTitleBackground }">工作经历</h2>
       <hr class="exp-divider" />
       <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
         <IconLogo name="edit" />
@@ -103,6 +105,14 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
       font-size: var(--resume-text-xl, 24px);
       font-weight: bold;
       margin: 0;
+      padding: 0;
+      
+      &.with-background {
+        display: inline-block;
+        background-color: color-mix(in srgb, var(--color-primary) 12%, white);
+        padding: 2px 8px;
+        border-radius: 3px;
+      }
     }
 
     .exp-divider {
@@ -111,6 +121,8 @@ const campus = () => experience.value.filter((item) => item.kind === 'campus')
       background-color: #eee;
       margin-left: 20px;
       border: 0;
+      align-self: flex-end;
+      margin-bottom: 0.35em;
     }
 
     .section-edit-btn {
