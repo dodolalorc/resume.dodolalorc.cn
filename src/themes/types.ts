@@ -4,6 +4,8 @@ export type ResumeThemeSectionKey =
   | 'profile'
   | 'education'
   | 'experience'
+  | 'skills'
+  | 'campus'
   | 'projects'
   | 'awards'
 
