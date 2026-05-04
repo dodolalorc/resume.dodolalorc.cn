@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Award, ResumeLocale } from '@/types/resume'
-import IconLogo from '@/components/icon-logo.vue'
+import type { ResumeThemeSectionTitleStyle } from '@/themes/types'
+import SectionHeaderBar from '@/views/components/common/section-header-bar.vue'
 import { resolveLocalizedText } from '@/utils/localized'
 
 const props = withDefaults(
@@ -8,11 +9,13 @@ const props = withDefaults(
     editable?: boolean
     locale?: ResumeLocale
     themeKey?: string
+    titleStyle?: ResumeThemeSectionTitleStyle
     enableTitleBackground?: boolean
   }>(),
   {
     locale: 'zh',
     themeKey: '',
+    titleStyle: 'divider',
     enableTitleBackground: false,
   },
 )
@@ -31,24 +34,13 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
 </script>
 <template>
   <div class="award-shell" :class="{ 'is-research': isResearchTheme() }">
-    <div
-      class="award-header resume-section-header"
-      :class="{ 'has-title-background': enableTitleBackground }"
-    >
-      <h2
-        class="award-title resume-section-title"
-        :class="{ 'with-background': enableTitleBackground }"
-      >
-        奖项
-      </h2>
-      <hr
-        class="award-divider resume-section-divider"
-        :class="{ 'with-background': enableTitleBackground }"
-      />
-      <button v-if="editable" class="section-edit-btn" @click="emit('edit')">
-        <IconLogo name="edit" />
-      </button>
-    </div>
+    <SectionHeaderBar
+      title="奖项"
+      :editable="editable"
+      :enable-title-background="enableTitleBackground"
+      :title-style="titleStyle"
+      @edit="emit('edit')"
+    />
     <div v-for="(item, index) in awards" :key="index" class="award-item">
       <span class="award-name">{{ resolveLocalizedText(item.title, props.locale) }}</span>
       <span class="award-level" v-if="resolveLocalizedText(item.issuer, props.locale)">{{
@@ -67,20 +59,6 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
 <style scoped>
 .award-shell {
   width: 100%;
-
-  .award-header {
-    .section-edit-btn {
-      border: 0;
-      background: transparent;
-      cursor: pointer;
-      color: #666;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      margin-left: 10px;
-    }
-  }
 
   .award-item {
     margin: var(--resume-section-gap, 8px) 0;
@@ -108,20 +86,6 @@ const isResearchTheme = () => props.themeKey === 'research-scholar'
 }
 
 .award-shell.is-research {
-  .award-header {
-    margin: var(--resume-section-gap, 7px) 0 4px;
-    border-bottom: 1px solid #111;
-    justify-content: space-between;
-  }
-
-  .award-title {
-    font-size: var(--resume-text-lg, 16px);
-  }
-
-  .award-divider {
-    display: none;
-  }
-
   .award-item {
     margin: 5px 0;
     font-size: var(--resume-text-base, 14px);
