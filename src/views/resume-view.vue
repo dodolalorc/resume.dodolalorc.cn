@@ -62,8 +62,8 @@ const researchResume = ref<ResumeConfig>({
   projects: [],
   awards: [],
 })
-const resumeLocale = ref<ResumeLocale>('zh')
-const { locale: appLocale, t } = useI18n()
+const resumeLocale: ResumeLocale = 'zh'
+const { t } = useI18n()
 const exportingType = ref<'none' | 'pdf' | 'html'>('none')
 const showExportMenu = ref(false)
 const exportMenuRef = ref<HTMLElement | null>(null)
@@ -89,7 +89,6 @@ const RESUME_THEME_STORAGE_KEY = 'resume-theme-preset-v1'
 const RESUME_SIZE_STORAGE_KEY = 'resume-font-size-v1'
 const RESUME_BACKGROUND_STORAGE_KEY = 'resume-background-v1'
 const RESUME_PRESERVE_BG_STORAGE_KEY = 'resume-preserve-bg-v1'
-const RESUME_LOCALE_STORAGE_KEY = 'resume-locale-v1'
 const ENABLE_TITLE_BACKGROUND_STORAGE_KEY = 'enable-title-background-v1'
 const THEME_SECTION_ORDER_STORAGE_KEY = 'resume-theme-section-order-v1'
 const THEME_COLOR_SCHEME_STORAGE_KEY = 'resume-theme-color-scheme-v1'
@@ -366,10 +365,7 @@ const currentSizePreset = computed(
 )
 const isExporting = computed(() => exportingType.value !== 'none')
 const currentProfileName = computed(() =>
-  resolveLocalizedText(activeProfile.value.name, resumeLocale.value),
-)
-const languageText = computed(() =>
-  resumeLocale.value === 'zh' ? 'Switch to English' : '切换中文',
+  resolveLocalizedText(activeProfile.value.name, resumeLocale),
 )
 const modeText = computed(() => (isEditing.value ? '编辑模式' : '预览模式'))
 const exportingText = computed(() => {
@@ -521,11 +517,6 @@ const setThemeColorScheme = (key: ThemeColorSchemeKey) => {
 
 const togglePreserveExportBackground = () => {
   preserveExportBackground.value = !preserveExportBackground.value
-}
-
-const toggleResumeLocale = () => {
-  resumeLocale.value = resumeLocale.value === 'zh' ? 'en' : 'zh'
-  appLocale.value = resumeLocale.value === 'zh' ? 'zhHans' : 'en'
 }
 
 const handleDocumentClick = (event: MouseEvent) => {
@@ -710,15 +701,6 @@ watch(
   { deep: true },
 )
 
-watch(resumeLocale, (value) => {
-  appLocale.value = value === 'zh' ? 'zhHans' : 'en'
-  try {
-    localStorage.setItem(RESUME_LOCALE_STORAGE_KEY, value)
-  } catch (error) {
-    console.warn('保存语言配置失败:', error)
-  }
-})
-
 onMounted(() => {
   document.addEventListener('click', handleDocumentClick)
 
@@ -808,16 +790,6 @@ onMounted(() => {
   }
 
   try {
-    const cachedLocale = localStorage.getItem(RESUME_LOCALE_STORAGE_KEY) as ResumeLocale | null
-    if (cachedLocale === 'zh' || cachedLocale === 'en') {
-      resumeLocale.value = cachedLocale
-      appLocale.value = cachedLocale === 'zh' ? 'zhHans' : 'en'
-    }
-  } catch (error) {
-    console.warn('读取语言配置失败:', error)
-  }
-
-  try {
     config.value = cvData as ResumeConfig
     applyResumeData(config.value)
   } catch (error) {
@@ -836,18 +808,7 @@ onBeforeUnmount(() => {
       <div class="toolbar-meta">
         <div class="mode-tag">{{ modeText }}</div>
         <div class="theme-intro">
-          <span class="theme-name-row">
-            <span class="theme-name">{{ currentTheme.name }}</span>
-            <button
-              class="language-icon-btn"
-              :disabled="isExporting"
-              :title="languageText"
-              :aria-label="languageText"
-              @click="toggleResumeLocale"
-            >
-              <LogoIcon name="globe" />
-            </button>
-          </span>
+          <span class="theme-name">{{ currentTheme.name }}</span>
           <span class="theme-description">{{ currentTheme.description }}</span>
         </div>
       </div>
@@ -1333,42 +1294,6 @@ onBeforeUnmount(() => {
 .theme-description {
   font-size: 13px;
   color: var(--resume-theme-muted);
-}
-
-.theme-name-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.language-icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 26px;
-  height: 26px;
-  padding: 0;
-  border: 1px solid var(--resume-theme-border);
-  border-radius: 50%;
-  background: var(--resume-theme-button-bg);
-  color: var(--resume-theme-muted);
-  cursor: pointer;
-  transition:
-    border-color 0.2s ease,
-    color 0.2s ease,
-    background-color 0.2s ease;
-}
-
-.language-icon-btn:hover:not(:disabled) {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: color-mix(in srgb, var(--color-primary) 8%, white);
-}
-
-.language-icon-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .toolbar-actions {
