@@ -1,0 +1,49 @@
+.agents/plans/architecture-baseline.md
+  s_c4fdd4cedc33e5::t_d4779b5af8d6f3 16-22
+.agents/skills/resume-data.md
+  s_c4fdd4cedc33e5::t_91fda6393f5ab1 8,20
+README.md
+  s_c6ddd6a4192bf5::t_6f6609bf15f1cd 167,170
+bun.lock
+  s_c4fdd4cedc33e5::t_fbf1329ca0883a 432
+src/data/cv.json
+  s_c4fdd4cedc33e5::t_1fd5ad70da0219 2,408
+src/i18n/index.ts
+  s_c4fdd4cedc33e5::t_b83e56c25f5692 5,11
+src/types/resume.ts
+  s_c4fdd4cedc33e5::t_24ba405df3ce23 9,15,21-28,37-38,57,128,136-144
+src/utils/__tests__/resume-import.test.ts
+  s_c4fdd4cedc33e5::t_5b186325f3eb6d 1-39
+src/utils/resume-import.ts
+  s_c4fdd4cedc33e5::t_73c7bbf826bace 3,5-9,12-13,15-16,18-23,25-29,31-36,38-40,42-44,46-47,49-60
+src/views/components/resume-import-dialog.vue
+  s_c4fdd4cedc33e5::t_e81f79a4066aa1 2-4,6,8,11-15,17-19,22,24-36,39-61,64-72,74,76-101,103-119
+src/views/resume-view.vue
+  s_c4fdd4cedc33e5::t_f07ab18a4c8332 28,84,443-453,536,588-609,612,614,616,618,620-652,654,656,659-668,679,1104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "e2d600b501e7aedd8c1a5dee77bb84df22672e11",
+  "prompts": {},
+  "sessions": {
+    "s_c4fdd4cedc33e5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6a9f-4105-7d83-a1dc-80f9471471ff",
+        "model": "unknown"
+      },
+      "human_author": "dodola <dodolalorc@gmail.com>"
+    },
+    "s_c6ddd6a4192bf5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6aa3-499f-72e2-96dc-bb66609a6499",
+        "model": "unknown"
+      },
+      "human_author": "dodola <dodolalorc@gmail.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
