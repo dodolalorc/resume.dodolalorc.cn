@@ -25,6 +25,7 @@ import CampusCard from './components/campus-card.vue'
 import ProjectCard from './components/project-card.vue'
 import AwardCard from './components/award-card.vue'
 import ColorPickerPanel from './components/color-picker-panel.vue'
+import ResumeImportDialog from './components/resume-import-dialog.vue'
 import cvData from '@/data/cv.json'
 import { exportResumeHTML, printResumePDF } from '@/utils/resume-export'
 import { resolveLocalizedText } from '@/utils/localized'
@@ -72,11 +73,6 @@ const isEditing = ref(false)
 const drawerOpen = ref(false)
 const activeSection = ref<EditorSection>('profile')
 const importDialogOpen = ref(false)
-const importJsonText = ref('')
-const importUrl = ref('')
-const importError = ref('')
-const importingFromUrl = ref(false)
-const importFileInputRef = ref<HTMLInputElement | null>(null)
 const fontSizeMenuOpen = ref(false)
 const selectedThemeKey = ref('')
 const selectedColorSchemeKey = ref<ThemeColorSchemeKey>('theme-default')
@@ -85,13 +81,7 @@ const preserveExportBackground = ref(true)
 const resumeBackground = ref('#fffdf7')
 const enableTitleBackground = ref(false)
 
-const RESUME_THEME_STORAGE_KEY = 'resume-theme-preset-v1'
-const RESUME_SIZE_STORAGE_KEY = 'resume-font-size-v1'
-const RESUME_BACKGROUND_STORAGE_KEY = 'resume-background-v1'
-const RESUME_PRESERVE_BG_STORAGE_KEY = 'resume-preserve-bg-v1'
-const ENABLE_TITLE_BACKGROUND_STORAGE_KEY = 'enable-title-background-v1'
-const THEME_SECTION_ORDER_STORAGE_KEY = 'resume-theme-section-order-v1'
-const THEME_COLOR_SCHEME_STORAGE_KEY = 'resume-theme-color-scheme-v1'
+const PREFERENCES_STORAGE_KEY = 'resume-preferences-v2'
 
 const RESUME_SIZE_PRESETS: Array<{
   key: ResumeSize
@@ -450,6 +440,17 @@ const resumeData = computed<ResumeConfig>({
   },
 })
 
+/** The complete portable document. Unlike `resumeData`, this never drops the inactive theme. */
+const documentData = computed<ResumeConfig>(() => ({
+  schemaVersion: 1,
+  profile: profile.value,
+  education: education.value,
+  experience: experience.value,
+  projects: projects.value,
+  awards: awards.value,
+  research: researchResume.value,
+}))
+
 const applyResumeData = (payload: Partial<ResumeConfig>) => {
   profile.value = payload.profile || {}
   education.value = payload.education || []
@@ -532,7 +533,7 @@ const handleDocumentClick = (event: MouseEvent) => {
 
 const exportResumeJSON = () => {
   const fileBaseName = currentProfileName.value || 'resume'
-  const blob = new Blob([JSON.stringify(resumeData.value, null, 2)], {
+  const blob = new Blob([JSON.stringify(documentData.value, null, 2)], {
     type: 'application/json;charset=utf-8',
   })
   const url = URL.createObjectURL(blob)
@@ -584,120 +585,87 @@ const startExport = async (mode: 'html' | 'pdf' | 'json') => {
   }
 }
 
-const triggerImportFile = () => {
-  importFileInputRef.value?.click()
+interface StoredPreferences {
+  themeKey?: string
+  resumeSize?: ResumeSize
+  background?: string
+  preserveExportBackground?: boolean
+  enableTitleBackground?: boolean
+  colorScheme?: ThemeColorSchemeKey
+  sectionOrder?: Record<string, unknown>
 }
 
-const onImportFileChange = async (event: Event) => {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-  if (!file) return
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
 
+const persistPreferences = () => {
+  const preferences: StoredPreferences = {
+    themeKey: selectedThemeKey.value,
+    resumeSize: resumeSize.value,
+    background: resumeBackground.value,
+    preserveExportBackground: preserveExportBackground.value,
+    enableTitleBackground: enableTitleBackground.value,
+    colorScheme: selectedColorSchemeKey.value,
+    sectionOrder: themeSectionOrderMap.value,
+  }
   try {
-    importJsonText.value = await file.text()
-    importError.value = ''
-  } catch {
-    importError.value = '读取文件失败，请重试'
-  } finally {
-    input.value = ''
+    localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify(preferences))
+  } catch (error) {
+    console.warn('保存简历偏好失败:', error)
   }
 }
 
-const fetchImportFromUrl = async () => {
-  if (!importUrl.value.trim()) {
-    importError.value = '请先输入在线 JSON URL'
-    return
-  }
-
-  importingFromUrl.value = true
-  importError.value = ''
-
+const loadPreferences = () => {
   try {
-    const response = await fetch(importUrl.value.trim())
-    if (!response.ok) {
-      importError.value = `URL 请求失败：${response.status}`
-      return
+    const raw = localStorage.getItem(PREFERENCES_STORAGE_KEY)
+    if (!raw) return
+    const parsed: unknown = JSON.parse(raw)
+    if (!isRecord(parsed)) return
+    const preferences = parsed as StoredPreferences
+
+    if (preferences.themeKey) {
+      selectedThemeKey.value = getResumeTheme(preferences.themeKey).key
+      applyThemeDefaults()
     }
-
-    importJsonText.value = await response.text()
-  } catch {
-    importError.value = 'URL 读取失败，请检查链接是否可访问'
-  } finally {
-    importingFromUrl.value = false
+    if (preferences.resumeSize && RESUME_SIZE_PRESETS.some((item) => item.key === preferences.resumeSize)) {
+      resumeSize.value = preferences.resumeSize
+    }
+    if (typeof preferences.background === 'string') resumeBackground.value = preferences.background
+    if (typeof preferences.preserveExportBackground === 'boolean') {
+      preserveExportBackground.value = preferences.preserveExportBackground
+    }
+    if (typeof preferences.enableTitleBackground === 'boolean') {
+      enableTitleBackground.value = preferences.enableTitleBackground
+    }
+    if (preferences.colorScheme && THEME_COLOR_SCHEMES.some((item) => item.key === preferences.colorScheme)) {
+      selectedColorSchemeKey.value = preferences.colorScheme
+    }
+    if (isRecord(preferences.sectionOrder)) {
+      const normalizedOrderMap: Record<string, ReorderableSectionKey[]> = {}
+      for (const theme of resumeThemes) {
+        normalizedOrderMap[theme.key] = normalizeThemeSectionOrder(
+          theme.key,
+          preferences.sectionOrder[theme.key],
+        )
+      }
+      themeSectionOrderMap.value = normalizedOrderMap
+    }
+  } catch (error) {
+    console.warn('读取简历偏好失败，已使用默认值:', error)
   }
 }
-
-const applyImport = () => {
-  try {
-    const parsed = JSON.parse(importJsonText.value || '{}') as Partial<ResumeConfig>
-    applyResumeData(parsed)
-    importDialogOpen.value = false
-    importJsonText.value = ''
-    importUrl.value = ''
-    importError.value = ''
-  } catch {
-    importError.value = 'JSON 解析失败，请检查格式'
-  }
-}
-
-watch(selectedThemeKey, (value) => {
-  if (!value) return
-  try {
-    localStorage.setItem(RESUME_THEME_STORAGE_KEY, value)
-  } catch (error) {
-    console.warn('保存主题配置失败:', error)
-  }
-})
-
-watch(resumeSize, (value) => {
-  try {
-    localStorage.setItem(RESUME_SIZE_STORAGE_KEY, value)
-  } catch (error) {
-    console.warn('保存字体大小配置失败:', error)
-  }
-})
-
-watch(resumeBackground, (value) => {
-  try {
-    localStorage.setItem(RESUME_BACKGROUND_STORAGE_KEY, value)
-  } catch (error) {
-    console.warn('保存背景色配置失败:', error)
-  }
-})
-
-watch(preserveExportBackground, (value) => {
-  try {
-    localStorage.setItem(RESUME_PRESERVE_BG_STORAGE_KEY, JSON.stringify(value))
-  } catch (error) {
-    console.warn('保存导出背景配置失败:', error)
-  }
-})
-
-watch(enableTitleBackground, (value) => {
-  try {
-    localStorage.setItem(ENABLE_TITLE_BACKGROUND_STORAGE_KEY, JSON.stringify(value))
-  } catch (error) {
-    console.warn('保存标题背景配置失败:', error)
-  }
-})
-
-watch(selectedColorSchemeKey, (value) => {
-  try {
-    localStorage.setItem(THEME_COLOR_SCHEME_STORAGE_KEY, value)
-  } catch (error) {
-    console.warn('保存主题色配置失败:', error)
-  }
-})
 
 watch(
-  themeSectionOrderMap,
-  (value) => {
-    try {
-      localStorage.setItem(THEME_SECTION_ORDER_STORAGE_KEY, JSON.stringify(value))
-    } catch (error) {
-      console.warn('保存模块顺序配置失败:', error)
-    }
-  },
+  [
+    selectedThemeKey,
+    resumeSize,
+    resumeBackground,
+    preserveExportBackground,
+    enableTitleBackground,
+    selectedColorSchemeKey,
+    themeSectionOrderMap,
+  ],
+  persistPreferences,
   { deep: true },
 )
 
@@ -708,67 +676,7 @@ onMounted(() => {
   selectedThemeKey.value = initialTheme.key
   applyThemeDefaults()
 
-  try {
-    const cachedTheme = localStorage.getItem(RESUME_THEME_STORAGE_KEY)
-    if (cachedTheme) {
-      selectedThemeKey.value = getResumeTheme(cachedTheme).key
-      applyThemeDefaults()
-    }
-  } catch (error) {
-    console.warn('读取主题配置失败:', error)
-  }
-
-  try {
-    const cachedSize = localStorage.getItem(RESUME_SIZE_STORAGE_KEY) as ResumeSize | null
-    if (cachedSize && RESUME_SIZE_PRESETS.some((item) => item.key === cachedSize)) {
-      resumeSize.value = cachedSize
-    }
-  } catch (error) {
-    console.warn('读取字体大小配置失败:', error)
-  }
-
-  try {
-    const cachedBackground = localStorage.getItem(RESUME_BACKGROUND_STORAGE_KEY)
-    if (cachedBackground) {
-      resumeBackground.value = cachedBackground
-    }
-  } catch (error) {
-    console.warn('读取背景色配置失败:', error)
-  }
-
-  try {
-    const cachedPreserveBackground = localStorage.getItem(RESUME_PRESERVE_BG_STORAGE_KEY)
-    if (cachedPreserveBackground !== null) {
-      preserveExportBackground.value = JSON.parse(cachedPreserveBackground)
-    }
-  } catch (error) {
-    console.warn('读取导出背景配置失败:', error)
-  }
-
-  try {
-    const cachedTitleBackground = localStorage.getItem(ENABLE_TITLE_BACKGROUND_STORAGE_KEY)
-    if (cachedTitleBackground !== null) {
-      enableTitleBackground.value = JSON.parse(cachedTitleBackground)
-    }
-  } catch (error) {
-    console.warn('读取标题背景配置失败:', error)
-  }
-
-  try {
-    const cachedThemeSectionOrder = localStorage.getItem(THEME_SECTION_ORDER_STORAGE_KEY)
-    if (cachedThemeSectionOrder) {
-      const parsed = JSON.parse(cachedThemeSectionOrder) as Record<string, unknown>
-      if (parsed && typeof parsed === 'object') {
-        const normalizedOrderMap: Record<string, ReorderableSectionKey[]> = {}
-        for (const theme of resumeThemes) {
-          normalizedOrderMap[theme.key] = normalizeThemeSectionOrder(theme.key, parsed[theme.key])
-        }
-        themeSectionOrderMap.value = normalizedOrderMap
-      }
-    }
-  } catch (error) {
-    console.warn('读取模块顺序配置失败:', error)
-  }
+  loadPreferences()
 
   if (Object.keys(themeSectionOrderMap.value).length === 0) {
     const fallbackOrderMap: Record<string, ReorderableSectionKey[]> = {}
@@ -779,15 +687,6 @@ onMounted(() => {
   }
 
   ensureThemeSectionOrder(selectedThemeKey.value)
-
-  try {
-    const cachedColorScheme = localStorage.getItem(THEME_COLOR_SCHEME_STORAGE_KEY)
-    if (cachedColorScheme && THEME_COLOR_SCHEMES.some((item) => item.key === cachedColorScheme)) {
-      selectedColorSchemeKey.value = cachedColorScheme as ThemeColorSchemeKey
-    }
-  } catch (error) {
-    console.warn('读取主题色配置失败:', error)
-  }
 
   try {
     config.value = cvData as ResumeConfig
@@ -1202,49 +1101,7 @@ onBeforeUnmount(() => {
       :locale="resumeLocale"
     />
 
-    <Transition name="fade">
-      <div v-if="importDialogOpen" class="import-overlay" @click.self="importDialogOpen = false">
-        <div class="import-panel" :style="resumeScaleStyle">
-          <h3 class="import-title">导入简历 JSON</h3>
-          <p class="import-tip">支持上传 JSON 文件、通过在线 URL 拉取、或直接粘贴 JSON 内容。</p>
-
-          <div class="import-actions-row">
-            <button class="export-btn" @click="triggerImportFile">上传 JSON 文件</button>
-            <input
-              ref="importFileInputRef"
-              class="hidden-input"
-              type="file"
-              accept="application/json,.json"
-              @change="onImportFileChange"
-            />
-          </div>
-
-          <div class="import-url-row">
-            <input
-              v-model="importUrl"
-              class="import-url-input"
-              placeholder="在线 JSON URL，例如：https://example.com/resume.json"
-            />
-            <button class="export-btn" :disabled="importingFromUrl" @click="fetchImportFromUrl">
-              {{ importingFromUrl ? '解析中...' : '从 URL 解析' }}
-            </button>
-          </div>
-
-          <textarea
-            v-model="importJsonText"
-            class="import-textarea"
-            placeholder="粘贴 JSON 内容"
-          ></textarea>
-
-          <p v-if="importError" class="import-error">{{ importError }}</p>
-
-          <div class="import-actions-row">
-            <button class="export-btn" @click="importDialogOpen = false">取消</button>
-            <button class="export-btn" @click="applyImport">应用导入</button>
-          </div>
-        </div>
-      </div>
-    </Transition>
+    <ResumeImportDialog v-model:open="importDialogOpen" @import="applyResumeData" />
   </ViewLayout>
 </template>
 
@@ -1872,96 +1729,6 @@ onBeforeUnmount(() => {
   min-width: 0;
 }
 
-.import-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.28);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 60;
-}
-
-.import-panel {
-  width: min(700px, calc(100vw - 24px));
-  background: var(--resume-theme-paper);
-  border: 1px solid var(--resume-theme-border);
-  border-radius: 24px;
-  box-shadow: var(--resume-theme-shadow);
-  padding: 18px;
-}
-
-.import-title {
-  margin: 0;
-  font-size: 20px;
-  color: var(--resume-theme-text);
-}
-
-.import-tip {
-  margin: 6px 0 12px;
-  color: var(--resume-theme-muted);
-  font-size: 13px;
-}
-
-.import-actions-row {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.hidden-input {
-  display: none;
-}
-
-.import-url-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px;
-  margin: 10px 0;
-}
-
-.import-url-input,
-.import-textarea {
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid var(--resume-theme-border);
-  border-radius: 16px;
-  padding: 10px 12px;
-  background: #fff;
-  color: var(--resume-theme-text);
-  outline: none;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.import-url-input:focus,
-.import-textarea:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 16%, transparent);
-}
-
-.import-textarea {
-  min-height: 220px;
-  resize: vertical;
-}
-
-.import-error {
-  margin: 6px 0 0;
-  color: #c53030;
-  font-size: 13px;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
 
 @media (max-width: 960px) {
   .export-toolbar {
@@ -2017,10 +1784,6 @@ onBeforeUnmount(() => {
   .font-size-panel {
     width: min(420px, calc(100vw - 24px));
     transform: none;
-  }
-
-  .import-url-row {
-    grid-template-columns: 1fr;
   }
 
   .resume-shell {

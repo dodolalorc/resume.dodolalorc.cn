@@ -6,19 +6,26 @@ export type LocalizedText = string | {
   en?: string
 }
 
-export interface avatarConfig {
+export interface AvatarConfig {
   url: string
   rounded?: boolean
   size?: number
 }
 
-export interface jobIntention {
+export interface JobIntention {
   position?: LocalizedText
   city?: LocalizedText
   salary?: LocalizedText
 }
 
-export type prependType = 'icon' | 'text' | 'both' | 'none'
+export type PrependType = 'icon' | 'text' | 'both' | 'none'
+
+/** @deprecated Use AvatarConfig. */
+export type avatarConfig = AvatarConfig
+/** @deprecated Use JobIntention. */
+export type jobIntention = JobIntention
+/** @deprecated Use PrependType. */
+export type prependType = PrependType
 
 export interface LinkField {
   url: string
@@ -27,8 +34,8 @@ export interface LinkField {
 
 export interface Profile {
   name?: LocalizedText
-  avatar?: avatarConfig
-  prepend?: prependType
+  avatar?: AvatarConfig
+  prepend?: PrependType
   email?: string
   phone?: string
   school?: LocalizedText
@@ -47,7 +54,7 @@ export interface Profile {
   xiaohongshu?: string
   wechat?: string
   workExpYear?: LocalizedText
-  jobIntention?: jobIntention
+  jobIntention?: JobIntention
 }
 
 export interface ExperienceConfig {
@@ -118,7 +125,7 @@ export interface Award {
   date?: string
 }
 
-export interface ResumeConfig {
+export interface ResumeContent {
   profile: Profile
   education: Array<EducationConfig>
   experience: Array<ExperienceConfig>
@@ -126,5 +133,13 @@ export interface ResumeConfig {
   campus?: Array<CampusItem>
   projects?: Array<Project>
   awards?: Array<Award>
-  research?: ResumeConfig
+}
+
+/** Content rendered by the research template. It intentionally cannot nest another research resume. */
+export type ResearchResumeConfig = ResumeContent
+
+/** Version 1 of the portable JSON document used for import and export. */
+export interface ResumeConfig extends ResumeContent {
+  schemaVersion?: 1
+  research?: ResearchResumeConfig
 }

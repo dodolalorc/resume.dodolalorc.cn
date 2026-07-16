@@ -164,10 +164,10 @@ src/
 | 框架   | Vue 3.5 + Composition API |
 | 语言   | TypeScript                |
 | 构建   | Vite                      |
-| 状态   | Pinia                     |
+| 状态   | Vue Composition API       |
 | 路由   | Vue Router                |
 | 样式   | TailwindCSS + 组件内 CSS  |
-| 界面文案 | vue-i18n（固定 zhHans）  |
+| 界面文案 | vue-i18n（仅简体中文）   |
 | 包管理 | Bun                       |
 
 ## 部署
