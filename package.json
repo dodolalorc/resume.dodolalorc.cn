@@ -18,8 +18,8 @@
     "theme:new": "bun run scripts/create-theme.mjs"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.18",
-    "tailwindcss": "^4.1.18",
+    "@tailwindcss/vite": "4.2.4",
+    "tailwindcss": "4.2.4",
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.5.26",
     "vue-i18n": "^11.2.7",
