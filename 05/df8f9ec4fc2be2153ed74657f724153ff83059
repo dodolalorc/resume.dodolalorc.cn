@@ -1,0 +1,23 @@
+bun.lock
+  s_4e5b2e7ebf2574::t_b2a30efb3285e6 8-9
+package.json
+  s_4e5b2e7ebf2574::t_0634caceb9d48c 21-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "05df8f9ec4fc2be2153ed74657f724153ff83059",
+  "prompts": {},
+  "sessions": {
+    "s_4e5b2e7ebf2574": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f83b9-7b18-7441-bffa-6e968c1f1658",
+        "model": "unknown"
+      },
+      "human_author": "dodola <dodolalorc@gmail.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
